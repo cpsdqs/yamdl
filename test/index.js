@@ -3,6 +3,7 @@ import Button from '../src/button';
 import Checkbox from '../src/checkbox';
 import { CircularProgress } from '../src/progress';
 import TextField from '../src/text-field';
+import { MenuIcon } from '../src/app';
 import './index.less';
 
 const root = document.createElement('div');
@@ -37,6 +38,32 @@ class ProgressDemo extends Component {
                 <p class="demo-description">
                     Tap to change state.
                 </p>
+            </div>
+        );
+    }
+}
+
+class MenuIconDemo extends Component {
+    render (props, state) {
+        return (
+            <div class="demo-region">
+                <h2>Menu Icon</h2>
+                <div class="demo-item" onClick={() => {
+                    this.setState({ i: !state.i });
+                }}>
+                    <MenuIcon type={state.i ? 'back' : ''} />
+                </div>
+                <div class="demo-item" onClick={() => {
+                    this.setState({ j: !state.j });
+                }}>
+                    <MenuIcon type={!state.j ? 'close' : ''} />
+                </div>
+                <div class="demo-item" onClick={() => {
+                    this.setState({ k: !state.k });
+                }}>
+                    <MenuIcon type={state.k ? 'close' : 'back'} />
+                </div>
+                <p class="demo-description">Tap to change state.</p>
             </div>
         );
     }
@@ -78,6 +105,7 @@ function Gallery () {
                 <div class="demo-item"><TextField label="Prefixed" prefix="an icon?" /></div>
                 <div class="demo-item"><TextField center label="Centered" /></div>
             </div>
+            <MenuIconDemo />
         </div>
     );
 }
