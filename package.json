@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "scripts": {
+    "build-test": "cd test && webpack --env prod",
+    "watch-test": "cd test && webpack --watch"
+  },
   "author": "cpsdqs",
   "license": "MIT",
   "devDependencies": {
