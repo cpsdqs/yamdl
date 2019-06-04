@@ -10,6 +10,30 @@ const root = document.createElement('div');
 root.id = 'root';
 document.body.appendChild(root);
 
+class ThemeColorConfig extends Component {
+    defaultValue = '#1883ff';
+
+    state = {
+        value: this.defaultValue,
+    };
+
+    render () {
+        return (
+            <div>
+                <label for="theme-color-config">Primary control color:</label>
+                <input
+                    type="color"
+                    id="theme-color-config"
+                    value={this.state.value}
+                    onChange={e => {
+                        this.setState({ value: e.target.value });
+                        root.style.setProperty('--md-control-primary', e.target.value);
+                    }} />
+            </div>
+        );
+    }
+}
+
 class ProgressDemo extends Component {
     render (props, state) {
         return (
@@ -73,6 +97,7 @@ function Gallery () {
     return (
         <div>
             <h1>Component Gallery</h1>
+            <ThemeColorConfig />
             <div class="demo-region">
                 <h2>Buttons</h2>
                 <div class="demo-item"><Button>button</Button></div>

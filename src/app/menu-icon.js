@@ -56,9 +56,9 @@ const positions = {
         },
         b: {
             // overcompensate with negative width to make it disappear halfway through the animation
-            x: 12 + 18 / 2,
+            x: 12 + 6 / 2,
             y: 11,
-            w: -18,
+            w: -6,
             r: 0,
         },
         c: {
@@ -83,8 +83,8 @@ const positions = {
 ///      show (or interpolate between).
 ///      To avoid strange behavior, the sum of the components should be about 1.
 export default class MenuIcon extends Component {
-    close = new Spring(1, 0.3);
-    back = new Spring(1, 0.3);
+    close = new Spring(1, 0.5);
+    back = new Spring(1, 0.5);
     rotateOut = false;
 
     update (dt) {
