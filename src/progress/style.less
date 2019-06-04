@@ -1,0 +1,34 @@
+@import '../prelude';
+
+.paper-circular-progress-indicator {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    vertical-align: middle;
+
+    .p-inner {
+        width: 48px;
+        height: 48px;
+        transform-origin: 50% 50%;
+
+        .p-path {
+            stroke: @control-primary;
+            stroke-width: 4px;
+            fill: none;
+        }
+    }
+
+    &.small {
+        width: 24px;
+        height: 24px;
+
+        .p-inner {
+            width: 24px;
+            height: 24px;
+
+            .p-path {
+                stroke-width: 3px;
+            }
+        }
+    }
+}
