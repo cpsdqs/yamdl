@@ -1,8 +1,51 @@
 @import '../prelude';
 
 @bar-bg: var(--md-app-bar-bg);
+@bar-fg: var(--md-app-bar-ink);
 
 .paper-app-bar {
     width: 100%;
+    height: 56px;
     background: @bar-bg;
+    color: @bar-fg;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    .elevation(4);
+
+    .p-menu {
+        padding-right: 32px;
+    }
+
+    .p-title {
+        flex: 1;
+        height: 24px;
+        line-height: 24px;
+    }
+
+    .p-title-text {
+        font-weight: 500;
+        font-size: 20px;
+
+        .p-inner {
+            animation: paper-app-bar-title-text-inner-in 0.2s cubic-bezier(.4, 0, .3, 1);
+
+            @keyframes paper-app-bar-title-text-inner-in {
+                from {
+                    opacity: 0;
+                }
+            }
+
+            &.p-out {
+                animation: paper-app-bar-title-text-inner-out 0.2s cubic-bezier(.7, 0, .6, 1) forwards;
+            }
+
+            @keyframes paper-app-bar-title-text-inner-out {
+                to {
+                    opacity: 0;
+                }
+            }
+        }
+    }
 }

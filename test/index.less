@@ -23,6 +23,15 @@ h1 {
         padding: 16px;
         border: 1px solid #eee;
         border-radius: 2px;
+
+        &.app-bar-demo {
+            min-width: 400px;
+
+            @media (max-width: 500px) {
+                min-width: 0;
+                width: 100%;
+            }
+        }
     }
 
     .demo-description {

@@ -91,6 +91,28 @@ class MenuIconDemo extends Component {
     }
 }
 
+class AppBarDemo extends Component {
+    state = { i: 0 };
+    render (props, state) {
+        return (
+            <div class="demo-region">
+                <h2>App Bar</h2>
+                <div class="demo-item app-bar-demo">
+                    <AppBar title="Without Menu" />
+                </div>
+                <div class="demo-item app-bar-demo" onClick={() => {
+                    this.setState({ i: (state.i | 0) + 1 });
+                }}>
+                    <AppBar
+                        menu={<MenuIcon type={['menu', 'back', 'close'][state.i % 3]} />}
+                        title={['Title 1', 'Other Title', 'Words'][state.i % 3]} />
+                </div>
+                <p class="demo-description">Tap to change state.</p>
+            </div>
+        );
+    }
+}
+
 function Gallery () {
     return (
         <div>
@@ -131,12 +153,7 @@ function Gallery () {
                 <div class="demo-item"><TextField center label="Centered" /></div>
             </div>
             <MenuIconDemo />
-            <div class="demo-region">
-                <h2>App Bar</h2>
-                <div class="demo-item">
-                    <AppBar />
-                </div>
-            </div>
+            <AppBarDemo />
         </div>
     );
 }
