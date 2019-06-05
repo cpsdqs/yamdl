@@ -49,6 +49,16 @@ export default class Button extends Component {
         if (!e.defaultPrevented) this.ripple.onAnonymousUp();
     };
 
+    onFocus = e => {
+        if (this.props.onFocus) this.props.onFocus(e);
+        if (!e.defaultPrevented) this.ripple.onFocus();
+    };
+
+    onBlur = e => {
+        if (this.props.onBlur) this.props.onBlur(e);
+        if (!e.defaultPrevented) this.ripple.onBlur();
+    };
+
     render () {
         const props = { ...this.props };
         props.class = (props.class || '') + ' paper-button';
@@ -68,7 +78,9 @@ export default class Button extends Component {
                 onTouchStart={this.onTouchStart}
                 onTouchEnd={this.onTouchEnd}
                 onKeyDown={this.onKeyDown}
-                onKeyUp={this.onKeyUp}>
+                onKeyUp={this.onKeyUp}
+                onFocus={this.onFocus}
+                onBlur={this.onBlur}>
                 <Ripple ref={ripple => this.ripple = ripple} circle={circle} />
                 {this.props.children}
             </button>

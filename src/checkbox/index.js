@@ -88,12 +88,14 @@ export default class Checkbox extends Component {
 
     onKeyDown = e => {
         if (this.props.onKeyDown) this.props.onKeyDown(e);
-        if (!e.defaultPrevented && isCheckboxCheckKey(e.key)) this.ripple.onAnonymousDown();
+        if (!e.defaultPrevented && isCheckboxCheckKey(e.key) && !this.props.switch) {
+            this.ripple.onAnonymousDown();
+        }
     };
 
     onKeyUp = e => {
         if (this.props.onKeyUp) this.props.onKeyUp(e);
-        if (!e.defaultPrevented) this.ripple.onAnonymousUp();
+        if (!e.defaultPrevented && !this.props.switch) this.ripple.onAnonymousUp();
     };
 
     onSwitchDragStart (x) {
@@ -207,9 +209,7 @@ export default class Checkbox extends Component {
                         class="p-thumb"
                         style={thumbStyle}
                         ref={node => this.thumbNode = node}>
-                        <span class="p-ripple-container">
-                            <Ripple ref={ripple => this.ripple = ripple} circle />
-                        </span>
+                        <span class="p-thumb-highlight" />
                     </span>
                 </span>
             );
@@ -223,8 +223,6 @@ export default class Checkbox extends Component {
                     onTouchEnd={this.onTouchEnd}
                     onKeyDown={this.onKeyDown}
                     onKeyUp={this.onKeyUp}>
-                    <span class="p-background"></span>
-                    <span class="p-inner-background"></span>
                     <input
                         class="p-input"
                         type="checkbox"
@@ -237,6 +235,7 @@ export default class Checkbox extends Component {
                     <span class="p-ripple-container">
                         <Ripple ref={ripple => this.ripple = ripple} circle />
                     </span>
+                    <span class="p-background"></span>
                     <span class="p-check"></span>
                 </span>
             );

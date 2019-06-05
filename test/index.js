@@ -3,36 +3,12 @@ import Button from '../src/button';
 import Checkbox from '../src/checkbox';
 import { CircularProgress } from '../src/progress';
 import TextField from '../src/text-field';
-import { MenuIcon } from '../src/app';
+import { MenuIcon, AppBar } from '../src/app';
 import './index.less';
 
 const root = document.createElement('div');
 root.id = 'root';
 document.body.appendChild(root);
-
-class ThemeColorConfig extends Component {
-    defaultValue = '#1883ff';
-
-    state = {
-        value: this.defaultValue,
-    };
-
-    render () {
-        return (
-            <div>
-                <label for="theme-color-config">Primary control color:</label>
-                <input
-                    type="color"
-                    id="theme-color-config"
-                    value={this.state.value}
-                    onChange={e => {
-                        this.setState({ value: e.target.value });
-                        root.style.setProperty('--md-control-primary', e.target.value);
-                    }} />
-            </div>
-        );
-    }
-}
 
 class ProgressDemo extends Component {
     render (props, state) {
@@ -97,7 +73,6 @@ function Gallery () {
     return (
         <div>
             <h1>Component Gallery</h1>
-            <ThemeColorConfig />
             <div class="demo-region">
                 <h2>Buttons</h2>
                 <div class="demo-item"><Button>button</Button></div>
@@ -105,6 +80,8 @@ function Gallery () {
                 <div class="demo-item"><Button fab>fab</Button></div>
                 <div class="demo-item"><Button icon>+</Button></div>
                 <div class="demo-item"><Button fab icon>+</Button></div>
+                <div class="demo-item"><Button disabled>button</Button></div>
+                <div class="demo-item"><Button raised disabled>button</Button></div>
             </div>
             <div class="demo-region">
                 <h2>Checkboxes</h2>
@@ -131,6 +108,12 @@ function Gallery () {
                 <div class="demo-item"><TextField center label="Centered" /></div>
             </div>
             <MenuIconDemo />
+            <div class="demo-region">
+                <h2>App Bar</h2>
+                <div class="demo-item">
+                    <AppBar />
+                </div>
+            </div>
         </div>
     );
 }

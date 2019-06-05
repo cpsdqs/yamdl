@@ -1,4 +1,4 @@
-import _MenuIcon from './menu-icon';
-export const MenuIcon = _MenuIcon;
+export MenuIcon from './menu-icon';
+export AppBar from './bar';
 
 // TODO: this

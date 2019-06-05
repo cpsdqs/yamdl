@@ -1,5 +1,11 @@
 @import '../prelude';
 
+@text-field-idle: var(--md-text-field-idle);
+@text-field-focus: var(--md-text-field-focus);
+@text-field-error: var(--md-text-field-error);
+@text-field-disabled: var(--md-text-field-disabled);
+@text-field-placeholder: var(--md-text-field-placeholder);
+
 .paper-text-field {
     display: inline-block;
     position: relative;
@@ -27,7 +33,7 @@
 
         .outline-left,
         .outline-right {
-            border: 1px solid @control-idle;
+            border: 1px solid @text-field-idle;
             box-sizing: border-box;
         }
 
@@ -56,7 +62,7 @@
                 position: absolute;
                 top: 0;
                 width: 50%;
-                border-top: 1px solid @control-idle;
+                border-top: 1px solid @text-field-idle;
             }
 
             .break-left {
@@ -74,7 +80,7 @@
                 left: 0;
                 bottom: 0;
                 width: 100%;
-                border-bottom: 1px solid @control-idle;
+                border-bottom: 1px solid @text-field-idle;
             }
         }
 
@@ -95,7 +101,7 @@
         .outline-break .break-right,
         .outline-break .break-bottom {
             border-width: 2px;
-            border-color: @control-primary;
+            border-color: @text-field-focus;
         }
     }
 
@@ -105,7 +111,7 @@
         .outline-break .break-left,
         .outline-break .break-right,
         .outline-break .break-bottom {
-            border-color: @error;
+            border-color: @text-field-error;
         }
     }
 
@@ -115,7 +121,7 @@
         .outline-break .break-left,
         .outline-break .break-right,
         .outline-break .break-bottom {
-            border-color: @disabled;
+            border-color: @text-field-disabled;
         }
     }
 
@@ -125,11 +131,11 @@
         bottom: 0;
         width: 100%;
         height: 1px;
-        background-color: @control-idle;
+        background-color: @text-field-idle;
 
         .p-underline-inner {
             margin-top: -1px;
-            border-bottom: 2px solid @control-primary;
+            border-bottom: 2px solid @text-field-focus;
             transform: scaleY(0);
             transform-origin: 50% 100%;
         }
@@ -153,15 +159,15 @@
     }
 
     &.has-error .p-underline {
-        background-color: @error;
+        background-color: @text-field-error;
 
         .p-underline-inner {
-            border-color: @error;
+            border-color: @text-field-error;
         }
     }
 
     &.is-disabled .p-underline {
-        background-color: @disabled;
+        background-color: @text-field-disabled;
 
         .p-underline-inner {
             display: none;
@@ -175,20 +181,20 @@
         transform-origin: 0 0;
         will-change: transform;
         pointer-events: none;
-        color: @control-idle;
+        color: @text-field-idle;
         transition: color 0.3s @easing;
     }
 
     &.is-focused .p-label {
-        color: @control-primary;
+        color: @text-field-focus;
     }
 
     &.has-error .p-label {
-        color: @error;
+        color: @text-field-error;
     }
 
     &.is-disabled .p-label {
-        color: @disabled;
+        color: @text-field-disabled;
     }
 
     .p-contents {
@@ -213,7 +219,7 @@
             }
 
             &::placeholder {
-                color: @placeholder;
+                color: @text-field-placeholder;
                 transition: opacity 0.3s @easing;
             }
         }
@@ -252,7 +258,7 @@
     }
 
     .p-error-label {
-        color: @error;
+        color: @text-field-error;
         opacity: 1;
     }
 

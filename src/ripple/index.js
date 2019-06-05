@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Spring } from '../animation';
+import { Spring, globalAnimator } from '../animation';
 import './style';
 
 /// Duration of a single ripple effect.
@@ -11,8 +11,8 @@ const RIPPLE_HOLD_DURATION = 3;
 ///
 /// Draws a material ripple in the parent container.
 ///
-/// Methods `onMouseDown`, `onTouchStart`, `onAnonymousDown`, `onAnonymousUp` should be called by
-/// the enclosing component when appropriate.
+/// Methods `onMouseDown`, `onTouchStart`, `onAnonymousDown`, `onAnonymousUp`, `onFocus`, `onBlur`
+/// should be called by the enclosing component when appropriate.
 ///
 /// # Props
 /// - `circle`: will use radius instead of bounding box diagonal for ripple size if true
@@ -26,14 +26,46 @@ export default class Ripple extends Component {
         currentRippleID: null,
     };
 
+    hoverSpring = new Spring(1, 0.3);
+    focusSpring = new Spring(1, 0.3);
+
     /// The DOM node.
     node = null;
 
-    componentWillUnmount () {
+    update (dt) {
         for (const ripple of this.state.ripples) {
-            ripple.sizeSpring.stop();
-            ripple.opacitySpring.stop();
+            ripple.sizeSpring.update(dt);
+            ripple.opacitySpring.update(dt);
         }
+
+        const indicesToRemove = [];
+        for (let i = 0; i < this.state.ripples.length; i++) {
+            if (!this.state.ripples[i].sizeSpring.wantsUpdate()) {
+                indicesToRemove.push(i);
+            }
+        }
+
+        if (indicesToRemove.length) {
+            const ripples = this.state.ripples.slice();
+            let offset = 0;
+            for (const index of indicesToRemove) {
+                ripples.splice(index + offset, 1);
+                offset--;
+            }
+            this.setState({ ripples });
+        }
+
+        this.focusSpring.update(dt);
+
+        if (!this.state.ripples.length && !this.focusSpring.wantsUpdate()) {
+            globalAnimator.deregister(this);
+        }
+
+        this.forceUpdate();
+    }
+
+    componentWillUnmount () {
+        globalAnimator.deregister(this);
     }
 
     onMouseDown = e => {
@@ -46,21 +78,31 @@ export default class Ripple extends Component {
     onMouseUp = () => {
         this.onPointerUp();
         window.removeEventListener('mouseup', this.onMouseUp);
-    }
+    };
 
     onTouchStart = e => {
         if (e.defaultPrevented) return;
         this.onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
         window.addEventListener('touchcancel', this.onTouchEnd);
         window.addEventListener('touchend', this.onTouchEnd);
-    }
+    };
 
     /// Will be bound automatically---should not be called directly.
     onTouchEnd = () => {
         this.onPointerUp();
         window.removeEventListener('touchcancel', this.onTouchEnd);
         window.removeEventListener('touchend', this.onTouchEnd);
-    }
+    };
+
+    onFocus = () => {
+        this.focusSpring.target = 1;
+        globalAnimator.register(this);
+    };
+
+    onBlur = () => {
+        this.focusSpring.target = 0;
+        globalAnimator.register(this);
+    };
 
     anonDown = false;
 
@@ -70,7 +112,7 @@ export default class Ripple extends Component {
             this.onPointerDown();
             this.anonDown = true;
         }
-    }
+    };
 
     /// Anonymous up event—will stop holding the ripple previously created by an `onAnonymousDown`
     /// call.
@@ -79,7 +121,7 @@ export default class Ripple extends Component {
             this.onPointerUp();
             this.anonDown = false;
         }
-    }
+    };
 
     onPointerDown (clientX, clientY) {
         const nodeRect = this.node.getBoundingClientRect();
@@ -99,18 +141,15 @@ export default class Ripple extends Component {
         ripple.sizeSpring.target = 1;
         ripple.opacitySpring.value = 1;
         ripple.opacitySpring.target = 0.3;
-        ripple.sizeSpring.on('update', () => this.forceUpdate());
-        ripple.sizeSpring.start();
-        ripple.opacitySpring.start();
 
         ripples.push(ripple);
         this.setState({
             currentRippleID: ripple.id,
             ripples,
-        });
+        }, () => globalAnimator.register(this));
     }
 
-    onPointerUp = () => {
+    onPointerUp () {
         let currentRippleIndex = null;
         for (let i = 0; i < this.state.ripples.length; i++) {
             if (this.state.ripples[i].id === this.state.currentRippleID) {
@@ -133,25 +172,6 @@ export default class Ripple extends Component {
         }
     }
 
-    componentDidUpdate () {
-        const indicesToRemove = [];
-        for (let i = 0; i < this.state.ripples.length; i++) {
-            if (!this.state.ripples[i].sizeSpring.wantsUpdate()) {
-                indicesToRemove.push(i);
-            }
-        }
-
-        if (indicesToRemove.length) {
-            const ripples = this.state.ripples.slice();
-            let offset = 0;
-            for (const index of indicesToRemove) {
-                ripples.splice(index + offset, 1);
-                offset--;
-            }
-            this.setState({ ripples });
-        }
-    }
-
     render () {
         let highlight = null;
         const ripples = [];
@@ -165,7 +185,7 @@ export default class Ripple extends Component {
                 : Math.hypot(nodeRect.width, nodeRect.height)
             : 0;
 
-        let maxHighlight = 0;
+        let maxHighlight = this.focusSpring.value;
 
         for (const ripple of this.state.ripples) {
             const sizeProgress = ripple.sizeSpring.value;
@@ -175,7 +195,7 @@ export default class Ripple extends Component {
             const opacity = ripple.opacitySpring.value;
 
             const rippleHighlight = 1 - 4 * Math.abs(sizeProgress - 0.5) ** 2;
-            maxHighlight = Math.max(rippleHighlight, maxHighlight);
+            maxHighlight += Math.max(rippleHighlight, maxHighlight);
 
             ripples.push(
                 <div

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "sideEffects": ["*.less", "*.css"],
   "scripts": {
     "build-test": "cd test && webpack --env prod",
     "watch-test": "cd test && webpack --watch"
@@ -12,6 +13,7 @@
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
     "autoprefixer": "^9.5.1",
     "babel-loader": "^8.0.6",

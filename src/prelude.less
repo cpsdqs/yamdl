@@ -1,48 +1,39 @@
-:root {
-    --md-control-primary: #1883ff;
-    --md-secondary: #f54784;
-    --md-error: #f44336;
-    --md-text-on-primary: #fff;
+.md-theme(@primary, @secondary, @error: #f44336) {
+    --md-app-bar-bg: @primary;
+
+    --md-button-color: @secondary;
+    --md-button-text-highlight: fade(@secondary, 15%);
+    --md-button-raised-text: #fff;
+    --md-button-raised-ripple: #fff;
+    --md-button-raised-ripple-highlight: fade(#fff, 20%);
+    --md-button-disabled: fade(#000, 30%);
+    --md-button-disabled-bg: fade(#000, 10%);
+
+    --md-checkbox-color: @secondary;
+    --md-checkbox-unchecked-color: fade(#000, 60%);
+    --md-checkbox-check: #fff;
+    --md-checkbox-disabled: fade(#000, 40%);
+
+    --md-switch-idle: fade(#000, 40%);
+    --md-switch-idle-thumb: #fff;
+    --md-switch-active: fade(@secondary, 40%);
+    --md-switch-active-thumb: @secondary;
+
+    --md-circular-progress-color: @secondary;
+
     --md-ripple-color: fade(#000, 20%);
-    --md-ripple-color-on-primary: fade(#fff, 70%);
     --md-ripple-highlight: fade(#000, 8%);
-    --md-ripple-highlight-on-primary: fade(#fff, 12%);
-    --md-hover-background: fade(#000, 10%);
-    --md-control-idle: fade(#000, 60%);
-    --md-placeholder: fade(#000, 60%);
-    --md-control-idle-on-primary: fade(#fff, 50%);
-    --md-disabled: fade(#000, 30%);
-    --md-disabled-background: fade(#000, 10%);
-    --md-text-field-filled-background: fade(#000, 10%);
-    --md-text-field-filled-disabled-background: fade(#000, 5%);
-    --md-checkbox-disabled: fade(#000, 30%);
-    --md-switch-bg-idle: fade(#000, 40%);
-    --md-switch-bg-active: fade(#1883ff, 40%);
-    --md-switch-idle: #fff;
-    --md-control-focus: fade(#1883ff, 20%);
+
+    --md-text-field-idle: fade(#000, 60%);
+    --md-text-field-focus: @secondary;
+    --md-text-field-error: @error;
+    --md-text-field-disabled: fade(#000, 30%);
+    --md-text-field-placeholder: fade(#000, 60%);
 }
 
-@control-primary: var(--md-control-primary);
-@secondary: var(--md-secondary);
-@error: var(--md-error);
-@text-on-primary: var(--md-text-on-primary);
-@ripple-color: var(--md-ripple-color);
-@ripple-color-on-primary: var(--md-ripple-color-on-primary);
-@ripple-highlight: var(--md-ripple-highlight);
-@ripple-highlight-on-primary: var(--md-ripple-highlight-on-primary);
-@hover-background: var(--md-hover-background);
-@control-idle: var(--md-control-idle);
-@placeholder: var(--md-placeholder);
-@control-idle-on-primary: var(--md-control-idle-on-primary);
-@disabled: var(--md-disabled);
-@disabled-background: var(--md-disabled-background);
-@text-field-filled-background: var(--md-text-field-filled-background);
-@text-field-filled-disabled-background: var(--md-text-field-filled-disabled-background);
-@checkbox-disabled: var(--md-checkbox-disabled);
-@switch-bg-idle: var(--md-switch-bg-idle);
-@switch-bg-active: var(--md-switch-bg-active);
-@switch-idle: var(--md-switch-idle);
-@control-focus: var(--md-control-focus);
+:root {
+    .md-theme(#015454, #018786);
+}
 
 @easing: cubic-bezier(0.2, 0.3, 0, 1);
 
