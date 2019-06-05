@@ -1,18 +1,20 @@
-.md-theme(@primary, @secondary, @error: #f44336) {
+.md-light-theme(@primary, @secondary, @error: #f44336) {
     --md-app-bar-bg: @primary;
 
     --md-button-color: @secondary;
     --md-button-text-highlight: fade(@secondary, 15%);
     --md-button-raised-text: #fff;
+    --md-button-raised-highlight: var(--md-button-color);
     --md-button-raised-ripple: #fff;
     --md-button-raised-ripple-highlight: fade(#fff, 20%);
     --md-button-disabled: fade(#000, 30%);
     --md-button-disabled-bg: fade(#000, 10%);
 
     --md-checkbox-color: @secondary;
-    --md-checkbox-unchecked-color: fade(#000, 60%);
+    --md-checkbox-idle: fade(#000, 60%);
     --md-checkbox-check: #fff;
     --md-checkbox-disabled: fade(#000, 40%);
+    --md-checkbox-disabled-check: var(--md-checkbox-check);
 
     --md-switch-idle: fade(#000, 40%);
     --md-switch-idle-thumb: #fff;
@@ -31,8 +33,26 @@
     --md-text-field-placeholder: fade(#000, 60%);
 }
 
+.md-dark-theme(@primary, @secondary, @error: #f44336) {
+    .md-light-theme(@primary, @secondary, @error);
+
+    --md-button-disabled: fade(#fff, 30%);
+    --md-button-raised-highlight: lighten(@secondary, 10%);
+    --md-button-disabled-bg: fade(#fff, 10%);
+    --md-checkbox-idle: fade(#fff, 50%);
+    --md-checkbox-disabled: fade(#fff, 20%);
+    --md-checkbox-disabled-check: #999;
+    --md-switch-idle: fade(#fff, 20%);
+    --md-switch-idle-thumb: #777;
+    --md-ripple-color: fade(#fff, 60%);
+    --md-ripple-highlight: fade(#fff, 12%);
+    --md-text-field-idle: fade(#fff, 40%);
+    --md-text-field-disabled: fade(#fff, 20%);
+    --md-text-field-placeholder: fade(#fff, 40%);
+}
+
 :root {
-    .md-theme(#015454, #018786);
+    .md-light-theme(#015454, #018786);
 }
 
 @easing: cubic-bezier(0.2, 0.3, 0, 1);

@@ -10,6 +10,28 @@ const root = document.createElement('div');
 root.id = 'root';
 document.body.appendChild(root);
 
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')) {
+    document.body.classList.add('dark');
+}
+
+class DarkSwitch extends Component {
+    render () {
+        return (
+            <div>
+                <label for="dark-switch">Dark mode:</label> <Checkbox
+                    switch
+                    id="dark-switch"
+                    checked={document.body.classList.contains('dark')}
+                    onChange={checked => {
+                        if (checked) document.body.classList.add('dark');
+                        else document.body.classList.remove('dark');
+                        this.forceUpdate();
+                    }} />
+            </div>
+        );
+    }
+}
+
 class ProgressDemo extends Component {
     render (props, state) {
         return (
@@ -73,6 +95,7 @@ function Gallery () {
     return (
         <div>
             <h1>Component Gallery</h1>
+            <DarkSwitch />
             <div class="demo-region">
                 <h2>Buttons</h2>
                 <div class="demo-item"><Button>button</Button></div>

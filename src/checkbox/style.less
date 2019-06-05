@@ -1,12 +1,13 @@
 @import '../prelude';
 
-@checkbox-idle-border: var(--md-checkbox-unchecked-color);
+@checkbox-idle-border: var(--md-checkbox-idle);
 @checkbox-check-color: var(--md-checkbox-check);
 @checkbox-checked-color: var(--md-checkbox-color);
 @checkbox-ripple-color: @checkbox-checked-color;
 @checkbox-ripple-highlight: transparent;
 @checkbox-highlight: @checkbox-checked-color;
 @checkbox-disabled: var(--md-checkbox-disabled);
+@checkbox-disabled-check-color: var(--md-checkbox-disabled-check);
 
 @switch-idle-bg: var(--md-switch-idle);
 @switch-idle-fg: var(--md-switch-idle-thumb);
@@ -196,6 +197,10 @@
 
         .p-ripple-container::before {
             background: none;
+        }
+
+        .p-check::before, .p-check::after {
+            background: @checkbox-disabled-check-color;
         }
     }
 }
