@@ -24,13 +24,16 @@ h1 {
         border: 1px solid #eee;
         border-radius: 2px;
 
-        &.app-bar-demo {
-            min-width: 400px;
+        &.app-bar-demo, &.nav-window-demo {
+            width: 400px;
 
             @media (max-width: 500px) {
-                min-width: 0;
                 width: 100%;
             }
+        }
+
+        &.nav-window-demo {
+            height: 500px;
         }
     }
 
@@ -53,5 +56,20 @@ body.dark {
         .demo-item {
             border-color: #444;
         }
+    }
+}
+
+.app-bar-demo-status-bar-space {
+    position: relative;
+    --md-app-bar-extra-padding-top: 22px;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 22px + 16px;
+        background: fade(#000, 20%);
     }
 }

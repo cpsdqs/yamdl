@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "sideEffects": ["*.less", "*.css"],
+  "sideEffects": [
+    "*.less",
+    "*.css"
+  ],
   "scripts": {
     "build-test": "cd test && webpack --env prod",
     "watch-test": "cd test && webpack --watch"

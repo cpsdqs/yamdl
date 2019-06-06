@@ -21,6 +21,7 @@ export default class AppBar extends Component {
                         ? <TitleText title={props.title} />
                         : props.title}
                 </div>
+                <div class="p-spacer" />
                 <span class="p-overflowing-buttons-and-stuff">todo</span>
             </div>
         );

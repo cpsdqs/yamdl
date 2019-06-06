@@ -3,7 +3,7 @@ import Button from '../src/button';
 import Checkbox from '../src/checkbox';
 import { CircularProgress } from '../src/progress';
 import TextField from '../src/text-field';
-import { MenuIcon, AppBar } from '../src/app';
+import { NavigationWindow, NavigationView, MenuIcon, AppBar } from '../src/app';
 import './index.less';
 
 const root = document.createElement('div');
@@ -107,7 +107,69 @@ class AppBarDemo extends Component {
                         menu={<MenuIcon type={['menu', 'back', 'close'][state.i % 3]} />}
                         title={['Title 1', 'Other Title', 'Words'][state.i % 3]} />
                 </div>
+                <div class="demo-item app-bar-demo app-bar-demo-status-bar-space">
+                    <AppBar title="22px status bar space also very long etc" />
+                </div>
                 <p class="demo-description">Tap to change state.</p>
+            </div>
+        );
+    }
+}
+
+class NavigationDemo extends Component {
+    state = {
+        subview: false,
+        subview2: false,
+        subview3: false,
+    };
+    render (props, state) {
+        return (
+            <div class="demo-region">
+                <h2>Navigation</h2>
+                <div class="demo-item nav-window-demo">
+                    <NavigationWindow>
+                        <NavigationView title="Root View">
+                            <div>
+                                {state.subview ? (
+                                    <NavigationView
+                                        title="Subview"
+                                        onClose={() => this.setState({ subview: false })}>
+                                        <div>
+                                            subview!
+                                            <Button onClick={() => this.setState({ subview3: true })}>
+                                                Open Sub-subview
+                                            </Button>
+                                            {state.subview3 && (
+                                                <NavigationView title="Sub-subview"
+                                                    close
+                                                    onClose={() => this.setState({ subview3: false })}>
+                                                    sub-subview
+                                                </NavigationView>
+                                            )}
+                                        </div>
+                                    </NavigationView>
+                                ) : state.subview2 ? (
+                                    <NavigationView
+                                        title="Subview 2"
+                                        close
+                                        onClose={() => this.setState({ subview2: false })}>
+                                        subview 2!
+                                    </NavigationView>
+                                ) : (
+                                    <div>
+                                        hello world
+                                        <Button onClick={() => this.setState({ subview: true })}>
+                                            Open Subview
+                                        </Button>
+                                        <Button onClick={() => this.setState({ subview2: true })}>
+                                            Open Subview 2
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </NavigationView>
+                    </NavigationWindow>
+                </div>
             </div>
         );
     }
@@ -154,6 +216,7 @@ function Gallery () {
             </div>
             <MenuIconDemo />
             <AppBarDemo />
+            <NavigationDemo />
         </div>
     );
 }
