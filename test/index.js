@@ -10,7 +10,7 @@ const root = document.createElement('div');
 root.id = 'root';
 document.body.appendChild(root);
 
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')) {
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.body.classList.add('dark');
 }
 
@@ -116,65 +116,6 @@ class AppBarDemo extends Component {
     }
 }
 
-class NavigationDemo extends Component {
-    state = {
-        subview: false,
-        subview2: false,
-        subview3: false,
-    };
-    render (props, state) {
-        return (
-            <div class="demo-region">
-                <h2>Navigation</h2>
-                <div class="demo-item nav-window-demo">
-                    <NavigationWindow>
-                        <NavigationView title="Root View">
-                            <div>
-                                {state.subview ? (
-                                    <NavigationView
-                                        title="Subview"
-                                        onClose={() => this.setState({ subview: false })}>
-                                        <div>
-                                            subview!
-                                            <Button onClick={() => this.setState({ subview3: true })}>
-                                                Open Sub-subview
-                                            </Button>
-                                            {state.subview3 && (
-                                                <NavigationView title="Sub-subview"
-                                                    close
-                                                    onClose={() => this.setState({ subview3: false })}>
-                                                    sub-subview
-                                                </NavigationView>
-                                            )}
-                                        </div>
-                                    </NavigationView>
-                                ) : state.subview2 ? (
-                                    <NavigationView
-                                        title="Subview 2"
-                                        close
-                                        onClose={() => this.setState({ subview2: false })}>
-                                        subview 2!
-                                    </NavigationView>
-                                ) : (
-                                    <div>
-                                        hello world
-                                        <Button onClick={() => this.setState({ subview: true })}>
-                                            Open Subview
-                                        </Button>
-                                        <Button onClick={() => this.setState({ subview2: true })}>
-                                            Open Subview 2
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        </NavigationView>
-                    </NavigationWindow>
-                </div>
-            </div>
-        );
-    }
-}
-
 function Gallery () {
     return (
         <div>
@@ -216,7 +157,6 @@ function Gallery () {
             </div>
             <MenuIconDemo />
             <AppBarDemo />
-            <NavigationDemo />
         </div>
     );
 }
