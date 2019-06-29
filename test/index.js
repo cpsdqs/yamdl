@@ -4,6 +4,7 @@ import Checkbox from '../src/checkbox';
 import { CircularProgress } from '../src/progress';
 import TextField from '../src/text-field';
 import { NavigationWindow, NavigationView, MenuIcon, AppBar } from '../src/app';
+import Menu from '../src/menu';
 import './index.less';
 
 const root = document.createElement('div');
@@ -116,6 +117,32 @@ class AppBarDemo extends Component {
     }
 }
 
+class MenuDemo extends Component {
+    state = { i: false };
+    render (props, state) {
+        return (
+            <div class="demo-region">
+                <h2>Menu</h2>
+                <div class="demo-item">
+                    <Button onClick={e => this.setState({
+                        i: !state.i,
+                        x: e.target.getBoundingClientRect().left,
+                        y: e.target.getBoundingClientRect().top,
+                    })}>
+                        {state.i ? 'Close' : 'Open'} Menu
+                    </Button>
+                    <Menu
+                        open={state.i}
+                        position={[state.x, state.y]}
+                        onClose={() => this.setState({ i: false })}>
+                        menu
+                    </Menu>
+                </div>
+            </div>
+        );
+    }
+}
+
 function Gallery () {
     return (
         <div>
@@ -157,6 +184,7 @@ function Gallery () {
             </div>
             <MenuIconDemo />
             <AppBarDemo />
+            <MenuDemo />
         </div>
     );
 }
