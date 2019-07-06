@@ -194,9 +194,10 @@ export class SpringSolver {
     getVelocity (t) {
         if (this.dampingRatio < 1) {
             // underdamped
-            return -this.amplitudeFactor * this.dampedAngularFrequency
-                * this.friction / 2 * Math.exp(-t * this.friction / 2)
-                * Math.sin(this.dampedAngularFrequency * t - this.angularOffset);
+            return this.amplitudeFactor * (-this.friction / 2 * Math.exp(-t * this.friction / 2)
+                * Math.cos(this.dampedAngularFrequency * t - this.angularOffset)
+                - this.dampedAngularFrequency * Math.exp(-t * this.friction / 2)
+                * Math.sin(this.dampedAngularFrequency * t - this.angularOffset));
         } else {
             // critically damped or overdamped
             return this.a1 * (-this.friction - this.dampedFriction) / 2
@@ -340,6 +341,27 @@ export class Spring extends EventEmitter {
     setDampingRatio (dampingRatio) {
         const period = this.getPeriod();
         this.setDampingRatioAndPeriod(dampingRatio, period);
+    }
+
+    /// Generates keyframes starting at the current time.
+    ///
+    /// @param {Function} shouldStop - `(value, velocity, time)` should return true at some point
+    /// @param {number} [sampleScale] - pass a larger value to sample more points
+    /// @returns {[number, number][]} - array of keyframes and time offsets
+    genKeyframes (shouldStop, sampleScale = 1) {
+        const startTime = this.getTime();
+        let t = startTime;
+        const values = [];
+        while (true) {
+            const value = this.inner.getValue(t);
+            const velocity = this.inner.getVelocity(t);
+            values.push([value, t - startTime]);
+
+            if (shouldStop(value, velocity, t - startTime)) break;
+
+            t += Math.max(1e-2, Math.sqrt(velocity) / sampleScale);
+        }
+        return values;
     }
 }
 
