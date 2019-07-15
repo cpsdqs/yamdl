@@ -1,9 +1,6 @@
 import { render, h, Component } from 'preact';
-import Button from '../src/button';
-import Checkbox from '../src/checkbox';
-import { CircularProgress } from '../src/progress';
-import TextField from '../src/text-field';
-import { NavigationWindow, NavigationView, MenuIcon, AppBar } from '../src/app';
+import { Button, Checkbox, CircularProgress, TextField } from '../src';
+import { NavigationWindow, NavigationView, MenuIcon, AppBar } from '../src';
 import Menu from '../src/menu';
 import './index.less';
 
