@@ -4,6 +4,7 @@
 @text-field-focus: var(--md-text-field-focus);
 @text-field-error: var(--md-text-field-error);
 @text-field-disabled: var(--md-text-field-disabled);
+@text-field-disabled-text: var(--md-text-field-disabled-text);
 @text-field-placeholder: var(--md-text-field-placeholder);
 
 .paper-text-field {
@@ -223,6 +224,10 @@
                 transition: opacity 0.3s @easing;
             }
         }
+    }
+
+    &.is-disabled .p-contents {
+        color: @text-field-disabled-text;
     }
 
     &:not(.floating):not(.no-label) .p-contents .p-input::placeholder {

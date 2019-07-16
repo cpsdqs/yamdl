@@ -92,6 +92,7 @@ export class CircularProgress extends Component {
 
     componentWillMount () {
         globalAnimator.register(this);
+        this.isMounted = true;
     }
 
     indeterminateState = this.props.indeterminate;
@@ -156,7 +157,9 @@ export class CircularProgress extends Component {
             && (this.props.indeterminate === this.indeterminateState)) {
             globalAnimator.deregister(this);
         }
-        this.forceUpdate();
+        if (this.isMounted) {
+            this.forceUpdate();
+        }
     }
 
     componentDidUpdate (prevProps) {
@@ -168,6 +171,7 @@ export class CircularProgress extends Component {
 
     componentWillUnmount () {
         globalAnimator.deregister(this);
+        this.isMounted = false;
     }
 
     getIndeterminateAngles () {

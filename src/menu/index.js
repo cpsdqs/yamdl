@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import Portal from 'preact-portal';
+import { createPortal } from 'preact/compat';
 import { Spring, globalAnimator } from '../animation';
 import './style';
 
@@ -67,17 +67,15 @@ export default class Menu extends Component {
             transformOrigin: this.props.anchor ? this.props.anchor : props.style.transformOrigin,
         });
 
-        return this.openness.value > 1 / 100 ? (
-            <Portal into={this.props.container || 'body'}>
-                <div
-                    class="paper-menu-container"
-                    ref={node => this.containerNode = node}
-                    onClick={this.onContainerClick}>
-                    <div {...props}>
-                        {this.props.children}
-                    </div>
+        return this.openness.value > 1 / 100 ? createPortal((
+            <div
+                class="paper-menu-container"
+                ref={node => this.containerNode = node}
+                onClick={this.onContainerClick}>
+                <div {...props}>
+                    {this.props.children}
                 </div>
-            </Portal>
-        ) : null;
+            </div>
+        ), this.props.container || document.body) : null;
     }
 }

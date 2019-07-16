@@ -86,6 +86,10 @@ export default class TextField extends Component {
         delete props.outline;
         delete props.label;
         delete props.value;
+        delete props.prefix;
+        delete props.center;
+        delete props.error;
+        delete props.helperLabel;
 
         const outline = !!this.props.outline;
 

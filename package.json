@@ -31,7 +31,5 @@
   "peerDependencies": {
     "preact": "*"
   },
-  "dependencies": {
-    "preact-portal": "^1.1.3"
-  }
+  "dependencies": {}
 }

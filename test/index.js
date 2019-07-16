@@ -63,6 +63,29 @@ class ProgressDemo extends Component {
     }
 }
 
+class TextFieldDemo extends Component {
+    state = { s: '' };
+    render (props, state) {
+        const sharedProps = { value: state.s, onChange: e => this.setState({ s: e.target.value }) };
+
+        return (
+            <div class="demo-region">
+                <h2>Text Fields</h2>
+                <div class="demo-item">
+                    <TextField label="Hello world" placeholder="Placeholder" {...sharedProps} />
+                </div>
+                <div class="demo-item"><TextField label="Disabled" disabled {...sharedProps} /></div>
+                <div class="demo-item"><TextField label="Hello world" outline {...sharedProps} /></div>
+                <div class="demo-item"><TextField label="Disabled " outline disabled {...sharedProps} /></div>
+                <div class="demo-item"><TextField label="Hello world" error="error" {...sharedProps} /></div>
+                <div class="demo-item"><TextField label="Hello world" helperLabel="help label" {...sharedProps} /></div>
+                <div class="demo-item"><TextField label="Prefixed" prefix="an icon?" {...sharedProps} /></div>
+                <div class="demo-item"><TextField center label="Centered" {...sharedProps} /></div>
+            </div>
+        );
+    }
+}
+
 class MenuIconDemo extends Component {
     render (props, state) {
         return (
@@ -168,17 +191,7 @@ function Gallery () {
                 </p>
             </div>
             <ProgressDemo />
-            <div class="demo-region">
-                <h2>Text Fields</h2>
-                <div class="demo-item"><TextField label="Hello world" placeholder="Placeholder" /></div>
-                <div class="demo-item"><TextField label="Disabled" disabled /></div>
-                <div class="demo-item"><TextField label="Hello world" outline /></div>
-                <div class="demo-item"><TextField label="Disabled " outline disabled /></div>
-                <div class="demo-item"><TextField label="Hello world" error="error" /></div>
-                <div class="demo-item"><TextField label="Hello world" helperLabel="help label" /></div>
-                <div class="demo-item"><TextField label="Prefixed" prefix="an icon?" /></div>
-                <div class="demo-item"><TextField center label="Centered" /></div>
-            </div>
+            <TextFieldDemo />
             <MenuIconDemo />
             <AppBarDemo />
             <MenuDemo />
