@@ -124,8 +124,8 @@ export default class Checkbox extends Component {
 
         const max = SWITCH_WIDTH - THUMB_SIZE;
         let pos = x + offset;
-        if (pos < 0) pos = -4 + 2 ** (pos + 2);
-        if (pos > max) pos = max + 4 - 2 ** -(pos - max - 2);
+        if (pos < 0) pos = -((-pos) ** 0.4);
+        if (pos > max) pos = max + ((pos - max) ** 0.4);
 
         const thumbCenter = x + offset + THUMB_SIZE / 2;
         const dt = Math.max(Date.now() - lastTime, 3) / 1000;
@@ -174,6 +174,7 @@ export default class Checkbox extends Component {
             + (this.props.switch ? ' paper-switch' : ' paper-checkbox');
         if (checked) props.class += ' is-checked';
         if (props.disabled) props.class += ' is-disabled';
+        if (this.state.draggingSwitch) props.class += ' is-being-dragged';
 
         if (this.props.switch) {
             const thumbStyle = this.state.draggingSwitch
@@ -184,7 +185,6 @@ export default class Checkbox extends Component {
                     {...props}
                     ref={node => this.node = node}
                     onMouseDown={this.onMouseDown}
-                    onMouseMove={this.onMouseMove}
                     onTouchStart={this.onTouchStart}
                     onTouchMove={this.onTouchMove}
                     onTouchEnd={this.onTouchEnd}

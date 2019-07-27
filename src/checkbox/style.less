@@ -286,11 +286,23 @@
         }
     }
 
+    @media (hover: hover) {
+        &:hover:not(:active):not(.is-disabled) .p-thumb-highlight {
+            opacity: 0.15;
+        }
+    }
+
     .p-input:focus ~ .p-thumb .p-thumb-highlight {
         opacity: 0.2;
     }
 
     &.is-disabled {
         opacity: 0.5;
+    }
+
+    &.is-being-dragged {
+        .p-thumb {
+            transition: none;
+        }
     }
 }
