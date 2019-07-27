@@ -116,6 +116,26 @@
         }
     }
 
+    .p-indeterminate {
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transition: transform 0.3s @easing;
+        transform: scale(0);
+        pointer-events: none;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -7px;
+            width: 14px;
+            height: 2px;
+            background: @checkbox-check-color;
+        }
+    }
+
     .p-ripple-container {
         pointer-events: none;
         position: absolute;
@@ -160,34 +180,49 @@
         }
     }
 
-    &.is-checked {
-        .p-background {
-            background: @checkbox-checked-color;
-            .clip-path-frame(9.99px, 9.99px, 9.99px, 9.99px);
+    &.is-checked .p-background, &.is-indeterminate .p-background {
+        background: @checkbox-checked-color;
+        .clip-path-frame(9.99px, 9.99px, 9.99px, 9.99px);
 
-            transition: background 0.3s @easing;
-            animation: p-background-check 0.2s cubic-bezier(.2, .5, .7, 1);
+        transition: background 0.3s @easing;
+        animation: p-background-check 0.2s cubic-bezier(.2, .5, .7, 1);
 
-            @keyframes p-background-check {
-                from {
-                    .clip-path-frame(2px, 2px, 2px, 2px);
-                }
-                to {
-                    .clip-path-frame(11px, 16px, 9px, 4px);
-                }
+        @keyframes p-background-check {
+            from {
+                .clip-path-frame(2px, 2px, 2px, 2px);
+            }
+            to {
+                .clip-path-frame(11px, 16px, 9px, 4px);
             }
         }
-        .p-check {
-            transform: scale(1);
-            transition: none;
+    }
+    &.is-indeterminate:not(.was-checked) .p-background {
+        animation: p-background-indeterminate 0.2s cubic-bezier(.2, .5, .7, 1);
 
-            &::before {
-                animation: p-check-in-before 0.3s 0.03s backwards;
+        @keyframes p-background-indeterminate {
+            from {
+                .clip-path-frame(2px, 2px, 2px, 2px);
             }
-            &::after {
-                animation: p-check-in-after 0.3s 0.03s backwards;
+            to {
+                .clip-path-frame(9px, 8px, 9px, 8px);
             }
         }
+    }
+
+    &.is-checked .p-check {
+        transform: scale(1);
+        transition: none;
+
+        &::before {
+            animation: p-check-in-before 0.3s 0.03s backwards;
+        }
+        &::after {
+            animation: p-check-in-after 0.3s 0.03s backwards;
+        }
+    }
+
+    &.is-indeterminate .p-indeterminate {
+        transform: scale(1);
     }
 
     &.is-disabled {

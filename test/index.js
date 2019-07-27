@@ -30,6 +30,37 @@ class DarkSwitch extends Component {
     }
 }
 
+class CheckboxDemo extends Component {
+    state = { a: true };
+    render (props, state) {
+        return (
+            <div class="demo-region">
+                <h2>Checkboxes</h2>
+                <div class="demo-item"><Checkbox /></div>
+                <div class="demo-item">
+                    <Checkbox
+                        indeterminate={state.a}
+                        checked={!state.a}
+                        onChange={() => this.setState({ a: !state.a })} />
+                </div>
+                <div class="demo-item">
+                    <Checkbox
+                        indeterminate={state.a}
+                        onChange={() => this.setState({ a: !state.a })} />
+                </div>
+                <div class="demo-item"><Checkbox disabled /></div>
+                <div class="demo-item"><Checkbox disabled checked /></div>
+                <div class="demo-item"><Checkbox switch /></div>
+                <div class="demo-item"><Checkbox switch disabled /></div>
+                <div class="demo-item"><Checkbox switch disabled checked /></div>
+                <p class="demo-description">
+                    Switches can also be dragged.
+                </p>
+            </div>
+        );
+    }
+}
+
 class ProgressDemo extends Component {
     render (props, state) {
         return (
@@ -178,18 +209,7 @@ function Gallery () {
                 <div class="demo-item"><Button disabled>button</Button></div>
                 <div class="demo-item"><Button raised disabled>button</Button></div>
             </div>
-            <div class="demo-region">
-                <h2>Checkboxes</h2>
-                <div class="demo-item"><Checkbox /></div>
-                <div class="demo-item"><Checkbox disabled /></div>
-                <div class="demo-item"><Checkbox disabled checked /></div>
-                <div class="demo-item"><Checkbox switch /></div>
-                <div class="demo-item"><Checkbox switch disabled /></div>
-                <div class="demo-item"><Checkbox switch disabled checked /></div>
-                <p class="demo-description">
-                    Switches can also be dragged.
-                </p>
-            </div>
+            <CheckboxDemo />
             <ProgressDemo />
             <TextFieldDemo />
             <MenuIconDemo />

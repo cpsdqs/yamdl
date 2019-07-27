@@ -13,6 +13,7 @@ const THUMB_SIZE = 24;
 ///
 /// # Props
 /// - `checked`: checked state
+/// - `indeterminate`: indeterminate state
 /// - `onChange`: change handler
 /// - `disabled`: disabled state
 /// - `switch`: if true, will render a switch
@@ -162,17 +163,28 @@ export default class Checkbox extends Component {
         this.setState({ draggingSwitch: false });
     }
 
+    wasChecked = false; // for the indeterminate animation
+
+    componentWillUpdate (newProps) {
+        this.wasChecked = this.props.checked || this.state.checked;
+    }
+
     render () {
         const props = { ...this.props };
 
-        const checked = this.props.checked || this.state.checked;
+        const checked = (this.props.checked || this.state.checked) && !this.props.indeterminate;
 
         delete props.id;
         delete props.onChange;
         delete props.switch;
+        delete props.indeterminate;
         props.class = (props.class || '')
             + (this.props.switch ? ' paper-switch' : ' paper-checkbox');
         if (checked) props.class += ' is-checked';
+        if (this.props.indeterminate) {
+            props.class += ' is-indeterminate';
+            if (this.wasChecked) props.class += ' was-checked';
+        }
         if (props.disabled) props.class += ' is-disabled';
         if (this.state.draggingSwitch) props.class += ' is-being-dragged';
 
@@ -228,6 +240,7 @@ export default class Checkbox extends Component {
                         type="checkbox"
                         id={this.props.id}
                         checked={checked}
+                        indeterminate={this.props.indeterminate}
                         onChange={e => this.props.onChange
                             ? this.props.onChange(e.target.checked)
                             : this.setState({ checked: e.target.checked })}
@@ -237,6 +250,7 @@ export default class Checkbox extends Component {
                     </span>
                     <span class="p-background"></span>
                     <span class="p-check"></span>
+                    <span class="p-indeterminate"></span>
                 </span>
             );
         }
