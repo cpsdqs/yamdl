@@ -180,14 +180,18 @@ class MenuDemo extends Component {
                         x: e.target.getBoundingClientRect().left,
                         y: e.target.getBoundingClientRect().top,
                     })}>
-                        {state.i ? 'Close' : 'Open'} Menu
+                        Open Menu
                     </Button>
                     <Menu
                         open={state.i}
                         position={[state.x, state.y]}
-                        onClose={() => this.setState({ i: false })}>
-                        menu
-                    </Menu>
+                        onClose={() => this.setState({ i: false })}
+                        items={[
+                            { label: 'no ripple' },
+                            { label: 'with ripple', action () {} },
+                            { label: 'disabled', disabled: true },
+                            { label: 'etc' },
+                        ]} />
                 </div>
             </div>
         );

@@ -23,7 +23,7 @@ export default class Button extends Component {
 
     onMouseDown = e => {
         if (this.props.onMouseDown) this.props.onMouseDown(e);
-        if (!this.ignoreMouse) this.ripple.onMouseDown(e);
+        if (!this.ignoreMouse && this.ripple) this.ripple.onMouseDown(e);
     };
 
     onMouseMove = e => {
@@ -33,30 +33,32 @@ export default class Button extends Component {
 
     onTouchStart = e => {
         if (this.props.onTouchStart) this.props.onTouchStart(e);
-        this.ripple.onTouchStart(e);
+        this.ripple && this.ripple.onTouchStart(e);
         this.ignoreMouse = true;
     };
 
     onKeyDown = e => {
         if (e.target !== this.button) return;
         if (this.props.onKeyDown) this.props.onKeyDown(e);
-        if (!e.defaultPrevented && isButtonPressKey(e.key)) this.ripple.onAnonymousDown();
+        if (!e.defaultPrevented && isButtonPressKey(e.key) && this.ripple) {
+            this.ripple.onAnonymousDown();
+        }
     };
 
     onKeyUp = e => {
         if (e.target !== this.button) return;
         if (this.props.onKeyUp) this.props.onKeyUp(e);
-        if (!e.defaultPrevented) this.ripple.onAnonymousUp();
+        if (!e.defaultPrevented && this.ripple) this.ripple.onAnonymousUp();
     };
 
     onFocus = e => {
         if (this.props.onFocus) this.props.onFocus(e);
-        if (!e.defaultPrevented) this.ripple.onFocus();
+        if (!e.defaultPrevented && this.ripple) this.ripple.onFocus();
     };
 
     onBlur = e => {
         if (this.props.onBlur) this.props.onBlur(e);
-        if (!e.defaultPrevented) this.ripple.onBlur();
+        if (!e.defaultPrevented && this.ripple) this.ripple.onBlur();
     };
 
     render () {
