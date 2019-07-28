@@ -13,9 +13,10 @@ import './style';
 /// - `container`: optional DOM node of the container. `<body>` by default
 /// - `position`: tuple of two elements; sets the top left position of the menu on screen.
 ///   Shortcut to `style.transform = translate(x, y)`
-/// - `anchor`: shortcut to setting `style.transformOrigin`
+/// - `anchor`: tuple of two elements; anchor position normalized to 0..1
 /// - `items`: array of menu items
 /// - `clampToScreenEdge`: set to false to disable
+/// - `cascadeUp`: set to cascade up instead of cascading down
 export default class Menu extends Component {
     openness = new Spring(1, 0.3);
 
@@ -45,6 +46,7 @@ export default class Menu extends Component {
     componentDidUpdate (prevProps) {
         if (prevProps.open !== this.props.open) {
             globalAnimator.register(this);
+            this.openness.setPeriod(this.props.open ? 0.3 : 0.1);
             this.sizeNeedsUpdate = true;
         }
     }
@@ -65,6 +67,8 @@ export default class Menu extends Component {
         delete props.container;
         delete props.position;
         delete props.anchor;
+        delete props.items;
+        delete props.clampToScreenEdge;
 
         props.class = (props.class || '') + ' paper-menu';
 
@@ -72,12 +76,16 @@ export default class Menu extends Component {
         const scale = isClosing ? 1 : this.openness.value;
         const opacity = isClosing ? this.openness.value : 1;
 
+        const [ax, ay] = this.props.anchor || [0, 0];
         let [x, y] = this.props.position || [0, 0];
         let anchorOffsetX = 0;
         let anchorOffsetY = 0;
 
+        const [width, height] = this.state.size;
+        x -= ax * width;
+        y -= ay * height;
+
         if (this.props.clampToScreenEdge !== false) {
-            const [width, height] = this.state.size;
             const newX = Math.max(0, Math.min(x, window.innerWidth - width));
             const newY = Math.max(0, Math.min(y, window.innerHeight - height));
             anchorOffsetX = newX - x;
@@ -102,15 +110,21 @@ export default class Menu extends Component {
         Object.assign(props.style, {
             transform,
             opacity: opacity * (props.style.opacity !== undefined ? props.style.opacity : 1),
-            transformOrigin: this.props.anchor ? this.props.anchor : props.style.transformOrigin,
+            transformOrigin: this.props.anchor
+                ? `${this.props.anchor[0] * 100}% ${this.props.anchor[1] * 100}%`
+                : props.style.transformOrigin,
         });
 
+        const cascadeDown = !this.props.cascadeUp;
         const menuItems = (this.props.items || [])
             .map((item, i) => (
                 <MenuItem
                     {...item}
+                    key={i}
                     onClick={item.action}
-                    cascadeDelay={i / 15} key={i}>
+                    cascadeDelay={(cascadeDown ? i : (this.props.items.length - 1 - i))
+                        * 0.3 / (this.props.items.length ** 0.9)}
+                    cascadeDirection={cascadeDown ? 1 : -1}>
                     {item.label}
                 </MenuItem>
             ));
@@ -134,6 +148,7 @@ export default class Menu extends Component {
 /// # Props
 /// - `disabled`: disabled state
 /// - `cascadeDelay`: if given, will animate in with a delay
+/// - `cascadeDirection`: if given, will cascade in the given vertical direction
 export class MenuItem extends Button {
     presence = new Spring(1, 0.3);
 
@@ -174,9 +189,12 @@ export class MenuItem extends Button {
 
         const Component = this.props.onClick ? 'button' : 'div';
 
+        const cascadeDirection = Number.isFinite(this.props.cascadeDirection)
+            ? this.props.cascadeDirection
+            : 1;
         const style = {
             opacity: this.presence.value * (this.props.disabled ? 0.5 : 1),
-            transform: `translateY(${-(1 - this.presence.value) * 10}px)`,
+            transform: `translateY(${-(1 - this.presence.value) * 10 * cascadeDirection}px)`,
         };
 
         return (

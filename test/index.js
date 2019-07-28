@@ -169,7 +169,7 @@ class AppBarDemo extends Component {
 }
 
 class MenuDemo extends Component {
-    state = { i: false };
+    state = { i: false, j: false };
     render (props, state) {
         return (
             <div class="demo-region">
@@ -188,9 +188,30 @@ class MenuDemo extends Component {
                         onClose={() => this.setState({ i: false })}
                         items={[
                             { label: 'no ripple' },
-                            { label: 'with ripple', action () {} },
+                            { label: 'with ripple', action: () => this.setState({ i: false }) },
                             { label: 'disabled', disabled: true },
                             { label: 'etc' },
+                        ]} />
+                </div>
+                <div class="demo-item">
+                    <Button onClick={e => this.setState({
+                        j: !state.j,
+                        x: e.target.getBoundingClientRect().right,
+                        y: e.target.getBoundingClientRect().bottom,
+                    })}>
+                        Open Menu
+                    </Button>
+                    <Menu
+                        open={state.j}
+                        position={[state.x, state.y]}
+                        onClose={() => this.setState({ j: false })}
+                        anchor={[1, 1]}
+                        cascadeUp
+                        items={[
+                            { label: 'abcd' },
+                            { label: 'menu items' },
+                            { label: 'efgh' },
+                            ...[1, 2, 3, 4, 5, 6, 7, 8].map(() => ({ label: 'item' })),
                         ]} />
                 </div>
             </div>
