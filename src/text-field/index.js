@@ -39,6 +39,8 @@ export default class TextField extends Component {
     labelID = this.inputID + '-label';
     errorID = this.inputID + '-error';
 
+    node = null;
+
     /// The `<input>` node.
     inputNode = null;
 
@@ -51,6 +53,22 @@ export default class TextField extends Component {
 
     onBlur = () => {
         this.setState({ isFocused: false });
+    };
+
+    onInputMouseDown = e => {
+        if (this.props.onMouseDown) this.props.onMouseDown(e);
+        if (!e.defaultPrevented && !this.state.isFocused) {
+            const nodeRect = this.node.getBoundingClientRect();
+            this.underlineX = (e.clientX - nodeRect.left) / nodeRect.width;
+        }
+    };
+
+    onInputTouchStart = e => {
+        if (this.props.onTouchStart) this.props.onTouchStart(e);
+        if (!e.defaultPrevented && !this.state.isFocused) {
+            const nodeRect = this.node.getBoundingClientRect();
+            this.underlineX = (e.touches[0].clientX - nodeRect.left) / nodeRect.width;
+        }
     };
 
     /// Calls `focus()` on the input node.
@@ -100,7 +118,7 @@ export default class TextField extends Component {
         if (!outline) className += ' filled-style';
 
         return (
-            <span class={className}>
+            <span class={className} ref={node => this.node = node}>
                 <span class="p-contents">
                     <span class="p-leading" ref={node => this.leadingNode = node}>
                         {this.props.leading}
@@ -111,6 +129,8 @@ export default class TextField extends Component {
                         class="p-input"
                         onFocus={this.onFocus}
                         onBlur={this.onBlur}
+                        onMouseDown={this.onInputMouseDown}
+                        onTouchStart={this.onInputTouchStart}
                         ref={node => this.inputNode = node}
                         value={this.props.value}
                         placeholder={this.props.placeholder}
@@ -131,7 +151,8 @@ export default class TextField extends Component {
                     inputNode={this.inputNode}
                     leadingNode={this.leadingNode}
                     outline={outline}
-                    center={this.props.center} />
+                    center={this.props.center}
+                    underlineX={this.underlineX} />
                 <label class="p-error-label" id={this.errorID}>{this.props.error}</label>
                 <label class="p-helper-label">{this.props.helperLabel}</label>
             </span>
@@ -241,7 +262,13 @@ class TextFieldDecoration extends Component {
                     </div>
                 ) : (
                     <div class="p-underline">
-                        <div class="p-underline-inner" />
+                        <div
+                            class="p-underline-inner"
+                            style={{
+                                transformOrigin: `${Number.isFinite(this.props.underlineX)
+                                    ? (this.props.underlineX * 100)
+                                    : 50}% 100%`,
+                            }} />
                     </div>
                 )}
             </span>
