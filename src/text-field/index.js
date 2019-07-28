@@ -19,6 +19,8 @@ let inputIDCounter = 0;
 /// - `center`: will center the input if set
 /// - `error`: error label; should be falsy if no error is present
 /// - `helperLabel`: helper label shown when there is no error
+/// - `leading`: leading icon
+/// - `trailing`: trailing icon
 export default class TextField extends Component {
     state = {
         isFocused: false,
@@ -40,8 +42,8 @@ export default class TextField extends Component {
     /// The `<input>` node.
     inputNode = null;
 
-    /// The prefix container node.
-    prefixNode = null;
+    /// The leading container node.
+    leadingNode = null;
 
     onFocus = () => {
         this.setState({ isFocused: true });
@@ -79,14 +81,16 @@ export default class TextField extends Component {
         if (this.props.center) className += ' centered';
         if (this.state.isFocused || this.props.value) className += ' floating';
         if (!this.props.label) className += ' no-label';
-        if (this.props.prefix) className += ' has-prefix';
+        if (this.props.leading) className += ' has-leading';
+        if (this.props.trailing) className += ' has-trailing';
 
         const props = { ...this.props };
         delete props.class;
         delete props.outline;
         delete props.label;
         delete props.value;
-        delete props.prefix;
+        delete props.leading;
+        delete props.trailing;
         delete props.center;
         delete props.error;
         delete props.helperLabel;
@@ -98,8 +102,8 @@ export default class TextField extends Component {
         return (
             <span class={className}>
                 <span class="p-contents">
-                    <span class="p-prefix" ref={node => this.prefixNode = node}>
-                        {this.props.prefix}
+                    <span class="p-leading" ref={node => this.leadingNode = node}>
+                        {this.props.leading}
                     </span>
                     <input
                         {...props}
@@ -115,6 +119,9 @@ export default class TextField extends Component {
                         aria-invalid={!!this.props.error}
                         aria-errormessage={this.props.error && this.errorID}
                         onInput={e => this.props.onChange && this.props.onChange(e)} />
+                    <span class="p-trailing">
+                        {this.props.trailing}
+                    </span>
                 </span>
                 <TextFieldDecoration
                     floatingSpring={this.floatingSpring}
@@ -122,7 +129,7 @@ export default class TextField extends Component {
                     labelID={this.labelID}
                     label={this.props.label}
                     inputNode={this.inputNode}
-                    prefixNode={this.prefixNode}
+                    leadingNode={this.leadingNode}
                     outline={outline}
                     center={this.props.center} />
                 <label class="p-error-label" id={this.errorID}>{this.props.error}</label>
@@ -154,11 +161,13 @@ class TextFieldDecoration extends Component {
         const floatingY = this.props.outline ? -labelHeight * FLOATING_LABEL_SCALE / 2 : 0;
         const fixedY = (parseInt(inputStyle.paddingTop) + parseInt(inputStyle.paddingBottom)) / 2;
 
+        const leadingWidth = this.props.leadingNode.offsetWidth;
+
         let x = this.props.center
             ? (this.props.inputNode.offsetWidth
                 - lerp(labelWidth, labelWidth * FLOATING_LABEL_SCALE, this.state.float)) / 2
             : parseInt(inputStyle.paddingLeft);
-        x += this.props.prefixNode.offsetWidth;
+        if (!this.props.outline) x += leadingWidth;
         const y = lerp(fixedY, floatingY, this.state.float);
         const scale = lerp(1, FLOATING_LABEL_SCALE, this.state.float);
 
@@ -167,9 +176,13 @@ class TextFieldDecoration extends Component {
             : x - 2;
         const breakWidth = labelWidth * FLOATING_LABEL_SCALE + 4;
 
+        let labelX = x;
+        const easeOutSine = t => Math.sin(Math.PI / 2 * t);
+        if (this.props.outline) labelX += leadingWidth * easeOutSine(1 - this.state.float);
+
         return [
             {
-                transform: `translate(${x}px, ${y}px) scale(${scale})`,
+                transform: `translate(${labelX}px, ${y}px) scale(${scale})`,
             },
             {
                 //           scale (of the two border lines, indicated by +++ here)

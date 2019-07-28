@@ -288,9 +288,25 @@
         }
     }
 
-    &.prefix-icon {
-        .p-prefix {
+    &.has-leading {
+        .p-leading {
             padding-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .p-input {
+            padding-left: 8px;
+        }
+    }
+
+    &.has-trailing {
+        .p-trailing {
+            padding-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .p-input {
+            padding-right: 8px;
         }
     }
 }

@@ -110,7 +110,10 @@ class TextFieldDemo extends Component {
                 <div class="demo-item"><TextField label="Disabled " outline disabled {...sharedProps} /></div>
                 <div class="demo-item"><TextField label="Hello world" error="error" {...sharedProps} /></div>
                 <div class="demo-item"><TextField label="Hello world" helperLabel="help label" {...sharedProps} /></div>
-                <div class="demo-item"><TextField label="Prefixed" prefix="an icon?" {...sharedProps} /></div>
+                <div class="demo-item"><TextField label="With leading" leading="an icon?" {...sharedProps} /></div>
+                <div class="demo-item"><TextField outline label="With leading" leading="an icon?" {...sharedProps} /></div>
+                <div class="demo-item"><TextField label="With trailing" trailing="an icon?" {...sharedProps} /></div>
+                <div class="demo-item"><TextField outline label="With trailing" trailing="an icon?" {...sharedProps} /></div>
                 <div class="demo-item"><TextField center label="Centered" {...sharedProps} /></div>
             </div>
         );
@@ -173,7 +176,7 @@ class MenuDemo extends Component {
     render (props, state) {
         return (
             <div class="demo-region">
-                <h2>Menu</h2>
+                <h2>Menus</h2>
                 <div class="demo-item">
                     <Button onClick={e => this.setState({
                         i: !state.i,
