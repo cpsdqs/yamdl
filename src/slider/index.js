@@ -2,6 +2,10 @@ import { h, Component } from 'preact';
 import { Spring, globalAnimator, lerp } from '../animation';
 import './style';
 
+// mark browsers in which the metaball filter does not cause weird glitches
+const METABALL_FILTER_DOES_NOT_CAUSE_WEIRD_GLITCHES = !!navigator.userAgent
+    .match(/Firefox|Chrome/);
+
 /// A material slider.
 ///
 /// # Props
@@ -158,7 +162,7 @@ export default class Slider extends Component {
 
         const needsFX = Array.isArray(this.props.value)
             && thumbDistance < 30 && thumbDistance !== 0;
-        if (needsFX) {
+        if (needsFX && METABALL_FILTER_DOES_NOT_CAUSE_WEIRD_GLITCHES) {
             fxStyle.filter = fxStyle.webkitFilter = 'url(#ink-slider-metaball-filter)';
         }
 
@@ -203,11 +207,16 @@ export default class Slider extends Component {
                         transform: rightThumbTransform,
                     }} />
                 </span>
-                <svg style={{ display: 'none' }}>
+                <svg class="p-svg">
                     <defs>
                         <filter id="ink-slider-metaball-filter" color-interpolation-filters="sRGB">
                             <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="a" />
-                            <feColorMatrix in="a" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -12" result="out" />
+                            <feColorMatrix in="a" mode="matrix" values={[
+                                1, 0, 0, 0, 0,
+                                0, 1, 0, 0, 0,
+                                0, 0, 1, 0, 0,
+                                0, 0, 0, 30, -12
+                            ].join(' ')} result="out" />
                         </filter>
                     </defs>
                 </svg>
