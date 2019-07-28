@@ -1,6 +1,7 @@
 @import '../prelude';
 
 @menu-background: var(--md-menu-background);
+@selected-item-background: var(--md-menu-selected-background);
 
 .paper-menu-container {
     position: fixed;
@@ -28,4 +29,22 @@
     margin: 0;
     background: none;
     border: none;
+
+    &.is-selected:not(.select-with-icon) {
+        background: @selected-item-background;
+    }
+
+    &.has-icon {
+        padding-left: 8px;
+    }
+
+    .p-icon {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        vertical-align: middle;
+        line-height: 24px;
+        text-align: center;
+        margin-right: 8px;
+    }
 }

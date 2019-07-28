@@ -17,6 +17,7 @@ import './style';
 /// - `items`: array of menu items
 /// - `clampToScreenEdge`: set to false to disable
 /// - `cascadeUp`: set to cascade up instead of cascading down
+/// - `selectionIcon`: icon to use for selection
 export default class Menu extends Component {
     openness = new Spring(1, 0.3);
 
@@ -119,6 +120,10 @@ export default class Menu extends Component {
         const menuItems = (this.props.items || [])
             .map((item, i) => (
                 <MenuItem
+                    leadingIcon={this.props.selectionIcon
+                        ? item.selected ? this.props.selectionIcon : ''
+                        : null}
+                    selectWithIcon={!!this.props.selectionIcon}
                     {...item}
                     key={i}
                     onClick={item.action}
@@ -146,7 +151,10 @@ export default class Menu extends Component {
 /// A menu item.
 ///
 /// # Props
+/// - `selected`: disabled state
 /// - `disabled`: disabled state
+/// - `leadingIcon`: if not null, will display a leading icon
+/// - `selectWithIcon`: if set, will not highlight when selected
 /// - `cascadeDelay`: if given, will animate in with a delay
 /// - `cascadeDirection`: if given, will cascade in the given vertical direction
 export class MenuItem extends Button {
@@ -154,6 +162,7 @@ export class MenuItem extends Button {
 
     componentDidMount () {
         this.presence.target = 1;
+        this.presence.velocity = 4;
         if (Number.isFinite(this.props.cascadeDelay)) {
             this.presenceTimeout = this.props.cascadeDelay;
             globalAnimator.register(this);
@@ -185,7 +194,22 @@ export class MenuItem extends Button {
 
         props.class = (props.class || '') + ' paper-menu-item';
         if (this.props.onClick) props.class += ' has-action';
+        if (this.props.selected) {
+            props.class += ' is-selected';
+            if (this.props.selectWithIcon) props.class += ' select-with-icon';
+        }
         if (this.props.disabled) props.class += ' is-disabled';
+
+        let icon = null;
+
+        if (this.props.leadingIcon !== null && this.props.leadingIcon !== undefined) {
+            props.class += ' has-icon';
+            icon = (
+                <div className="p-icon">
+                    {this.props.leadingIcon}
+                </div>
+            );
+        }
 
         const Component = this.props.onClick ? 'button' : 'div';
 
@@ -213,6 +237,7 @@ export class MenuItem extends Button {
                 {this.props.onClick ? (
                     <Ripple ref={ripple => this.ripple = ripple} />
                 ) : null}
+                {icon}
                 {this.props.children}
             </Component>
         );

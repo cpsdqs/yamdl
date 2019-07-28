@@ -190,6 +190,7 @@ class MenuDemo extends Component {
                             { label: 'no ripple' },
                             { label: 'with ripple', action: () => this.setState({ i: false }) },
                             { label: 'disabled', disabled: true },
+                            { label: 'selected', selected: true },
                             { label: 'etc' },
                         ]} />
                 </div>
@@ -207,10 +208,11 @@ class MenuDemo extends Component {
                         onClose={() => this.setState({ j: false })}
                         anchor={[1, 1]}
                         cascadeUp
+                        selectionIcon={'✓'}
                         items={[
                             { label: 'abcd' },
                             { label: 'menu items' },
-                            { label: 'efgh' },
+                            { label: 'efgh', selected: true },
                             ...[1, 2, 3, 4, 5, 6, 7, 8].map(() => ({ label: 'item' })),
                         ]} />
                 </div>
