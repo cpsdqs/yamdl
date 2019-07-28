@@ -1,5 +1,5 @@
 import { render, h, Component } from 'preact';
-import { Button, Checkbox, CircularProgress, TextField } from '../src';
+import { Button, Checkbox, CircularProgress, TextField, Slider } from '../src';
 import { NavigationWindow, NavigationView, MenuIcon, AppBar } from '../src';
 import Menu from '../src/menu';
 import './index.less';
@@ -224,6 +224,59 @@ class MenuDemo extends Component {
     }
 }
 
+class SliderDemo extends Component {
+    state = { a: 5, b: 7 };
+    render (props, state) {
+        return (
+            <div class="demo-region">
+                <h2>Sliders</h2>
+                <div class="demo-item">
+                    <Slider
+                        value={state.a}
+                        max={10}
+                        onChange={a => this.setState({ a })} />
+                </div>
+                <div class="demo-item">
+                    <Slider
+                        max={10}
+                        discrete
+                        value={state.a}
+                        onChange={a => this.setState({ a })} />
+                </div>
+                <div class="demo-item">
+                    <Slider
+                        max={10}
+                        value={[state.a, state.b]}
+                        onChange={([a, b]) => this.setState({ a, b })} />
+                </div>
+                <div class="demo-item">
+                    <Slider
+                        max={10}
+                        discrete
+                        tickDistance={2}
+                        disabled
+                        value={state.a}
+                        onChange={a => this.setState({ a })} />
+                </div>
+                <div class="demo-item">
+                    <Slider
+                        max={10}
+                        discrete
+                        disabled
+                        value={state.b}
+                        transfer={[
+                            t => Math.sqrt(t) * 10,
+                            x => (x / 10) ** 2,
+                        ]}
+                        onChange={b => this.setState({ b })} />
+                </div>
+                <Button onClick={() => this.setState({ a: (state.a + 1) % 11 })}>a</Button>
+                <Button onClick={() => this.setState({ b: (state.b + 1) % 11 })}>b</Button>
+            </div>
+        );
+    }
+}
+
 function Gallery () {
     return (
         <div>
@@ -245,6 +298,7 @@ function Gallery () {
             <MenuIconDemo />
             <AppBarDemo />
             <MenuDemo />
+            <SliderDemo />
         </div>
     );
 }

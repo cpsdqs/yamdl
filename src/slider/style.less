@@ -1,0 +1,92 @@
+@track-color: var(--md-slider-track);
+@track-highlight: var(--md-slider-track-highlight);
+@track-tick: var(--md-slider-track-tick);
+@track-highlight-tick: var(--md-slider-track-highlight-tick);
+@track-disabled: var(--md-slider-track-disabled);
+@track-highlight-disabled: var(--md-slider-track-highlight-disabled);
+@track-tick-disabled: var(--md-slider-track-tick-disabled);
+@track-highlight-tick-disabled: var(--md-slider-track-highlight-tick-disabled);
+@thumb: var(--md-slider-thumb);
+@thumb-disabled: var(--md-slider-thumb-disabled);
+
+.ink-slider {
+    display: inline-block;
+    position: relative;
+    width: 200px;
+    height: 16px;
+    user-select: none;
+
+    .p-track {
+        display: inline-block;
+        position: relative;
+        background: @track-color;
+        height: 2px;
+        width: calc(100% - 16px);
+        margin: 7px 8px;
+        border-radius: 1px;
+        overflow: hidden;
+        line-height: 0;
+
+        .p-track-highlight {
+            display: block;
+            background: @track-highlight;
+            width: 100%;
+            height: 100%;
+            transform-origin: 0 0;
+        }
+
+        .p-tick {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 2px;
+            border-radius: 1px;
+            background: @track-tick;
+
+            &.p-highlight {
+                background: @track-highlight-tick;
+            }
+        }
+    }
+
+    .p-thumb-fx {
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        right: -8px;
+        bottom: -8px;
+    }
+
+    .p-thumb {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        width: 16px;
+        height: 16px;
+        background: @thumb;
+        border-radius: 50%;
+    }
+
+    &.is-disabled {
+        .p-track {
+            background: @track-disabled;
+
+            .p-track-highlight {
+                background: @track-highlight-disabled;
+            }
+
+            .p-tick {
+                background: @track-tick-disabled;
+
+                &.p-highlight {
+                    background: @track-highlight-tick-disabled;
+                }
+            }
+        }
+
+        .p-thumb {
+            background: @thumb-disabled;
+        }
+    }
+}

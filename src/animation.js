@@ -109,6 +109,15 @@ export class SpringSolver {
 
     /// Sets internal parameters for the given initial velocity.
     hydrateParams (initialValue, initialVelocity) {
+        if (this.target === null) {
+            // uncontrolled “spring”
+            this.initialValue = initialValue;
+            this.initialVelocity = initialVelocity;
+            return;
+        }
+
+        initialValue -= this.target;
+
         this.undampedAngularFrequency = this.dampingRatio === 0
             ? 0
             : this.friction / this.dampingRatio / 2;
@@ -141,7 +150,7 @@ export class SpringSolver {
         const value = this.getValue(t);
         const velocity = this.getVelocity(t);
         this.target = newTarget;
-        this.hydrateParams(value - this.target, velocity);
+        this.hydrateParams(value, velocity);
     }
 
     /// Resets the velocity to a new value.
@@ -151,21 +160,21 @@ export class SpringSolver {
     /// @param {number} newVelocity - the new velocity
     resetVelocity (t, newVelocity) {
         const value = this.getValue(t);
-        this.hydrateParams(value - this.target, newVelocity);
+        this.hydrateParams(value, newVelocity);
     }
 
     resetDampingRatio (t, newDampingRatio) {
         const value = this.getValue(t);
         const velocity = this.getVelocity(t);
         this.dampingRatio = newDampingRatio;
-        this.hydrateParams(value - this.target, velocity);
+        this.hydrateParams(value, velocity);
     }
 
     resetFriction (t, newFriction) {
         const value = this.getValue(t);
         const velocity = this.getVelocity(t);
         this.friction = newFriction;
-        this.hydrateParams(value - this.target, velocity);
+        this.hydrateParams(value, velocity);
     }
 
     resetPeriod (t, newPeriod) {
@@ -174,10 +183,17 @@ export class SpringSolver {
 
     resetValue (t, newValue) {
         const velocity = this.getVelocity(t);
-        this.hydrateParams(newValue - this.target, velocity);
+        this.hydrateParams(newValue, velocity);
     }
 
     getValue (t) {
+        if (this.target === null) {
+            // no target means the only active part of the equation is v' = -cv
+            // => solution: v = k * e^(-cx); integral: dx = -k * e^(-cx) / c
+            return this.initialValue - this.initialVelocity
+                * Math.exp(-t * this.friction) / this.friction;
+        }
+
         let value;
         if (this.dampingRatio < 1) {
             // underdamped
@@ -192,6 +208,10 @@ export class SpringSolver {
     }
 
     getVelocity (t) {
+        if (this.target === null) {
+            return this.initialVelocity * Math.exp(-t * this.friction);
+        }
+
         if (this.dampingRatio < 1) {
             // underdamped
             return this.amplitudeFactor * (-this.friction / 2 * Math.exp(-t * this.friction / 2)

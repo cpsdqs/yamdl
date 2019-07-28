@@ -31,6 +31,17 @@
     --md-ripple-color: fade(#000, 20%);
     --md-ripple-highlight: fade(#000, 8%);
 
+    --md-slider-track: fade(@secondary, 50%);
+    --md-slider-track-highlight: @secondary;
+    --md-slider-track-tick: @secondary;
+    --md-slider-track-highlight-tick: fade(#fff, 50%);
+    --md-slider-track-disabled: fade(#000, 10%);
+    --md-slider-track-highlight-disabled: fade(#000, 40%);
+    --md-slider-track-tick-disabled: fade(#000, 20%);
+    --md-slider-track-highlight-tick-disabled: fade(#fff, 50%);
+    --md-slider-thumb: @secondary;
+    --md-slider-thumb-disabled: var(--md-slider-track-highlight-disabled);
+
     --md-text-field-idle: fade(#000, 60%);
     --md-text-field-focus: @secondary;
     --md-text-field-error: @error;
@@ -54,6 +65,9 @@
     --md-menu-selected-background: fade(#fff, 10%);
     --md-ripple-color: fade(#fff, 60%);
     --md-ripple-highlight: fade(#fff, 12%);
+    --md-slider-track-disabled: fade(#fff, 10%);
+    --md-slider-track-highlight-disabled: fade(#fff, 30%);
+    --md-slider-track-tick-disabled: fade(#fff, 20%);
     --md-text-field-idle: fade(#fff, 40%);
     --md-text-field-disabled: fade(#fff, 20%);
     --md-text-field-disabled-text: fade(#fff, 30%);
