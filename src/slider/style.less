@@ -8,6 +8,7 @@
 @track-highlight-tick-disabled: var(--md-slider-track-highlight-tick-disabled);
 @thumb: var(--md-slider-thumb);
 @thumb-disabled: var(--md-slider-thumb-disabled);
+@text: var(--md-slider-text);
 
 .ink-slider {
     display: inline-block;
@@ -61,6 +62,11 @@
         .p-thumb, .p-thumb-join, .p-thumb-popout {
             fill: @thumb;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        .p-thumb-popout-text {
+            pointer-events: none;
+            fill: @text;
         }
     }
 

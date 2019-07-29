@@ -225,7 +225,7 @@ class MenuDemo extends Component {
 }
 
 class SliderDemo extends Component {
-    state = { a: 5, b: 7 };
+    state = { a: 5, b: 7, c: 250, d: 500 };
     render (props, state) {
         return (
             <div class="demo-region">
@@ -251,6 +251,7 @@ class SliderDemo extends Component {
                 </div>
                 <div class="demo-item">
                     <Slider
+                        min={-10}
                         max={10}
                         discrete
                         tickDistance={2}
@@ -269,6 +270,18 @@ class SliderDemo extends Component {
                             x => (x / 10) ** 2,
                         ]}
                         onChange={() => {}} />
+                </div>
+                <div class="demo-item">
+                    <Slider
+                        min={100}
+                        max={1000}
+                        popout
+                        value={[state.c, state.d]}
+                        transfer={[
+                            t => (Math.exp(t) - 1) * 1000 / Math.E / (1 - 1 / Math.E),
+                            x => Math.log(x / 1000 * (1 - 1 / Math.E) * Math.E + 1),
+                        ]}
+                        onChange={([c, d]) => this.setState({ c, d })} />
                 </div>
             </div>
         );

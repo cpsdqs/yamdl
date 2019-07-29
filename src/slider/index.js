@@ -7,6 +7,14 @@ const THUMB_SIZE = 12;
 const MIN_DRAG_DISTANCE = 4;
 const SPLIT_VELOCITY = 435;
 const POPOUT_DISTANCE = 36;
+const THUMB_DISTANCE_EXTRA_QUOTIENT = 16;
+
+const measureTextCanvas = document.createElement('canvas');
+const measureTextCtx = measureTextCanvas.getContext('2d');
+const measureTextWidth = (font, text) => {
+    measureTextCtx.font = font;
+    return measureTextCtx.measureText(text).width;
+};
 
 /// A material slider.
 ///
@@ -19,6 +27,7 @@ const POPOUT_DISTANCE = 36;
 /// - `onChange`: called with a new value when it changes
 /// - `discrete`: if true, will round to integers
 /// - `tickDistance`: distance for tick marks. 1 by default
+/// - `popout`: if true, will show popout with rounded values despite not being discrete
 /// - `disabled`: disabled state
 export default class Slider extends Component {
     // thumb positions in [0, 1]
@@ -27,6 +36,8 @@ export default class Slider extends Component {
 
     leftPopoutAngle = new Spring(0.7, 0.5);
     rightPopoutAngle = new Spring(0.7, 0.5);
+    leftPopoutScale = new Spring(1, 0.5);
+    rightPopoutScale = new Spring(1, 0.5);
 
     leftThumbScale = new Spring(1, 0.3);
     rightThumbScale = new Spring(1, 0.3);
@@ -96,7 +107,7 @@ export default class Slider extends Component {
         if (this.draggingThumb === 'both') {
             this.leftThumbX.value = this.rightThumbX.value = (this.leftThumbX.value
                 + this.rightThumbX.value) / 2;
-            this.leftThumbScale.target = this.rightThumbScale.target = 1;
+            this.leftThumbScale.target = 1;
             this.leftThumbX.locked = this.rightThumbX.locked = true;
         } else if (this.draggingThumb === 'left') {
             this.leftThumbScale.target = 1;
@@ -146,6 +157,7 @@ export default class Slider extends Component {
 
             if (this.leftThumbX.value > this.rightThumbX.value) {
                 this.draggingThumb = 'both';
+                this.leftThumbX.locked = this.rightThumbX.locked = true;
             }
 
             let newValue;
@@ -223,20 +235,37 @@ export default class Slider extends Component {
             );
         }
 
-        const handlePopout = (popout, thumb, scale) => {
+        const font = this.node ? getComputedStyle(this.node).font : null;
+
+        const handlePopout = (popout, thumb, scale, pscale) => {
             const v = thumb.velocity;
             const popoutY = Math.max(0, -Math.sin(popout.value - Math.PI / 2) * scale.value);
 
             popout.velocity -= 9 * Math.sqrt(popoutY) * v * dt;
+
+            if (font) {
+                const value = clamp(
+                    Math.round(this.transferToValue(thumb.value)), this.min, this.max,
+                );
+                const valueWidth = measureTextWidth(font, value);
+                pscale.target = Math.max(THUMB_SIZE * 1.1, valueWidth / 2 + 8);
+                if (scale.value < 0.1) pscale.value = pscale.target;
+            }
         };
 
-        handlePopout(this.leftPopoutAngle, this.leftThumbX, this.leftThumbScale);
-        handlePopout(this.rightPopoutAngle, this.rightThumbX, this.rightThumbScale);
+        handlePopout(
+            this.leftPopoutAngle, this.leftThumbX, this.leftThumbScale, this.leftPopoutScale,
+        );
+        handlePopout(
+            this.rightPopoutAngle, this.rightThumbX, this.rightThumbScale, this.rightPopoutScale,
+        );
 
         this.leftThumbX.update(dt);
         this.rightThumbX.update(dt);
         this.leftPopoutAngle.update(dt);
         this.rightPopoutAngle.update(dt);
+        this.leftPopoutScale.update(dt);
+        this.rightPopoutScale.update(dt);
         this.leftThumbScale.update(dt);
         this.rightThumbScale.update(dt);
 
@@ -252,6 +281,7 @@ export default class Slider extends Component {
 
         let wantsUpdate = this.leftThumbX.wantsUpdate() || this.rightThumbX.wantsUpdate()
             || this.leftPopoutAngle.wantsUpdate() || this.rightPopoutAngle.wantsUpdate()
+            || this.leftPopoutScale.wantsUpdate() || this.rightPopoutScale.wantsUpdate()
             || this.leftThumbScale.wantsUpdate() || this.rightThumbScale.wantsUpdate();
         if (!wantsUpdate && !this.isDragging) {
             globalAnimator.deregister(this);
@@ -435,21 +465,38 @@ export default class Slider extends Component {
         let leftDiscretePopout;
         let rightDiscretePopout;
 
-        if (this.props.discrete) {
-            const leftDistance = POPOUT_DISTANCE * this.leftThumbScale.value;
+        if (this.props.discrete || this.props.popout) {
+            const leftDistance = POPOUT_DISTANCE * this.leftThumbScale.value
+                * Math.max(1, this.leftPopoutScale.value / THUMB_DISTANCE_EXTRA_QUOTIENT);
             const leftAngle = this.leftPopoutAngle.value - Math.PI / 2;
+
             leftDiscretePopout = {
-                radius: THUMB_SIZE * 1.1 * this.leftThumbScale.value,
+                radius: this.leftPopoutScale.value * this.leftThumbScale.value,
                 x: 8 + leftThumbXpx + Math.cos(leftAngle) * leftDistance,
                 y: 8 + Math.sin(leftAngle) * leftDistance,
+                text: clamp(
+                    Math.round(this.transferToValue(this.leftThumbX.value)), this.min, this.max,
+                ),
+                textScale: this.leftThumbScale.value,
             };
-            const rightDistance = POPOUT_DISTANCE * this.rightThumbScale.value;
-            const rightAngle = this.rightPopoutAngle.value - Math.PI / 2;
-            rightDiscretePopout = {
-                radius: THUMB_SIZE * 1.1 * this.rightThumbScale.value,
-                x: 8 + rightThumbXpx + Math.cos(rightAngle) * rightDistance,
-                y: 8 + Math.sin(rightAngle) * rightDistance,
-            };
+
+            if (Array.isArray(this.props.value)) {
+                const rightDistance = POPOUT_DISTANCE * this.rightThumbScale.value
+                    * Math.max(1, this.rightPopoutScale.value / THUMB_DISTANCE_EXTRA_QUOTIENT);
+                const rightAngle = this.rightPopoutAngle.value - Math.PI / 2;
+
+                rightDiscretePopout = {
+                    radius: this.rightPopoutScale.value * this.rightThumbScale.value,
+                    x: 8 + rightThumbXpx + Math.cos(rightAngle) * rightDistance,
+                    y: 8 + Math.sin(rightAngle) * rightDistance,
+                    text: clamp(
+                        Math.round(this.transferToValue(this.rightThumbX.value)),
+                        this.min,
+                        this.max,
+                    ),
+                    textScale: this.rightThumbScale.value,
+                };
+            }
         }
 
         const metaballJoins = [
@@ -498,28 +545,58 @@ export default class Slider extends Component {
                         onTouchStart={this.onTouchStartLeft}
                         onTouchMove={this.onTouchMove}
                         onTouchEnd={this.onTouchEnd} />
-                    <circle
-                        class="p-thumb"
-                        cx={rightThumbCircle.x}
-                        cy={rightThumbCircle.y}
-                        r={rightThumbCircle.radius}
-                        onMouseDown={this.onMouseDownRight}
-                        onTouchStart={this.onTouchStartRight}
-                        onTouchMove={this.onTouchMove}
-                        onTouchEnd={this.onTouchEnd} />
-                    {this.props.discrete ? (
+                    {Array.isArray(this.props.value) ? (
+                        <circle
+                            class="p-thumb"
+                            cx={rightThumbCircle.x}
+                            cy={rightThumbCircle.y}
+                            r={rightThumbCircle.radius}
+                            onMouseDown={this.onMouseDownRight}
+                            onTouchStart={this.onTouchStartRight}
+                            onTouchMove={this.onTouchMove}
+                            onTouchEnd={this.onTouchEnd} />
+                    ) : null}
+                    {leftDiscretePopout ? (
                         <circle
                             class="p-thumb-popout"
                             cx={leftDiscretePopout.x}
                             cy={leftDiscretePopout.y}
                             r={leftDiscretePopout.radius} />
                     ) : null}
-                    {this.props.discrete ? (
+                    {rightDiscretePopout ? (
                         <circle
                             class="p-thumb-popout"
                             cx={rightDiscretePopout.x}
                             cy={rightDiscretePopout.y}
                             r={rightDiscretePopout.radius} />
+                    ) : null}
+                    {leftDiscretePopout ? (
+                        <text
+                            class="p-thumb-popout-text"
+                            x={0}
+                            y={0}
+                            text-anchor="middle"
+                            dominant-baseline="middle"
+                            transform={[
+                                `translate(${leftDiscretePopout.x} ${leftDiscretePopout.y})`,
+                                `scale(${leftDiscretePopout.textScale})`
+                            ].join(' ')}>
+                            {leftDiscretePopout.text}
+                        </text>
+                    ) : null}
+                    {rightDiscretePopout ? (
+                        <text
+                            class="p-thumb-popout-text"
+                            x={0}
+                            y={0}
+                            text-anchor="middle"
+                            dominant-baseline="middle"
+                            transform={[
+                                `translate(${rightDiscretePopout.x} ${rightDiscretePopout.y})`,
+                                `scale(${rightDiscretePopout.textScale})`
+                            ].join(' ')}>
+                            {rightDiscretePopout.text}
+                        </text>
                     ) : null}
                 </svg>
             </span>
