@@ -256,22 +256,20 @@ class SliderDemo extends Component {
                         tickDistance={2}
                         disabled
                         value={state.a}
-                        onChange={a => this.setState({ a })} />
+                        onChange={() => {}} />
                 </div>
                 <div class="demo-item">
                     <Slider
                         max={10}
                         discrete
                         disabled
-                        value={state.b}
+                        value={[state.a, state.b]}
                         transfer={[
                             t => Math.sqrt(t) * 10,
                             x => (x / 10) ** 2,
                         ]}
-                        onChange={b => this.setState({ b })} />
+                        onChange={() => {}} />
                 </div>
-                <Button onClick={() => this.setState({ a: (state.a + 1) % 11 })}>a</Button>
-                <Button onClick={() => this.setState({ b: (state.b + 1) % 11 })}>b</Button>
             </div>
         );
     }

@@ -111,7 +111,9 @@ export class SpringSolver {
     hydrateParams (initialValue, initialVelocity) {
         if (this.target === null) {
             // uncontrolled “spring”
-            this.initialValue = initialValue;
+            this.initialValueOffset = initialValue + (this.friction === 0
+                ? 0
+                : initialVelocity / this.friction);
             this.initialVelocity = initialVelocity;
             return;
         }
@@ -188,9 +190,11 @@ export class SpringSolver {
 
     getValue (t) {
         if (this.target === null) {
+            if (this.friction === 0) return this.initialValueOffset + t * this.initialVelocity;
+
             // no target means the only active part of the equation is v' = -cv
-            // => solution: v = k * e^(-cx); integral: dx = -k * e^(-cx) / c
-            return this.initialValue - this.initialVelocity
+            // => solution: v = k * e^(-cx); integral: x = -k * e^(-cx) / c + C
+            return this.initialValueOffset - this.initialVelocity
                 * Math.exp(-t * this.friction) / this.friction;
         }
 
@@ -227,6 +231,8 @@ export class SpringSolver {
         }
     }
 }
+
+window.ss = SpringSolver;
 
 const timeKey = Symbol('time');
 

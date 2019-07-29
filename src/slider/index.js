@@ -1,10 +1,11 @@
 import { h, Component } from 'preact';
-import { Spring, globalAnimator, lerp } from '../animation';
+import { Spring, globalAnimator, lerp, clamp } from '../animation';
+import metaball from './metaball';
 import './style';
 
-// mark browsers in which the metaball filter does not cause weird glitches
-const METABALL_FILTER_DOES_NOT_CAUSE_WEIRD_GLITCHES = !!navigator.userAgent
-    .match(/Firefox|Chrome/);
+const THUMB_SIZE = 16;
+const MIN_DRAG_DISTANCE = 4;
+const SPLIT_VELOCITY = 400;
 
 /// A material slider.
 ///
@@ -26,11 +27,173 @@ export default class Slider extends Component {
     // true after the user has released a thumb, letting it drift from inertia
     coasting = false;
 
+    // MARK: event handling
+    shouldDragBothThumbs () {
+        const width = this.node.offsetWidth - 16;
+        return Math.abs(this.leftThumbX.value - this.rightThumbX.value) * width < 8;
+    }
+    onMouseDownLeft = e => {
+        if (this.props.disabled) return;
+        e.preventDefault();
+        this.draggingThumb = this.shouldDragBothThumbs() ? 'both' : 'left';
+        this.onPointerDown(e.clientX);
+        window.addEventListener('mousemove', this.onMouseMove);
+        window.addEventListener('mouseup', this.onMouseUp);
+    };
+    onMouseDownRight = e => {
+        if (this.props.disabled) return;
+        e.preventDefault();
+        this.draggingThumb = this.shouldDragBothThumbs() ? 'both' : 'right';
+        this.onPointerDown(e.clientX);
+        window.addEventListener('mousemove', this.onMouseMove);
+        window.addEventListener('mouseup', this.onMouseUp);
+    };
+    onMouseMove = e => {
+        e.preventDefault();
+        this.onPointerMove(e.clientX);
+    };
+    onMouseUp = e => {
+        e.preventDefault();
+        this.onPointerUp();
+        window.removeEventListener('mousemove', this.onMouseMove);
+        window.removeEventListener('mouseup', this.onMouseUp);
+    };
+    onTouchStartLeft = e => {
+        if (this.props.disabled) return;
+        e.preventDefault();
+        this.draggingThumb = this.shouldDragBothThumbs() ? 'both' : 'left';
+        this.onPointerDown(e.touches[0].clientX);
+    };
+    onTouchStartRight = e => {
+        if (this.props.disabled) return;
+        e.preventDefault();
+        this.draggingThumb = this.shouldDragBothThumbs() ? 'both' : 'right';
+        this.onPointerDown(e.touches[0].clientX);
+    };
+    onTouchMove = e => {
+        e.preventDefault();
+        this.onPointerMove(e.touches[0].clientX);
+    };
+    onTouchEnd = e => {
+        e.preventDefault();
+        this.onPointerUp();
+    };
+
+    onPointerDown (clientX) {
+        const nodeRect = this.node.getBoundingClientRect();
+        this.dragFirstX = clientX;
+        this.isDragging = false;
+        this.dragPrevX = this.softBounds(clientX - nodeRect.left - 8, nodeRect.width - 16);
+        this.dragPrevTime = Date.now();
+
+        if (this.draggingThumb === 'both') {
+            this.leftThumbX.value = this.rightThumbX.value = (this.leftThumbX.value
+                + this.rightThumbX.value) / 2;
+        }
+        globalAnimator.register(this);
+    }
+    onPointerMove (clientX) {
+        const nodeRect = this.node.getBoundingClientRect();
+        const x = this.softBounds(clientX - nodeRect.left - 8, nodeRect.width - 16);
+
+        if (!this.isDragging && Math.abs(clientX - this.dragFirstX) > MIN_DRAG_DISTANCE) {
+            this.isDragging = true;
+
+            this.dragOffset = (this.draggingThumb === 'left'
+                    ? this.leftThumbX.value
+                    : this.rightThumbX.value) - x;
+        }
+
+        if (this.isDragging) {
+            this.leftThumbX.target = null;
+            this.rightThumbX.target = null;
+            this.leftThumbX.velocity = 0;
+            this.rightThumbX.velocity = 0;
+
+            const thumbX = x + this.dragOffset;
+            if (this.draggingThumb === 'both' || this.draggingThumb === 'left') {
+                this.leftThumbX.value = thumbX;
+            }
+            if (this.draggingThumb === 'both' || this.draggingThumb === 'right') {
+                this.rightThumbX.value = thumbX;
+            }
+
+            if (this.leftThumbX.value > this.rightThumbX.value) {
+                this.draggingThumb = 'both';
+            }
+
+            let newValue;
+            if (Array.isArray(this.props.value)) {
+                const left = this.transferToValue(this.leftThumbX.value);
+                const right = this.transferToValue(this.rightThumbX.value);
+                newValue = [left, right];
+            } else {
+                newValue = this.transferToValue(this.rightThumbX.value);
+            }
+
+            this.emitChange(newValue);
+
+            this.dragVelocity = (x - this.dragPrevX) / Math.max(
+                1e-3,
+                (Date.now() - this.dragPrevTime) / 1000,
+            );
+
+            globalAnimator.register(this);
+        }
+
+        this.dragPrevX = x;
+        this.dragPrevTime = Date.now();
+    }
+    onPointerUp () {
+        if (!this.isDragging && this.draggingThumb === 'both' && Array.isArray(this.props.value)) {
+            // split
+            this.coasting = true;
+            const width = this.node.offsetWidth - 16;
+            this.leftThumbX.velocity = -SPLIT_VELOCITY / width;
+            this.rightThumbX.velocity = SPLIT_VELOCITY / width;
+            globalAnimator.register(this);
+        } else if (this.isDragging) {
+            this.coasting = true;
+
+            if (this.draggingThumb === 'both' || this.draggingThumb === 'left') {
+                this.leftThumbX.velocity = this.dragVelocity;
+            }
+            if (this.draggingThumb === 'both' || this.draggingThumb === 'right') {
+                this.rightThumbX.velocity = this.dragVelocity;
+            }
+
+            globalAnimator.register(this);
+        }
+
+        this.isDragging = false;
+    }
+    softBounds (x, w) {
+        const rubberBand = x => Math.sqrt(x);
+        if (x < 0) return -rubberBand(-x) / w;
+        else if (x > w) return (rubberBand(x - w) + w) / w;
+        else return x / w;
+    }
+
+    emitChange (newValue) {
+        if (Array.isArray(newValue)) {
+            if (this.props.discrete) {
+                newValue = [Math.round(newValue[0]), Math.round(newValue[1])];
+            }
+            this.props.onChange([
+                clamp(newValue[0], this.min, this.max),
+                clamp(newValue[1], this.min, this.max),
+            ]);
+        } else {
+            if (this.props.discrete) newValue = Math.round(newValue);
+            this.props.onChange(clamp(newValue, this.min, this.max));
+        }
+    }
+
     update (dt) {
         if (this.coasting) {
             this.leftThumbX.target = this.leftThumbX.value < 0 ? 0 : null;
             this.rightThumbX.target = this.rightThumbX.value > 1 ? 1 : null;
-        } else {
+        } else if (!this.isDragging) {
             this.leftThumbX.target = this.transferToScreen(
                 Array.isArray(this.props.value) ? this.props.value[0] : this.props.value,
             );
@@ -43,14 +206,17 @@ export default class Slider extends Component {
         this.rightThumbX.update(dt);
 
         if (this.coasting) {
+            this.prevCoastingValue = this.coastingValue || this.props.value;
             this.coastingValue = Array.isArray(this.props.value) ? [
                 this.transferToValue(this.leftThumbX.value),
                 this.transferToValue(this.rightThumbX.value),
             ] : this.transferToValue(this.rightThumbX.value);
+
+            this.emitChange(this.coastingValue);
         } else this.coastingValue = null;
 
         let wantsUpdate = this.leftThumbX.wantsUpdate() || this.rightThumbX.wantsUpdate();
-        if (!wantsUpdate) {
+        if (!wantsUpdate && !this.isDragging) {
             globalAnimator.deregister(this);
         }
 
@@ -68,11 +234,23 @@ export default class Slider extends Component {
     componentWillUnmount () {
         globalAnimator.deregister(this);
         window.removeEventListener('resize', this.onResize);
+        window.removeEventListener('mousemove', this.onMouseMove);
+        window.removeEventListener('mouseup', this.onMouseUp);
     }
 
     componentWillUpdate (newProps) {
-        if (this.coasting && newProps.value !== this.coastingValue) {
-            this.coasting = false;
+        if (this.coasting) {
+            const threshold = 0.1;
+            const newValueIsCloseToEqualTo = value => {
+                if (Array.isArray(newProps.value) && Array.isArray(value)) {
+                    return Math.abs(newProps.value[0] - value[0])
+                        + Math.abs(newProps.value[1] - value[1]) < threshold * 2;
+                } else return Math.abs(newProps.value - value) < threshold;
+            };
+            if (!newValueIsCloseToEqualTo(this.coastingValue)
+                && !newValueIsCloseToEqualTo(this.prevCoastingValue)) {
+                this.coasting = false;
+            }
         }
     }
 
@@ -155,29 +333,43 @@ export default class Slider extends Component {
 
         const width = this.node ? this.node.offsetWidth - 16 : 0;
 
-        const fxStyle = {};
         const trackStyle = {};
 
-        const thumbDistance = Math.abs(rightThumbX - leftThumbX) * width;
+        let leftThumbXpx = leftThumbX * width;
+        let rightThumbXpx = rightThumbX * width;
+        let leftThumbScale = 1;
+        let rightThumbScale = 1;
 
-        const needsFX = Array.isArray(this.props.value)
-            && thumbDistance < 30 && thumbDistance !== 0;
-        if (needsFX && METABALL_FILTER_DOES_NOT_CAUSE_WEIRD_GLITCHES) {
-            fxStyle.filter = fxStyle.webkitFilter = 'url(#ink-slider-metaball-filter)';
+        {
+            // make thumbs grow when they get close
+            const s = 1 + Math.exp(-((Math.abs(rightThumbXpx - leftThumbXpx) / 5) ** 2)) * 0.3;
+            leftThumbScale *= s;
+            rightThumbScale *= s;
         }
 
-        let leftThumbTransform = `translateX(${leftThumbX * width}px)`;
-        let rightThumbTransform = `translateX(${rightThumbX * width}px)`;
+        {
+            // scale track when thumb is out of bounds
+            const left = Math.min(leftThumbXpx, rightThumbXpx, 0);
+            const right = Math.max(leftThumbXpx, rightThumbXpx, width);
+
+            const scale = (right - left) / width;
+            if (scale > 1) {
+                const center = (left + right) / 2 - width / 2;
+                trackStyle.transform = `translateX(${center}px) scaleX(${scale})`;
+            }
+        }
 
         if (this.props.disabled) {
-            leftThumbTransform += ' scale(0.5)';
-            rightThumbTransform += ' scale(0.5)';
+            leftThumbScale /= 2;
+            rightThumbScale /= 2;
 
+            // when disabled, the track looks like this: ------ o --- with a space around the
+            // thumbs, so a clip path is required
             let clipPath = 'polygon(0% 0%,';
-            const split1 = leftThumbX * width - 8;
-            const split2 = leftThumbX * width + 8;
-            const split3 = leftThumbX * width - 8;
-            const split4 = leftThumbX * width + 8;
+            const split1 = leftThumbXpx - THUMB_SIZE * leftThumbScale;
+            const split2 = leftThumbXpx + THUMB_SIZE * leftThumbScale;
+            const split3 = rightThumbXpx - THUMB_SIZE * leftThumbScale;
+            const split4 = rightThumbXpx + THUMB_SIZE * leftThumbScale;
             const splitTwice = split2 < split3;
             clipPath += `${split1}px 0%,${split1}px 99%,`;
             if (splitTwice) {
@@ -185,11 +377,27 @@ export default class Slider extends Component {
             }
             clipPath += `${split4}px 99%,${split4}px 0%,100% 0%,100% 100%,0% 100%`;
             trackStyle.clipPath = trackStyle.webkitClipPath = clipPath;
-        } else if (Array.isArray(this.props.value) && thumbDistance < 30) {
-            const s = 1 + Math.exp(-((thumbDistance / 5) ** 2)) * 0.3;
-            leftThumbTransform += ` scale(${s})`;
-            rightThumbTransform += ` scale(${s})`;
         }
+
+        const leftThumbCircle = {
+            radius: leftThumbScale * THUMB_SIZE / 2,
+            x: 8 + leftThumbXpx,
+            y: 8,
+        };
+        const rightThumbCircle = {
+            radius: rightThumbScale * THUMB_SIZE / 2,
+            x: 8 + rightThumbXpx,
+            y: 8,
+        };
+        // TODO: discrete value popouts
+        const metaballJoins = [
+            metaball(
+                leftThumbCircle.radius,
+                rightThumbCircle.radius,
+                [leftThumbCircle.x, leftThumbCircle.y],
+                [rightThumbCircle.x, rightThumbCircle.y],
+            ),
+        ].join(' ');
 
         return (
             <span {...props} ref={node => this.node = node}>
@@ -199,26 +407,26 @@ export default class Slider extends Component {
                     }} />
                     {ticks}
                 </span>
-                <span class="p-thumb-fx" style={fxStyle}>
-                    <span class="p-thumb" style={{
-                        transform: leftThumbTransform,
-                    }} />
-                    <span class="p-thumb" style={{
-                        transform: rightThumbTransform,
-                    }} />
-                </span>
-                <svg class="p-svg">
-                    <defs>
-                        <filter id="ink-slider-metaball-filter" color-interpolation-filters="sRGB">
-                            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="a" />
-                            <feColorMatrix in="a" mode="matrix" values={[
-                                1, 0, 0, 0, 0,
-                                0, 1, 0, 0, 0,
-                                0, 0, 1, 0, 0,
-                                0, 0, 0, 30, -12
-                            ].join(' ')} result="out" />
-                        </filter>
-                    </defs>
+                <svg class="p-thumb-fx">
+                    <path class="p-thumb-join" d={metaballJoins} />
+                    <circle
+                        class="p-thumb"
+                        cx={leftThumbCircle.x}
+                        cy={leftThumbCircle.y}
+                        r={leftThumbCircle.radius}
+                        onMouseDown={this.onMouseDownLeft}
+                        onTouchStart={this.onTouchStartLeft}
+                        onTouchMove={this.onTouchMove}
+                        onTouchEnd={this.onTouchEnd} />
+                    <circle
+                        class="p-thumb"
+                        cx={rightThumbCircle.x}
+                        cy={rightThumbCircle.y}
+                        r={rightThumbCircle.radius}
+                        onMouseDown={this.onMouseDownRight}
+                        onTouchStart={this.onTouchStartRight}
+                        onTouchMove={this.onTouchMove}
+                        onTouchEnd={this.onTouchEnd} />
                 </svg>
             </span>
         );

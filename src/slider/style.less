@@ -52,20 +52,15 @@
 
     .p-thumb-fx {
         position: absolute;
-        top: -8px;
-        left: -8px;
-        right: -8px;
-        bottom: -8px;
-    }
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
 
-    .p-thumb {
-        position: absolute;
-        top: 8px;
-        left: 8px;
-        width: 16px;
-        height: 16px;
-        background: @thumb;
-        border-radius: 50%;
+        .p-thumb, .p-thumb-join {
+            fill: @thumb;
+        }
     }
 
     &.is-disabled {
@@ -85,13 +80,8 @@
             }
         }
 
-        .p-thumb {
-            background: @thumb-disabled;
+        .p-thumb, .p-thumb-join {
+            fill: @thumb-disabled;
         }
-    }
-
-    .p-svg {
-        width: 0;
-        height: 0;
     }
 }
