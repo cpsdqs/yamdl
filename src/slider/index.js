@@ -6,6 +6,7 @@ import './style';
 const THUMB_SIZE = 12;
 const MIN_DRAG_DISTANCE = 4;
 const SPLIT_VELOCITY = 435;
+const POPOUT_DISTANCE = 36;
 
 /// A material slider.
 ///
@@ -23,6 +24,9 @@ export default class Slider extends Component {
     // thumb positions in [0, 1]
     leftThumbX = new Spring(1, 0.3);
     rightThumbX = new Spring(1, 0.3);
+
+    leftPopoutAngle = new Spring(0.7, 0.5);
+    rightPopoutAngle = new Spring(0.7, 0.5);
 
     leftThumbScale = new Spring(1, 0.3);
     rightThumbScale = new Spring(1, 0.3);
@@ -93,8 +97,17 @@ export default class Slider extends Component {
             this.leftThumbX.value = this.rightThumbX.value = (this.leftThumbX.value
                 + this.rightThumbX.value) / 2;
             this.leftThumbScale.target = this.rightThumbScale.target = 1;
-        } else if (this.draggingThumb === 'left') this.leftThumbScale.target = 1;
-        else if (this.draggingThumb === 'right') this.rightThumbScale.target = 1;
+            this.leftThumbX.locked = this.rightThumbX.locked = true;
+        } else if (this.draggingThumb === 'left') {
+            this.leftThumbScale.target = 1;
+            this.leftThumbX.locked = true;
+        } else if (this.draggingThumb === 'right') {
+            this.rightThumbScale.target = 1;
+            this.rightThumbX.locked = true;
+        }
+
+        if (!this.leftPopoutAngle.wantsUpdate()) this.leftPopoutAngle.value = 0;
+        if (!this.rightPopoutAngle.wantsUpdate()) this.rightPopoutAngle.value = 0;
 
         globalAnimator.register(this);
     }
@@ -117,11 +130,18 @@ export default class Slider extends Component {
             this.rightThumbX.velocity = 0;
 
             const thumbX = x + this.dragOffset;
+            this.dragVelocity = (x - this.dragPrevX) / Math.max(
+                1e-3,
+                (Date.now() - this.dragPrevTime) / 1000,
+            );
+
             if (this.draggingThumb === 'both' || this.draggingThumb === 'left') {
                 this.leftThumbX.value = thumbX;
+                this.leftThumbX.velocity = this.dragVelocity;
             }
             if (this.draggingThumb === 'both' || this.draggingThumb === 'right') {
                 this.rightThumbX.value = thumbX;
+                this.rightThumbX.velocity = this.dragVelocity;
             }
 
             if (this.leftThumbX.value > this.rightThumbX.value) {
@@ -138,11 +158,6 @@ export default class Slider extends Component {
             }
 
             this.emitChange(newValue);
-
-            this.dragVelocity = (x - this.dragPrevX) / Math.max(
-                1e-3,
-                (Date.now() - this.dragPrevTime) / 1000,
-            );
 
             globalAnimator.register(this);
         }
@@ -168,6 +183,7 @@ export default class Slider extends Component {
             }
         }
 
+        this.leftThumbX.locked = this.rightThumbX.locked = false;
         this.leftThumbScale.target = this.rightThumbScale.target = 0;
         this.isDragging = false;
         globalAnimator.register(this);
@@ -207,8 +223,20 @@ export default class Slider extends Component {
             );
         }
 
+        const handlePopout = (popout, thumb, scale) => {
+            const v = thumb.velocity;
+            const popoutY = Math.max(0, -Math.sin(popout.value - Math.PI / 2) * scale.value);
+
+            popout.velocity -= 9 * Math.sqrt(popoutY) * v * dt;
+        };
+
+        handlePopout(this.leftPopoutAngle, this.leftThumbX, this.leftThumbScale);
+        handlePopout(this.rightPopoutAngle, this.rightThumbX, this.rightThumbScale);
+
         this.leftThumbX.update(dt);
         this.rightThumbX.update(dt);
+        this.leftPopoutAngle.update(dt);
+        this.rightPopoutAngle.update(dt);
         this.leftThumbScale.update(dt);
         this.rightThumbScale.update(dt);
 
@@ -223,6 +251,7 @@ export default class Slider extends Component {
         } else this.coastingValue = null;
 
         let wantsUpdate = this.leftThumbX.wantsUpdate() || this.rightThumbX.wantsUpdate()
+            || this.leftPopoutAngle.wantsUpdate() || this.rightPopoutAngle.wantsUpdate()
             || this.leftThumbScale.wantsUpdate() || this.rightThumbScale.wantsUpdate();
         if (!wantsUpdate && !this.isDragging) {
             globalAnimator.deregister(this);
@@ -407,15 +436,19 @@ export default class Slider extends Component {
         let rightDiscretePopout;
 
         if (this.props.discrete) {
+            const leftDistance = POPOUT_DISTANCE * this.leftThumbScale.value;
+            const leftAngle = this.leftPopoutAngle.value - Math.PI / 2;
             leftDiscretePopout = {
                 radius: THUMB_SIZE * 1.1 * this.leftThumbScale.value,
-                x: leftThumbCircle.x,
-                y: 8 - 36 * this.leftThumbScale.value,
+                x: 8 + leftThumbXpx + Math.cos(leftAngle) * leftDistance,
+                y: 8 + Math.sin(leftAngle) * leftDistance,
             };
+            const rightDistance = POPOUT_DISTANCE * this.rightThumbScale.value;
+            const rightAngle = this.rightPopoutAngle.value - Math.PI / 2;
             rightDiscretePopout = {
                 radius: THUMB_SIZE * 1.1 * this.rightThumbScale.value,
-                x: rightThumbCircle.x,
-                y: 8 - 36 * this.leftThumbScale.value,
+                x: 8 + rightThumbXpx + Math.cos(rightAngle) * rightDistance,
+                y: 8 + Math.sin(rightAngle) * rightDistance,
             };
         }
 
