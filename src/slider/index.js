@@ -3,9 +3,9 @@ import { Spring, globalAnimator, lerp, clamp } from '../animation';
 import metaball from './metaball';
 import './style';
 
-const THUMB_SIZE = 16;
+const THUMB_SIZE = 12;
 const MIN_DRAG_DISTANCE = 4;
-const SPLIT_VELOCITY = 400;
+const SPLIT_VELOCITY = 435;
 
 /// A material slider.
 ///
@@ -23,6 +23,9 @@ export default class Slider extends Component {
     // thumb positions in [0, 1]
     leftThumbX = new Spring(1, 0.3);
     rightThumbX = new Spring(1, 0.3);
+
+    leftThumbScale = new Spring(1, 0.3);
+    rightThumbScale = new Spring(1, 0.3);
 
     // true after the user has released a thumb, letting it drift from inertia
     coasting = false;
@@ -89,7 +92,10 @@ export default class Slider extends Component {
         if (this.draggingThumb === 'both') {
             this.leftThumbX.value = this.rightThumbX.value = (this.leftThumbX.value
                 + this.rightThumbX.value) / 2;
-        }
+            this.leftThumbScale.target = this.rightThumbScale.target = 1;
+        } else if (this.draggingThumb === 'left') this.leftThumbScale.target = 1;
+        else if (this.draggingThumb === 'right') this.rightThumbScale.target = 1;
+
         globalAnimator.register(this);
     }
     onPointerMove (clientX) {
@@ -151,7 +157,6 @@ export default class Slider extends Component {
             const width = this.node.offsetWidth - 16;
             this.leftThumbX.velocity = -SPLIT_VELOCITY / width;
             this.rightThumbX.velocity = SPLIT_VELOCITY / width;
-            globalAnimator.register(this);
         } else if (this.isDragging) {
             this.coasting = true;
 
@@ -161,11 +166,11 @@ export default class Slider extends Component {
             if (this.draggingThumb === 'both' || this.draggingThumb === 'right') {
                 this.rightThumbX.velocity = this.dragVelocity;
             }
-
-            globalAnimator.register(this);
         }
 
+        this.leftThumbScale.target = this.rightThumbScale.target = 0;
         this.isDragging = false;
+        globalAnimator.register(this);
     }
     softBounds (x, w) {
         const rubberBand = x => Math.sqrt(x);
@@ -204,6 +209,8 @@ export default class Slider extends Component {
 
         this.leftThumbX.update(dt);
         this.rightThumbX.update(dt);
+        this.leftThumbScale.update(dt);
+        this.rightThumbScale.update(dt);
 
         if (this.coasting) {
             this.prevCoastingValue = this.coastingValue || this.props.value;
@@ -215,7 +222,8 @@ export default class Slider extends Component {
             this.emitChange(this.coastingValue);
         } else this.coastingValue = null;
 
-        let wantsUpdate = this.leftThumbX.wantsUpdate() || this.rightThumbX.wantsUpdate();
+        let wantsUpdate = this.leftThumbX.wantsUpdate() || this.rightThumbX.wantsUpdate()
+            || this.leftThumbScale.wantsUpdate() || this.rightThumbScale.wantsUpdate();
         if (!wantsUpdate && !this.isDragging) {
             globalAnimator.deregister(this);
         }
@@ -340,11 +348,16 @@ export default class Slider extends Component {
         let leftThumbScale = 1;
         let rightThumbScale = 1;
 
-        {
+        if (Array.isArray(this.props.value)) {
             // make thumbs grow when they get close
             const s = 1 + Math.exp(-((Math.abs(rightThumbXpx - leftThumbXpx) / 5) ** 2)) * 0.3;
             leftThumbScale *= s;
             rightThumbScale *= s;
+        }
+
+        if (!this.props.discrete) {
+            leftThumbScale *= 1 + this.leftThumbScale.value * 0.3;
+            rightThumbScale *= 1 + this.rightThumbScale.value * 0.3;
         }
 
         {
@@ -360,8 +373,8 @@ export default class Slider extends Component {
         }
 
         if (this.props.disabled) {
-            leftThumbScale /= 2;
-            rightThumbScale /= 2;
+            leftThumbScale *= 0.6;
+            rightThumbScale *= 0.6;
 
             // when disabled, the track looks like this: ------ o --- with a space around the
             // thumbs, so a clip path is required
@@ -389,7 +402,23 @@ export default class Slider extends Component {
             x: 8 + rightThumbXpx,
             y: 8,
         };
-        // TODO: discrete value popouts
+
+        let leftDiscretePopout;
+        let rightDiscretePopout;
+
+        if (this.props.discrete) {
+            leftDiscretePopout = {
+                radius: THUMB_SIZE * 1.1 * this.leftThumbScale.value,
+                x: leftThumbCircle.x,
+                y: 8 - 36 * this.leftThumbScale.value,
+            };
+            rightDiscretePopout = {
+                radius: THUMB_SIZE * 1.1 * this.rightThumbScale.value,
+                x: rightThumbCircle.x,
+                y: 8 - 36 * this.leftThumbScale.value,
+            };
+        }
+
         const metaballJoins = [
             metaball(
                 leftThumbCircle.radius,
@@ -397,7 +426,25 @@ export default class Slider extends Component {
                 [leftThumbCircle.x, leftThumbCircle.y],
                 [rightThumbCircle.x, rightThumbCircle.y],
             ),
-        ].join(' ');
+            leftDiscretePopout && metaball(
+                leftDiscretePopout.radius,
+                leftThumbCircle.radius,
+                [leftDiscretePopout.x, leftDiscretePopout.y],
+                [leftThumbCircle.x, leftThumbCircle.y],
+                undefined,
+                0.53,
+                true,
+            ),
+            rightDiscretePopout && metaball(
+                rightDiscretePopout.radius,
+                rightThumbCircle.radius,
+                [rightDiscretePopout.x, rightDiscretePopout.y],
+                [rightThumbCircle.x, rightThumbCircle.y],
+                undefined,
+                0.53,
+                true,
+            ),
+        ].filter(x => x).join(' ');
 
         return (
             <span {...props} ref={node => this.node = node}>
@@ -427,6 +474,20 @@ export default class Slider extends Component {
                         onTouchStart={this.onTouchStartRight}
                         onTouchMove={this.onTouchMove}
                         onTouchEnd={this.onTouchEnd} />
+                    {this.props.discrete ? (
+                        <circle
+                            class="p-thumb-popout"
+                            cx={leftDiscretePopout.x}
+                            cy={leftDiscretePopout.y}
+                            r={leftDiscretePopout.radius} />
+                    ) : null}
+                    {this.props.discrete ? (
+                        <circle
+                            class="p-thumb-popout"
+                            cx={rightDiscretePopout.x}
+                            cy={rightDiscretePopout.y}
+                            r={rightDiscretePopout.radius} />
+                    ) : null}
                 </svg>
             </span>
         );

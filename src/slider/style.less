@@ -58,8 +58,9 @@
         height: 100%;
         overflow: visible;
 
-        .p-thumb, .p-thumb-join {
+        .p-thumb, .p-thumb-join, .p-thumb-popout {
             fill: @thumb;
+            -webkit-tap-highlight-color: transparent;
         }
     }
 
@@ -80,7 +81,7 @@
             }
         }
 
-        .p-thumb, .p-thumb-join {
+        .p-thumb, .p-thumb-join, .p-thumb-popout {
             fill: @thumb-disabled;
         }
     }

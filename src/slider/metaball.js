@@ -8,7 +8,15 @@ const getVector = (p, t, r) => [p[0] + Math.cos(t) * r, p[1] + Math.sin(t) * r];
  * Based on Metaball script by Hiroyuki Sato
  * http://shspage.com/aijs/en/#metaball
  */
-export default function metaball (radius1, radius2, center1, center2, handleSize = 2.4, v = 0.5) {
+export default function metaball (
+    radius1,
+    radius2,
+    center1,
+    center2,
+    handleSize = 2.4,
+    v = 0.5,
+    force = false,
+) {
     const HALF_PI = Math.PI / 2;
     const d = dist(center1, center2);
     const maxDist = Math.max(radius1, radius2) + Math.min(radius1, radius2) * 2.5;
@@ -17,7 +25,8 @@ export default function metaball (radius1, radius2, center1, center2, handleSize
     // No blob if a radius is 0
     // or if distance between the circles is larger than max-dist
     // or if circle2 is completely inside circle1
-    if (radius1 === 0 || radius2 === 0 || d > maxDist || d <= Math.abs(radius1 - radius2)) {
+    if (radius1 === 0 || radius2 === 0 || (!force && d > maxDist)
+        || d <= Math.abs(radius1 - radius2)) {
         return '';
     }
 
