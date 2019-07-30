@@ -232,8 +232,6 @@ export class SpringSolver {
     }
 }
 
-window.ss = SpringSolver;
-
 const timeKey = Symbol('time');
 
 /// Simulates spring physics.

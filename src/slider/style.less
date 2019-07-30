@@ -60,13 +60,18 @@
         overflow: visible;
 
         .p-thumb, .p-thumb-join, .p-thumb-popout {
+            pointer-events: none;
             fill: @thumb;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .p-thumb-popout-text {
             pointer-events: none;
             fill: @text;
+        }
+
+        .p-thumb-hitbox {
+            -webkit-tap-highlight-color: transparent;
+            fill: transparent;
         }
     }
 
