@@ -163,16 +163,25 @@ export default class Checkbox extends Component {
         this.setState({ draggingSwitch: false });
     }
 
-    wasChecked = false; // for the indeterminate animation
+    prevState = 'uninitialized';
+    prevRenderState = 'uninitialized';
 
-    componentWillUpdate (newProps) {
-        this.wasChecked = this.props.checked || this.state.checked;
+    componentDidMount () {
+        this.forceUpdate();
     }
 
     render () {
         const props = { ...this.props };
 
-        const checked = (this.props.checked || this.state.checked) && !this.props.indeterminate;
+        const state = this.props.indeterminate
+            ? 'indeterminate'
+            : ('checked' in this.props ? this.props.checked : this.state.checked)
+                ? 'checked' : 'unchecked';
+
+        if (state !== this.prevRenderState) {
+            this.prevState = this.prevRenderState;
+            this.prevRenderState = state;
+        }
 
         delete props.id;
         delete props.onChange;
@@ -180,11 +189,8 @@ export default class Checkbox extends Component {
         delete props.indeterminate;
         props.class = (props.class || '')
             + (this.props.switch ? ' paper-switch' : ' paper-checkbox');
-        if (checked) props.class += ' is-checked';
-        if (this.props.indeterminate) {
-            props.class += ' is-indeterminate';
-            if (this.wasChecked) props.class += ' was-checked';
-        }
+        props.class += ` is-${state}`;
+        props.class += ` was-${this.prevState}`;
         if (props.disabled) props.class += ' is-disabled';
         if (this.state.draggingSwitch) props.class += ' is-being-dragged';
 
@@ -207,7 +213,7 @@ export default class Checkbox extends Component {
                         class="p-input"
                         type="checkbox"
                         id={this.props.id}
-                        checked={checked}
+                        checked={state === 'checked'}
                         onChange={e => this.props.onChange
                             ? this.props.onChange(e.target.checked)
                             : this.setState({ checked: e.target.checked })}
@@ -239,8 +245,8 @@ export default class Checkbox extends Component {
                         class="p-input"
                         type="checkbox"
                         id={this.props.id}
-                        checked={checked}
-                        indeterminate={this.props.indeterminate}
+                        checked={state === 'checked'}
+                        indeterminate={state === 'indeterminate'}
                         onChange={e => this.props.onChange
                             ? this.props.onChange(e.target.checked)
                             : this.setState({ checked: e.target.checked })}

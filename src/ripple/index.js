@@ -32,6 +32,9 @@ export default class Ripple extends Component {
     /// The DOM node.
     node = null;
 
+    /// Base highlight opacity;
+    highlightOpacity = 1;
+
     update (dt) {
         for (const ripple of this.state.ripples) {
             ripple.sizeSpring.update(dt);
@@ -95,6 +98,7 @@ export default class Ripple extends Component {
     };
 
     onFocus = () => {
+        this.updateHighlightOpacity();
         this.focusSpring.target = 1;
         globalAnimator.register(this);
     };
@@ -123,8 +127,14 @@ export default class Ripple extends Component {
         }
     };
 
+    updateHighlightOpacity () {
+        this.highlightOpacity = getComputedStyle(this.node)
+            .getPropertyValue('--md-ripple-highlight-opacity');
+    }
+
     onPointerDown (clientX, clientY) {
         const nodeRect = this.node.getBoundingClientRect();
+        this.updateHighlightOpacity();
 
         const offsetX = clientX !== undefined ? clientX - nodeRect.left : nodeRect.width / 2;
         const offsetY = clientY !== undefined ? clientY - nodeRect.top : nodeRect.height / 2;
@@ -195,7 +205,7 @@ export default class Ripple extends Component {
             const opacity = ripple.opacitySpring.value;
 
             const rippleHighlight = 1 - 4 * Math.abs(sizeProgress - 0.5) ** 2;
-            maxHighlight += Math.max(rippleHighlight, maxHighlight);
+            maxHighlight = Math.max(rippleHighlight, maxHighlight);
 
             ripples.push(
                 <div
@@ -216,7 +226,7 @@ export default class Ripple extends Component {
         if (maxHighlight) {
             highlight = <div
                 class="ink-ripple-highlight"
-                style={{ opacity: maxHighlight }} />;
+                style={{ opacity: maxHighlight * this.highlightOpacity }} />;
         }
 
         return (

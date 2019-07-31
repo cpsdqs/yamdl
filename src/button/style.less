@@ -1,23 +1,24 @@
 @import '../prelude';
 
 @button-fg: var(--md-button-color);
-@button-hover-bg: var(--md-button-text-highlight);
 @button-ripple-color: @button-fg;
-@button-ripple-highlight: @button-hover-bg;
+@button-highlight-opacity: var(--md-button-highlight-opacity);
 @button-disabled: var(--md-button-disabled);
 
 @raised-bg: var(--md-button-color);
 @raised-fg: var(--md-button-raised-text);
-@raised-hover-bg: var(--md-button-raised-highlight);
 @raised-ripple-color: var(--md-button-raised-ripple);
 @raised-ripple-highlight: var(--md-button-raised-ripple-highlight);
 @raised-disabled-bg: var(--md-button-disabled-bg);
 @raised-disabled-fg: var(--md-button-disabled);
 
 .paper-button {
+    display: inline-block;
     position: relative;
     font-weight: 500;
     text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
     padding: 0 16px;
     border-radius: 4px;
     border: none;
@@ -29,20 +30,38 @@
     background: none;
     color: @button-fg;
     -webkit-tap-highlight-color: transparent;
-    transition: background 0.3s @easing, box-shadow 0.5s @easing;
+    transition: box-shadow 0.5s @easing;
     touch-action: manipulation;
     user-select: none;
 
     --md-ripple-color: @button-ripple-color;
-    --md-ripple-highlight: @button-ripple-highlight;
+    --md-ripple-highlight: @button-ripple-color;
+    --md-ripple-highlight-opacity: 0.15;
 
     &:focus {
         outline: none;
     }
+    &::-moz-focus-inner {
+        border: 0;
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        border-radius: inherit;
+        background: @button-ripple-color;
+        opacity: 0;
+        transition: opacity 0.3s @easing;
+    }
 
     @media (hover: hover) {
-        &:hover:not([disabled]) {
-            background: @button-hover-bg;
+        &:hover:not([disabled])::before {
+            opacity: @button-highlight-opacity;
         }
     }
 
@@ -57,6 +76,7 @@
 
         --md-ripple-color: @raised-ripple-color;
         --md-ripple-highlight: @raised-ripple-highlight;
+        --md-ripple-highlight-opacity: 1;
 
         .elevation(3);
 
@@ -64,10 +84,13 @@
             .elevation(5);
         }
 
+        &::before {
+            background: var(--md-ripple-color);
+        }
+
         @media (hover: hover) {
             &:hover {
                 .elevation(5);
-                background: @raised-hover-bg;
             }
         }
 
@@ -100,7 +123,7 @@
         width: 48px;
         min-width: 0;
         height: 48px;
-        line-height: 48px;
+        line-height: 0;
         padding: 0;
     }
 }

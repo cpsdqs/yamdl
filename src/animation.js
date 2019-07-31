@@ -317,6 +317,7 @@ export class Spring extends EventEmitter {
 
     /// Returns true if the spring should not be considered stopped.
     wantsUpdate () {
+        if (this.target === null) return Math.abs(this.velocity) > this.tolerance;
         return Math.abs(this.value - this.target) + Math.abs(this.velocity) > this.tolerance;
     }
 
@@ -332,8 +333,8 @@ export class Spring extends EventEmitter {
 
     /// Will finish the animation by immediately jumping to the end and emitting an `update`.
     finish () {
-        if (this.target === null) return;
         this.velocity = 0;
+        if (this.target === null) return;
         this.value = this.target;
         this.emit('update', this.value);
         this.stop();

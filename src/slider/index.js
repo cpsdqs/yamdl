@@ -118,6 +118,7 @@ export default class Slider extends Component {
 
     onPointerDown (clientX) {
         const nodeRect = this.node.getBoundingClientRect();
+        this.updateFont();
         this.dragFirstX = clientX;
         this.dragPrevX = clientX - nodeRect.left - PAD_X;
         this.isDragging = false;
@@ -261,6 +262,23 @@ export default class Slider extends Component {
         }
     }
 
+    font = null;
+
+    updateFont () {
+        const computedStyle = this.node ? getComputedStyle(this.node) : null;
+        this.font = computedStyle && computedStyle.font;
+        if (computedStyle && !this.font) {
+            // Firefox is a bit weird here; computed style does not seem to contain the font
+            // property
+            this.font = [
+                computedStyle.fontStyle,
+                computedStyle.fontWeight,
+                computedStyle.fontSize,
+                computedStyle.fontFamily,
+            ].join(' ');
+        }
+    }
+
     update (dt) {
         if (this.coasting) {
             this.leftThumbX.target = this.leftThumbX.value < 0 ? 0 : null;
@@ -274,20 +292,25 @@ export default class Slider extends Component {
             );
         }
 
-        const font = this.node ? getComputedStyle(this.node).font : null;
-
         const handlePopout = (popout, thumb, scale, pscale) => {
             const v = thumb.velocity;
             const popoutY = Math.max(0, -Math.sin(popout.value - Math.PI / 2) * scale.value);
 
             popout.velocity -= 9 * Math.sqrt(popoutY) * v * dt;
 
-            if (font) {
+            if (this.font) {
                 const value = clamp(
                     Math.round(this.transferToValue(thumb.value)), this.min, this.max,
                 );
-                const valueWidth = measureTextWidth(font, value);
-                pscale.target = Math.max(THUMB_SIZE * 1.1, valueWidth / 2 + PAD_TEXT);
+                const id = `${this.font}$${value}`;
+                if (pscale._prevMeasured !== id) {
+                    // measureText seems to be expensive in some browsers, so only do it when
+                    // necessary
+                    const valueWidth = measureTextWidth(this.font, value);
+                    pscale.target = Math.max(THUMB_SIZE * 1.1, valueWidth / 2 + PAD_TEXT);
+                    pscale._prevMeasured = id;
+                }
+
                 if (scale.value < 0.1) pscale.value = pscale.target;
             }
         };
@@ -325,7 +348,7 @@ export default class Slider extends Component {
             this.emitChange(this.coastingValue);
         } else this.coastingValue = null;
 
-        let wantsUpdate = this.leftThumbX.wantsUpdate() || this.rightThumbX.wantsUpdate()
+        const wantsUpdate = this.leftThumbX.wantsUpdate() || this.rightThumbX.wantsUpdate()
             || this.leftPopoutAngle.wantsUpdate() || this.rightPopoutAngle.wantsUpdate()
             || this.leftPopoutScale.wantsUpdate() || this.rightPopoutScale.wantsUpdate()
             || this.leftThumbScale.wantsUpdate() || this.rightThumbScale.wantsUpdate();
@@ -369,7 +392,10 @@ export default class Slider extends Component {
 
     componentDidUpdate (prevProps) {
         if (prevProps.min !== this.props.min || prevProps.max !== this.props.max
-            || prevProps.value !== this.props.value) {
+            || (Array.isArray(this.props.value) && Array.isArray(prevProps.value)
+                ? prevProps.value[0] !== this.props.value[0]
+                    || prevProps.value[1] !== this.props.value[1]
+                : prevProps.value !== this.props.value)) {
             globalAnimator.register(this);
         }
     }

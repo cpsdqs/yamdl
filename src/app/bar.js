@@ -13,13 +13,20 @@ import './bar.less';
 ///        - `overflow`: if true, will always stay in the overflow menu
 export default class AppBar extends Component {
     render (props) {
+        props = { ...props };
+        const { menu, title } = props;
+        delete props.menu;
+        delete props.title;
+
+        props.class = (props.class || '') + ' paper-app-bar';
+
         return (
-            <div class="paper-app-bar">
-                {props.menu ? <div class="p-menu">{props.menu}</div> : null}
+            <div {...props}>
+                {menu ? <div class="p-menu">{menu}</div> : null}
                 <div class="p-title">
-                    {typeof props.title === 'string'
-                        ? <TitleText title={props.title} />
-                        : props.title}
+                    {typeof title === 'string'
+                        ? <TitleText title={title} />
+                        : title}
                 </div>
                 <div class="p-spacer" />
                 <span class="p-overflowing-buttons-and-stuff">todo</span>

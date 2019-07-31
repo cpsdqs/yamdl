@@ -53,6 +53,12 @@ class CheckboxDemo extends Component {
                 <div class="demo-item"><Checkbox switch /></div>
                 <div class="demo-item"><Checkbox switch disabled /></div>
                 <div class="demo-item"><Checkbox switch disabled checked /></div>
+                <div class="demo-item">
+                    <Checkbox
+                        checked={state.a}
+                        onChange={() => this.setState({ a: !state.a })}
+                        class="custom-checkbox-color" />
+                </div>
                 <p class="demo-description">
                     Switches can also be dragged.
                 </p>
@@ -85,6 +91,9 @@ class ProgressDemo extends Component {
                     this.setState({ l: !state.l });
                 }}>
                     <CircularProgress small indeterminate={!state.l} progress={1} />
+                </div>
+                <div class="demo-item">
+                    <CircularProgress indeterminate class="custom-progress-color" />
                 </div>
                 <p class="demo-description">
                     Tap to change state.
@@ -164,6 +173,9 @@ class AppBarDemo extends Component {
                 </div>
                 <div class="demo-item app-bar-demo app-bar-demo-status-bar-space">
                     <AppBar title="22px status bar space also very long etc" />
+                </div>
+                <div class="demo-item app-bar-demo">
+                    <AppBar class="custom-app-bar-color" title="custom color" />
                 </div>
                 <p class="demo-description">Tap to change state.</p>
             </div>
@@ -302,6 +314,8 @@ function Gallery () {
                 <div class="demo-item"><Button fab icon>+</Button></div>
                 <div class="demo-item"><Button disabled>button</Button></div>
                 <div class="demo-item"><Button raised disabled>button</Button></div>
+                <div class="demo-item"><Button class="custom-button-color">custom color</Button></div>
+                <div class="demo-item"><Button href="javascript:void(0)">link</Button></div>
             </div>
             <CheckboxDemo />
             <ProgressDemo />

@@ -13,7 +13,7 @@ function isButtonPressKey (key) {
 /// - `raised`: will render a raised button
 /// - `fab`: will render a floating action button. Usually in conjunction with `icon`.
 /// - `icon`: will render a circular icon button (to be rendered with an icon inside)
-///
+/// - `href`: if given, will use a <a> instead
 export default class Button extends Component {
     /// The button node.
     button = null;
@@ -71,8 +71,10 @@ export default class Button extends Component {
 
         const circle = props.fab || props.icon;
 
+        const Component = 'href' in props ? 'a' : 'button';
+
         return (
-            <button
+            <Component
                 {...props}
                 ref={node => this.button = node}
                 onMouseDown={this.onMouseDown}
@@ -85,7 +87,7 @@ export default class Button extends Component {
                 onBlur={this.onBlur}>
                 <Ripple ref={ripple => this.ripple = ripple} circle={circle} />
                 {this.props.children}
-            </button>
+            </Component>
         );
     }
 }

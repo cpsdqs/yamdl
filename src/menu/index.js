@@ -18,6 +18,7 @@ import './style';
 /// - `clampToScreenEdge`: set to false to disable
 /// - `cascadeUp`: set to cascade up instead of cascading down
 /// - `selectionIcon`: icon to use for selection
+/// - `persistent`: if true, will not automatically close once an item is selected
 export default class Menu extends Component {
     openness = new Spring(1, 0.3);
 
@@ -41,14 +42,19 @@ export default class Menu extends Component {
     }
 
     componentDidMount () {
+        this.sizeNeedsUpdate = true;
         globalAnimator.register(this);
     }
 
     componentDidUpdate (prevProps) {
         if (prevProps.open !== this.props.open) {
-            globalAnimator.register(this);
             this.openness.setPeriod(this.props.open ? 0.3 : 0.1);
             this.sizeNeedsUpdate = true;
+            globalAnimator.register(this);
+        }
+        if (prevProps.items !== this.props.items) {
+            this.sizeNeedsUpdate = true;
+            globalAnimator.register(this);
         }
     }
 
@@ -126,7 +132,10 @@ export default class Menu extends Component {
                     selectWithIcon={!!this.props.selectionIcon}
                     {...item}
                     key={i}
-                    onClick={item.action}
+                    onClick={() => {
+                        if (!this.props.persistent && this.props.onClose) this.props.onClose();
+                        if (item.action) item.action();
+                    }}
                     cascadeDelay={(cascadeDown ? i : (this.props.items.length - 1 - i))
                         * 0.3 / (this.props.items.length ** 0.9)}
                     cascadeDirection={cascadeDown ? 1 : -1}>
@@ -191,6 +200,7 @@ export class MenuItem extends Button {
         const props = { ...this.props };
 
         delete props.cascadeDelay;
+        delete props.cascadeDirection;
 
         props.class = (props.class || '') + ' paper-menu-item';
         if (this.props.onClick) props.class += ' has-action';

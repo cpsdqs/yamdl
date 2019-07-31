@@ -185,6 +185,9 @@
         .clip-path-frame(9.99px, 9.99px, 9.99px, 9.99px);
 
         transition: background 0.3s @easing;
+    }
+
+    &.is-checked.was-unchecked .p-background {
         animation: p-background-check 0.2s cubic-bezier(.2, .5, .7, 1);
 
         @keyframes p-background-check {
@@ -196,7 +199,7 @@
             }
         }
     }
-    &.is-indeterminate:not(.was-checked) .p-background {
+    &.is-indeterminate.was-unchecked .p-background {
         animation: p-background-indeterminate 0.2s cubic-bezier(.2, .5, .7, 1);
 
         @keyframes p-background-indeterminate {
@@ -212,7 +215,10 @@
     &.is-checked .p-check {
         transform: scale(1);
         transition: none;
+    }
 
+    &.is-checked.was-unchecked .p-check,
+    &.is-checked.was-indeterminate .p-check {
         &::before {
             animation: p-check-in-before 0.3s 0.03s backwards;
         }
