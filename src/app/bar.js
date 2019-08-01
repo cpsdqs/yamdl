@@ -35,6 +35,7 @@ export default class AppBar extends Component {
                 </div>
                 <div class="p-spacer" />
                 <Actions items={actions || []} />
+                {props.children}
             </div>
         );
     }

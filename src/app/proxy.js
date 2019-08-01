@@ -111,6 +111,14 @@ export class AppBarConsumer extends Component {
 
         props.class = (this.state.appBar.class || '') + ' ' + (this.props.class || '');
         props.style = Object.assign({}, this.state.appBar.style || {}, this.props.style || {});
+        props.children = [];
+
+        if (Array.isArray(this.state.appBar.children)) {
+            props.children.push(...this.state.appBar.children);
+        } else props.children.push(this.state.appBar.children);
+        if (Array.isArray(this.props.children)) {
+            props.children.push(...this.props.children);
+        } else props.children.push(this.props.children);
 
         return <AppBar {...props} />;
     }
