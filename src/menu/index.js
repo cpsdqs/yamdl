@@ -132,9 +132,9 @@ export default class Menu extends Component {
                     selectWithIcon={!!this.props.selectionIcon}
                     {...item}
                     key={i}
-                    onClick={() => {
+                    onClick={e => {
                         if (!this.props.persistent && this.props.onClose) this.props.onClose();
-                        if (item.action) item.action();
+                        if (item.action) item.action(e);
                     }}
                     cascadeDelay={(cascadeDown ? i : (this.props.items.length - 1 - i))
                         * 0.3 / (this.props.items.length ** 0.9)}

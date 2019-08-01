@@ -168,8 +168,28 @@ class AppBarDemo extends Component {
                     this.setState({ i: (state.i | 0) + 1 });
                 }}>
                     <AppBar
-                        menu={<MenuIcon type={['menu', 'back', 'close'][state.i % 3]} />}
-                        title={['Title 1', 'Other Title', 'Words'][state.i % 3]} />
+                        menu={
+                            <Button small icon>
+                                <MenuIcon type={['menu', 'back', 'close'][state.i % 3]} />
+                            </Button>
+                        }
+                        title={['Title 1', 'Other Title', 'Words'][state.i % 3]}
+                        actions={[
+                            {
+                                label: 'action 1',
+                                action: () => {},
+                            },
+                            {
+                                icon: <span>+</span>,
+                                label: 'icon',
+                                action: () => {},
+                            },
+                            {
+                                label: 'action 2',
+                                action: () => {},
+                                overflow: true,
+                            },
+                        ]} />
                 </div>
                 <div class="demo-item app-bar-demo app-bar-demo-status-bar-space">
                     <AppBar title="22px status bar space also very long etc" />

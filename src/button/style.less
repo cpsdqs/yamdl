@@ -30,7 +30,7 @@
     background: none;
     color: @button-fg;
     -webkit-tap-highlight-color: transparent;
-    transition: box-shadow 0.5s @easing;
+    transition: background 0.3s @easing, box-shadow 0.5s @easing;
     touch-action: manipulation;
     user-select: none;
 
@@ -125,5 +125,10 @@
         height: 48px;
         line-height: 0;
         padding: 0;
+
+        &.small {
+            width: 40px;
+            height: 40px;
+        }
     }
 }

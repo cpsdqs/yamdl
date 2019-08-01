@@ -13,6 +13,7 @@ function isButtonPressKey (key) {
 /// - `raised`: will render a raised button
 /// - `fab`: will render a floating action button. Usually in conjunction with `icon`.
 /// - `icon`: will render a circular icon button (to be rendered with an icon inside)
+/// - `small`: will use the smaller icon button size
 /// - `href`: if given, will use a <a> instead
 export default class Button extends Component {
     /// The button node.
@@ -68,6 +69,12 @@ export default class Button extends Component {
         if (props.raised) props.class += ' raised';
         if (props.fab) props.class += ' fab';
         if (props.icon) props.class += ' icon-button';
+        if (props.small) props.class += ' small';
+
+        delete props.raised;
+        delete props.fab;
+        delete props.icon;
+        delete props.small;
 
         const circle = props.fab || props.icon;
 

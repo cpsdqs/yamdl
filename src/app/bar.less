@@ -5,18 +5,20 @@
 
 .paper-app-bar {
     width: 100%;
+    min-height: calc(56px + var(--md-app-bar-extra-padding-top));
+    padding-top: var(--md-app-bar-extra-padding-top);
     background: @bar-bg;
     color: @bar-fg;
-    padding: 16px;
-    padding-top: calc(16px + var(--md-app-bar-extra-padding-top));
     box-sizing: border-box;
     display: flex;
     align-items: center;
     transition: background 0.4s @easing;
     .elevation(4);
 
+    --md-button-color: currentColor;
+
     .p-menu {
-        padding-right: 32px;
+        margin: 0 8px;
     }
 
     .p-title {
@@ -24,6 +26,7 @@
         height: 24px;
         line-height: 24px;
         max-width: 80%;
+        margin-left: 16px;
     }
 
     .p-spacer {
@@ -54,6 +57,41 @@
             @keyframes paper-app-bar-title-text-inner-out {
                 to {
                     opacity: 0;
+                }
+            }
+        }
+    }
+
+    .p-actions {
+        padding-right: 8px;
+
+        .p-action {
+            margin-left: 8px;
+        }
+
+        .p-overflow-icon {
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            width: 24px;
+            height: 24px;
+
+            span {
+                position: absolute;
+                left: 10px;
+                width: 4px;
+                height: 4px;
+                background: currentColor;
+                border-radius: 2px;
+
+                &:first-child {
+                    top: 4px;
+                }
+                &:nth-child(2) {
+                    top: 10px;
+                }
+                &:last-child {
+                    top: 16px;
                 }
             }
         }
