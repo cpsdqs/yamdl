@@ -61,7 +61,7 @@ export class AppBarProvider extends Component {
             }
         }
 
-        return topBar ? <AppBar {...topBar} /> : null;
+        return topBar;
     }
 
     updateConsumers () {
@@ -103,7 +103,16 @@ export class AppBarConsumer extends Component {
     }
 
     render () {
-        return this.state.appBar;
+        if (!this.state.appBar) return null;
+        const props = {
+            ...this.state.appBar,
+            ...this.props,
+        };
+
+        props.class = (this.state.appBar.class || '') + ' ' + (this.props.class || '');
+        props.style = Object.assign({}, this.state.appBar.style || {}, this.props.style || {});
+
+        return <AppBar {...props} />;
     }
 }
 

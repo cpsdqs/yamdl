@@ -335,7 +335,7 @@ class AppBarProxyDemo extends Component {
                 <h2>App Bar Proxy</h2>
                 <div class="demo-item app-bar-demo app-bar-proxy-demo">
                     <AppBarProvider>
-                        <AppBarConsumer />
+                        <AppBarConsumer class="app-bar-consumer" />
                         <AppBarProxy title="root" />
                         {state.a ? (
                             <div class="app-bar-proxy-demo-subview">
