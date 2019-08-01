@@ -20,11 +20,14 @@ import './style';
 /// - `selectionIcon`: icon to use for selection
 /// - `persistent`: if true, will not automatically close once an item is selected
 export default class Menu extends Component {
-    openness = new Spring(1, 0.3);
+    presence = new Spring(1, 0.3);
 
     state = {
         size: [0, 0],
     };
+
+    // item y-offsets, for animation
+    itemOffsets = [];
 
     update (dt) {
         if (this.node && this.sizeNeedsUpdate) {
@@ -32,10 +35,14 @@ export default class Menu extends Component {
             this.sizeNeedsUpdate = false;
         }
 
-        this.openness.target = this.props.open ? 1 : 0;
-        this.openness.update(dt);
+        this.presence.target = this.props.open ? 1 : 0;
+        this.presence.update(dt);
 
-        if (!this.openness.wantsUpdate()) {
+        if (this.presence.value === 0 || this.presence.value === 1) {
+            this.itemOffsets = [];
+        }
+
+        if (!this.presence.wantsUpdate()) {
             globalAnimator.deregister(this);
         }
         this.forceUpdate();
@@ -48,7 +55,7 @@ export default class Menu extends Component {
 
     componentDidUpdate (prevProps) {
         if (prevProps.open !== this.props.open) {
-            this.openness.setPeriod(this.props.open ? 0.3 : 0.1);
+            this.presence.setPeriod(this.props.open ? 0.3 : 0.1);
             this.sizeNeedsUpdate = true;
             globalAnimator.register(this);
         }
@@ -80,8 +87,8 @@ export default class Menu extends Component {
         props.class = (props.class || '') + ' paper-menu';
 
         const isClosing = !this.props.open;
-        const scale = isClosing ? 1 : this.openness.value;
-        const opacity = isClosing ? this.openness.value : 1;
+        const scale = isClosing ? 1 : this.presence.value;
+        const opacity = isClosing ? this.presence.value : 1;
 
         const [ax, ay] = this.props.anchor || [0, 0];
         let [x, y] = this.props.position || [0, 0];
@@ -124,26 +131,39 @@ export default class Menu extends Component {
 
         const cascadeDown = !this.props.cascadeUp;
         const menuItems = (this.props.items || [])
-            .map((item, i) => (
-                <MenuItem
-                    leadingIcon={this.props.selectionIcon
-                        ? item.selected ? this.props.selectionIcon : ''
-                        : null}
-                    selectWithIcon={!!this.props.selectionIcon}
-                    {...item}
-                    key={i}
-                    onClick={e => {
-                        if (!this.props.persistent && this.props.onClose) this.props.onClose();
-                        if (item.action) item.action(e);
-                    }}
-                    cascadeDelay={(cascadeDown ? i : (this.props.items.length - 1 - i))
-                        * 0.3 / (this.props.items.length ** 0.9)}
-                    cascadeDirection={cascadeDown ? 1 : -1}>
-                    {item.label}
-                </MenuItem>
-            ));
+            .map((item, i) => {
+                const yOffset = this.itemOffsets[i] | 0;
+                const dy = this.presence.velocity > 0
+                    ? cascadeDown ? -yOffset : (height - yOffset)
+                    : 0;
 
-        return this.openness.value > 1 / 100 ? createPortal((
+                return (
+                    <MenuItem
+                        leadingIcon={this.props.selectionIcon
+                            ? item.selected ? this.props.selectionIcon : ''
+                            : null}
+                        selectWithIcon={!!this.props.selectionIcon}
+                        {...item}
+                        key={i}
+                        innerRef={node => {
+                            if (node) {
+                                this.itemOffsets[i] = node.offsetTop;
+                                if (!cascadeDown) this.itemOffsets[i] += node.offsetHeight;
+                            }
+                        }}
+                        onClick={e => {
+                            if (!this.props.persistent && this.props.onClose) this.props.onClose();
+                            if (item.action) item.action(e);
+                        }}
+                        cascadeDelay={(cascadeDown ? i : (this.props.items.length - 1 - i))
+                            * 0.1 / (this.props.items.length ** 0.9)}
+                        cascadeOffset={dy}>
+                        {item.label}
+                    </MenuItem>
+                );
+            });
+
+        return this.presence.value > 1 / 100 ? createPortal((
             <div
                 class="paper-menu-container"
                 ref={node => this.containerNode = node}
@@ -164,8 +184,9 @@ export default class Menu extends Component {
 /// - `disabled`: disabled state
 /// - `leadingIcon`: if not null, will display a leading icon
 /// - `selectWithIcon`: if set, will not highlight when selected
-/// - `cascadeDelay`: if given, will animate in with a delay
-/// - `cascadeDirection`: if given, will cascade in the given vertical direction
+/// - `innerRef`: allows access to the DOM node
+/// - `cascadeDelay`: if given, will animate it with a delay
+/// - `cascadeOffset`: if given, will cascade from the given offset
 export class MenuItem extends Button {
     presence = new Spring(1, 0.3);
 
@@ -199,8 +220,11 @@ export class MenuItem extends Button {
     render () {
         const props = { ...this.props };
 
-        delete props.cascadeDelay;
-        delete props.cascadeDirection;
+        delete props.selected;
+        delete props.disabled;
+        delete props.leadingIcon;
+        delete props.selectWithIcon;
+        delete props.innerRef;
 
         props.class = (props.class || '') + ' paper-menu-item';
         if (this.props.onClick) props.class += ' has-action';
@@ -223,18 +247,20 @@ export class MenuItem extends Button {
 
         const Component = this.props.onClick ? 'button' : 'div';
 
-        const cascadeDirection = Number.isFinite(this.props.cascadeDirection)
-            ? this.props.cascadeDirection
-            : 1;
-        const style = {
-            opacity: this.presence.value * (this.props.disabled ? 0.5 : 1),
-            transform: `translateY(${-(1 - this.presence.value) * 10 * cascadeDirection}px)`,
-        };
+        const dy = (1 - this.presence.value) * (this.props.cascadeOffset | 0);
+        const style = {};
+        if (dy) {
+            style.opacity = Math.exp(-((dy / 20) ** 2));
+            style.transform = `translateY(${dy}px)`;
+        }
 
         return (
             <Component
                 {...props}
-                ref={node => this.button = node}
+                ref={node => {
+                    this.button = node;
+                    if (this.props.innerRef) this.props.innerRef(node);
+                }}
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
                 onTouchStart={this.onTouchStart}
