@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import Button from '../button';
 import Menu from '../menu';
+import { Spring, globalAnimator } from '../animation';
 import './bar.less';
 
 /// An app bar.
@@ -26,7 +27,7 @@ export default class AppBar extends Component {
 
         return (
             <div {...props}>
-                {menu ? <div class="p-menu">{menu}</div> : null}
+                <MenuContainer>{menu}</MenuContainer>
                 <div class="p-title">
                     {typeof title === 'string'
                         ? <TitleText title={title} />
@@ -38,6 +39,59 @@ export default class AppBar extends Component {
         );
     }
 };
+
+/// Contains a menu and animates width.
+class MenuContainer extends Component {
+    width = new Spring(1, 0.5);
+    opacity = new Spring(1, 0.5);
+    node = null;
+    baseMarginRight = 0;
+
+    updateWidth () {
+        this.width.target = this.node.offsetWidth;
+        this.opacity.target = +!!this.width.target;
+    }
+
+    componentDidMount () {
+        const computedStyle = getComputedStyle(this.node);
+        this.baseMarginRight = parseInt(computedStyle.marginRight);
+        this.updateWidth();
+        this.width.value = this.width.target;
+        globalAnimator.register(this);
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.children !== this.props.children) {
+            this.updateWidth();
+            globalAnimator.register(this);
+        }
+    }
+
+    update (dt) {
+        this.width.update(dt);
+        this.opacity.update(dt);
+        if (!this.width.wantsUpdate()) globalAnimator.deregister(this);
+        this.forceUpdate();
+    }
+
+    componentWillUnmount () {
+        globalAnimator.deregister(this);
+    }
+
+    render () {
+        const style = {};
+        if (this.width.value !== this.width.target) {
+            style.marginRight = this.width.value - this.width.target + this.baseMarginRight;
+            style.opacity = this.opacity.value;
+        }
+
+        return (
+            <div class="p-menu" style={style} ref={node => this.node = node}>
+                {this.props.children}
+            </div>
+        );
+    }
+}
 
 /// Renders a title string and animates changes with a crossfade.
 class TitleText extends Component {

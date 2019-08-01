@@ -1,4 +1,4 @@
-export { MenuIcon, AppBar } from './app';
+export { MenuIcon, AppBar, AppBarProvider, AppBarConsumer, AppBarProxy } from './app';
 export Button from './button';
 export Checkbox from './checkbox';
 export Menu, { MenuItem } from './menu';

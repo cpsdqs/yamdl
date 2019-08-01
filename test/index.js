@@ -1,6 +1,7 @@
 import { render, h, Component } from 'preact';
 import { Button, Checkbox, CircularProgress, TextField, Slider } from '../src';
 import { NavigationWindow, NavigationView, MenuIcon, AppBar } from '../src';
+import { AppBarProvider, AppBarConsumer, AppBarProxy } from '../src';
 import Menu from '../src/menu';
 import './index.less';
 
@@ -320,6 +321,55 @@ class SliderDemo extends Component {
     }
 }
 
+class AppBarProxyDemo extends Component {
+    state = { a: false, b: false };
+    subviewActions = [
+        {
+            label: 'action',
+            action () {},
+        }
+    ];
+    render (props, state) {
+        return (
+            <div class="demo-region">
+                <h2>App Bar Proxy</h2>
+                <div class="demo-item app-bar-demo app-bar-proxy-demo">
+                    <AppBarProvider>
+                        <AppBarConsumer />
+                        <AppBarProxy title="root" />
+                        {state.a ? (
+                            <div class="app-bar-proxy-demo-subview">
+                                <AppBarProxy
+                                    class="custom-app-bar-color"
+                                    local={state.b}
+                                    menu={
+                                        <Button
+                                            small
+                                            icon
+                                            onClick={() => this.setState({ a: false })}>
+                                            <MenuIcon type={'back'} />
+                                        </Button>
+                                    }
+                                    title="subview"
+                                    priority={1}
+                                    actions={this.subviewActions} />
+                                subview
+                                <Button onClick={() => this.setState({ b: !state.b })}>
+                                    {state.b ? 'make proxied' : 'make local'}
+                                </Button>
+                            </div>
+                        ) : (
+                            <Button onClick={() => this.setState({ a: true })}>
+                                open subview
+                            </Button>
+                        )}
+                    </AppBarProvider>
+                </div>
+            </div>
+        );
+    }
+}
+
 function Gallery () {
     return (
         <div>
@@ -344,6 +394,7 @@ function Gallery () {
             <AppBarDemo />
             <MenuDemo />
             <SliderDemo />
+            <AppBarProxyDemo />
         </div>
     );
 }
