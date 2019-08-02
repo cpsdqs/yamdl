@@ -141,6 +141,7 @@ class Actions extends Component {
         const visibleItems = [];
         const overflowingItems = [];
 
+        let keyIndex = 0;
         for (const item of items) {
             if (item.overflow) {
                 overflowingItems.push({
@@ -148,10 +149,14 @@ class Actions extends Component {
                     action: item.action,
                 });
             } else if (item.node) {
-                visibleItems.push(<span class="p-action">{item.node}</span>);
+                visibleItems.push(
+                    <span class="p-action" key={item.key || keyIndex++}>
+                        {item.node}
+                    </span>
+                );
             } else if (item.icon) {
                 visibleItems.push(
-                    <span class="p-action">
+                    <span class="p-action" key={item.key || keyIndex++}>
                         <Button
                             small
                             icon
@@ -164,7 +169,7 @@ class Actions extends Component {
                 );
             } else {
                 visibleItems.push(
-                    <span class="p-action">
+                    <span class="p-action" key={item.key || keyIndex++}>
                         <Button onClick={item.action}>{item.label}</Button>
                     </span>
                 );
