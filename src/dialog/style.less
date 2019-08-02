@@ -36,10 +36,13 @@
     }
 
     .paper-dialog {
+        display: flex;
+        flex-direction: column;
         position: relative;
         z-index: 1;
         background: @dialog-bg;
         border-radius: 4px;
+        max-height: 100%;
         .elevation(24);
 
         &.is-full-screen {
@@ -60,10 +63,13 @@
 
         .p-app-bar-placeholder {
             height: 56px;
+            flex-shrink: 0;
         }
 
         .paper-dialog-contents {
             padding: 24px;
+            overflow: auto;
+            flex: 1;
         }
 
         .paper-dialog-actions {

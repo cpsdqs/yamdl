@@ -147,6 +147,8 @@ class Actions extends Component {
                     label: item.label,
                     action: item.action,
                 });
+            } else if (item.node) {
+                visibleItems.push(<span class="p-action">{item.node}</span>);
             } else if (item.icon) {
                 visibleItems.push(
                     <span class="p-action">

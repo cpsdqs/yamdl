@@ -177,7 +177,6 @@ export class AppBarProxy extends Component {
     }
 
     render () {
-
         if (this.context[contextKey] && !this.props.local) return this.props.proxied || null;
         else {
             const props = { ...this.props };
