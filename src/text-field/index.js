@@ -87,8 +87,13 @@ export default class TextField extends Component {
         this.forceUpdate();
     }
 
-    componentDidUpdate () {
+    componentDidUpdate (prevProps) {
         this.updateFloatingSpring();
+
+        if (prevProps.label !== this.props.label) {
+            // label width changed; decorations need to be updated
+            this.floatingSpring.start();
+        }
     }
 
     render () {

@@ -1,7 +1,6 @@
 import { render, h, Component } from 'preact';
-import { Button, Checkbox, CircularProgress, TextField, Slider } from '../src';
-import { NavigationWindow, NavigationView, MenuIcon, AppBar } from '../src';
-import { AppBarProvider, AppBarConsumer, AppBarProxy } from '../src';
+import { Button, Checkbox, CircularProgress, TextField, Slider, Dialog } from '../src';
+import { MenuIcon, AppBar, AppBarProvider, AppBarConsumer, AppBarProxy } from '../src';
 import Menu from '../src/menu';
 import './index.less';
 
@@ -370,6 +369,85 @@ class AppBarProxyDemo extends Component {
     }
 }
 
+class DialogDemo extends Component {
+    state = { a: 0 };
+    render (props, state) {
+        return (
+            <div class="demo-region">
+                <h2>Dialogs</h2>
+                <div class="demo-item">
+                    <Button onClick={() => this.setState({ a: 1 })}>Open Alert Dialog</Button>
+                    <Button onClick={() => this.setState({ a: 2 })}>Open Simple Dialog</Button>
+                    <Button onClick={() => this.setState({ a: 3 })}>Open Full Screen Dialog</Button>
+                    <Button onClick={() => this.setState({ a: 4 })}>Open &lt; 500 Full Screen Dialog</Button>
+                    <Dialog
+                        open={state.a === 1}
+                        backdrop
+                        onClose={() => this.setState({ a: 0 })}
+                        actions={[
+                            {
+                                label: 'action 1',
+                                action: () => this.setState({ a: 0 }),
+                            },
+                            {
+                                label: 'action 2',
+                                action: () => this.setState({ a: 0 }),
+                            },
+                        ]}>
+                        alert dialog
+                    </Dialog>
+                    <Dialog
+                        open={state.a === 2}
+                        backdrop
+                        title="Simple Dialog"
+                        onClose={() => this.setState({ a: 0 })}>
+                        simple dialog
+                    </Dialog>
+                    <Dialog
+                        open={state.a === 3}
+                        fullScreen
+                        title="Full Screen Dialog"
+                        onClose={() => this.setState({ a: 0 })}
+                        actions={[ { label: 'action', action () {} } ]}>
+                        full screen dialog
+                    </Dialog>
+                    <Dialog
+                        open={state.a === 4}
+                        backdrop
+                        fullScreen={width => width < 500}
+                        title="Conditionally Full Screen Dialog"
+                        onClose={() => this.setState({ a: 0 })}>
+                        cond. full screen dialog
+                    </Dialog>
+                    <div ref={node => this.container5 = node} class="demo-item proxied-dialog-demo">
+                        <AppBarProvider>
+                            <AppBarConsumer
+                                style={{
+                                    opacity: (state.a === 0 || state.a === 5) ? 1 : 0,
+                                }} />
+                            <AppBarProxy
+                                title="root"
+                                menu={
+                                    <Button icon small><MenuIcon type="menu" /></Button>
+                                } />
+                            <Button onClick={() => this.setState({ a: 5 })}>Open Proxied Full Screen Dialog</Button>
+                            <Dialog
+                                open={state.a === 5}
+                                title="proxied"
+                                onClose={() => this.setState({ a: 0 })}
+                                container={this.container5}
+                                fullScreen
+                                appBarProps={{ class: 'dialog-app-bar' }}>
+                                proxied full screen dialog
+                            </Dialog>
+                        </AppBarProvider>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+
 function Gallery () {
     return (
         <div>
@@ -395,6 +473,7 @@ function Gallery () {
             <MenuDemo />
             <SliderDemo />
             <AppBarProxyDemo />
+            <DialogDemo />
         </div>
     );
 }

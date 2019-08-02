@@ -83,6 +83,8 @@ export class AppBarProvider extends Component {
     }
 }
 
+/// # Props
+/// - `prependedProps`: props to prepend to the app bar props instead of appending
 export class AppBarConsumer extends Component {
     state = {
         appBar: null,
@@ -105,9 +107,12 @@ export class AppBarConsumer extends Component {
     render () {
         if (!this.state.appBar) return null;
         const props = {
+            ...(this.props.prependedProps || {}),
             ...this.state.appBar,
             ...this.props,
         };
+        delete props.priority;
+        delete props.prependedProps;
 
         props.class = (this.state.appBar.class || '') + ' ' + (this.props.class || '');
         props.style = Object.assign({}, this.state.appBar.style || {}, this.props.style || {});
@@ -133,6 +138,7 @@ export class AppBarConsumer extends Component {
 /// - `priority`: works like z-index; the highest priority app bar will be visible. Defaults to 0
 /// - `local`: if true, will cause the app bar not to be proxied. Useful for dialogs that are
 ///   conditionally full-screen
+/// - `proxied`: will be returned when the app bar is proxied. null by default.
 export class AppBarProxy extends Component {
     id = Math.random().toString();
 
@@ -159,7 +165,10 @@ export class AppBarProxy extends Component {
 
     updateProxied () {
         const provider = this.context[contextKey];
-        if (provider) provider.register(this.id, this.props);
+        const props = { ...this.props };
+        delete props.local;
+        delete props.proxied;
+        if (provider) provider.register(this.id, props);
     }
 
     removeProxied () {
@@ -168,7 +177,14 @@ export class AppBarProxy extends Component {
     }
 
     render () {
-        if (this.context[contextKey] && !this.props.local) return null;
-        else return <AppBar {...this.props} />;
+
+        if (this.context[contextKey] && !this.props.local) return this.props.proxied || null;
+        else {
+            const props = { ...this.props };
+            delete props.priority;
+            delete props.local;
+            delete props.proxied;
+            return <AppBar {...props} />;
+        }
     }
 }

@@ -11,7 +11,7 @@ import './bar.less';
 /// - `title`: the title
 /// - `actions`: array of actions to show on the right
 ///    - each action should be an object like `{ icon, label, action, overflow }`
-///        - `icon`: optional icon to show instead of text. Will overflow if omitted.
+///        - `icon`: optional icon to show instead of text
 ///        - `label`: label in the overflow menu
 ///        - `action`: action callback
 ///        - `overflow`: if true, will always stay in the overflow menu
@@ -142,7 +142,7 @@ class Actions extends Component {
         const overflowingItems = [];
 
         for (const item of items) {
-            if (item.overflow || !item.icon) {
+            if (item.overflow) {
                 overflowingItems.push({
                     label: item.label,
                     action: item.action,
@@ -150,9 +150,20 @@ class Actions extends Component {
             } else if (item.icon) {
                 visibleItems.push(
                     <span class="p-action">
-                        <Button small icon>
+                        <Button
+                            small
+                            icon
+                            onClick={item.action}
+                            title={item.label}
+                            aria-label={item.label}>
                             {item.icon}
                         </Button>
+                    </span>
+                );
+            } else {
+                visibleItems.push(
+                    <span class="p-action">
+                        <Button onClick={item.action}>{item.label}</Button>
                     </span>
                 );
             }

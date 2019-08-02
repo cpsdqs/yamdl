@@ -1,0 +1,74 @@
+@import '../prelude';
+
+@dialog-backdrop: var(--md-dialog-backdrop);
+@dialog-bg: var(--md-dialog-background);
+
+.paper-dialog-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    z-index: 1000;
+    padding: 2em;
+
+    &.is-fixed {
+        position: fixed;
+    }
+
+    &.is-full-screen {
+        padding: 0;
+        z-index: 200;
+    }
+
+    .paper-dialog-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: @dialog-backdrop;
+        pointer-events: none;
+    }
+
+    .paper-dialog {
+        position: relative;
+        z-index: 1;
+        background: @dialog-bg;
+        border-radius: 4px;
+        .elevation(24);
+
+        &.is-full-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+        }
+
+        &:not(.is-full-screen) .paper-dialog-app-bar {
+            background: none;
+            box-shadow: none;
+            color: inherit;
+
+            .p-title {
+                margin-left: 8px;
+            }
+        }
+
+        .p-app-bar-placeholder {
+            height: 56px;
+        }
+
+        .paper-dialog-contents {
+            padding: 24px;
+        }
+
+        .paper-dialog-actions {
+            padding: 0 8px 8px 24px;
+            text-align: right;
+        }
+    }
+}
