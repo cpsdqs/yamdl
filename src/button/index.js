@@ -15,6 +15,7 @@ function isButtonPressKey (key) {
 /// - `icon`: will render a circular icon button (to be rendered with an icon inside)
 /// - `small`: will use the smaller icon button size
 /// - `href`: if given, will use a <a> instead
+/// - `selected`: if true, will pretend it’s focused
 export default class Button extends Component {
     /// The button node.
     button = null;
@@ -54,13 +55,26 @@ export default class Button extends Component {
 
     onFocus = e => {
         if (this.props.onFocus) this.props.onFocus(e);
+        if (this.props.selected) return;
         if (!e.defaultPrevented && this.ripple) this.ripple.onFocus();
     };
 
     onBlur = e => {
         if (this.props.onBlur) this.props.onBlur(e);
+        if (this.props.selected) return;
         if (!e.defaultPrevented && this.ripple) this.ripple.onBlur();
     };
+
+    componentDidMount () {
+        if (this.props.selected) this.ripple.onFocus();
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.selected !== this.props.selected) {
+            if (this.props.selected) this.ripple.onFocus();
+            else this.ripple.onBlur();
+        }
+    }
 
     render () {
         const props = { ...this.props };
@@ -75,6 +89,7 @@ export default class Button extends Component {
         delete props.fab;
         delete props.icon;
         delete props.small;
+        delete props.selected;
 
         const circle = props.fab || props.icon;
 

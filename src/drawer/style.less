@@ -1,0 +1,44 @@
+@import '../prelude';
+
+.paper-drawer-item {
+    display: flex;
+    box-sizing: border-box;
+    width: calc(100% - 16px);
+    min-height: 40px;
+    margin: 8px;
+    align-items: center;
+    text-transform: none;
+    letter-spacing: inherit;
+    white-space: nowrap;
+    padding-left: 8px;
+    transition: color 0.5s @easing;
+
+    .p-icon {
+        width: 24px;
+        margin-right: 24px;
+        flex-shrink: 0;
+    }
+
+    .p-contents {
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: left;
+        flex: 1;
+    }
+
+    &:not(.is-selected) {
+        color: var(--md-drawer-item-color);
+    }
+}
+
+.paper-drawer-label {
+    display: block;
+    font-size: small;
+    margin: 12px 0 8px 0;
+    padding-top: 15px;
+    padding-left: 12px;
+    padding-right: 8px;
+    border-top: 1px solid var(--md-drawer-divider-color);
+    color: var(--md-drawer-label-color);
+}

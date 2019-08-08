@@ -2,6 +2,7 @@ export { MenuIcon, AppBar, AppBarProvider, AppBarConsumer, AppBarProxy } from '.
 export Button from './button';
 export Checkbox from './checkbox';
 export Dialog from './dialog';
+export { DrawerItem, DrawerLabel } from './drawer';
 export Menu, { MenuItem } from './menu';
 export { CircularProgress, LinearProgress } from './progress';
 export Ripple from './ripple';

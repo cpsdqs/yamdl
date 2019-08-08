@@ -1,6 +1,7 @@
 import { render, h, Component } from 'preact';
 import { Button, Checkbox, CircularProgress, LinearProgress, TextField, Slider, Dialog } from '../src';
 import { MenuIcon, AppBar, AppBarProvider, AppBarConsumer, AppBarProxy } from '../src';
+import { DrawerItem, DrawerLabel } from '../src';
 import Menu from '../src/menu';
 import './index.less';
 
@@ -460,6 +461,26 @@ class DialogDemo extends Component {
     }
 }
 
+class DrawerListDemo extends Component {
+    state = { i: 0 };
+    render (props, { i }) {
+        const k = i => () => this.setState({ i });
+        return (
+            <div class="demo-region">
+                <h2>Drawer Lists</h2>
+                <div class="demo-item">
+                    <div class="drawer-list-demo">
+                        <DrawerItem icon="ic" onClick={k(0)} selected={i == 0}>Item 1</DrawerItem>
+                        <DrawerItem icon="on" onClick={k(1)} selected={i == 1}>Item 2</DrawerItem>
+                        <DrawerLabel>Label</DrawerLabel>
+                        <DrawerItem icon="ic" onClick={k(2)} selected={i == 2}>Item 3</DrawerItem>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+
 function Gallery () {
     return (
         <div>
@@ -486,6 +507,7 @@ function Gallery () {
             <SliderDemo />
             <AppBarProxyDemo />
             <DialogDemo />
+            <DrawerListDemo />
         </div>
     );
 }

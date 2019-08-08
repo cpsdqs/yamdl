@@ -144,10 +144,7 @@ class Actions extends Component {
         let keyIndex = 0;
         for (const item of items) {
             if (item.overflow) {
-                overflowingItems.push({
-                    label: item.label,
-                    action: item.action,
-                });
+                overflowingItems.push(item);
             } else if (item.node) {
                 visibleItems.push(
                     <span class="p-action" key={item.key || keyIndex++}>
@@ -162,7 +159,9 @@ class Actions extends Component {
                             icon
                             onClick={item.action}
                             title={item.label}
-                            aria-label={item.label}>
+                            aria-label={item.label}
+                            disabled={item.disabled}
+                            {...(item.props || {})}>
                             {item.icon}
                         </Button>
                     </span>
@@ -170,7 +169,12 @@ class Actions extends Component {
             } else {
                 visibleItems.push(
                     <span class="p-action" key={item.key || keyIndex++}>
-                        <Button onClick={item.action}>{item.label}</Button>
+                        <Button
+                            onClick={item.action}
+                            disabled={item.disabled}
+                            {...(item.props || {})}>
+                            {item.label}
+                        </Button>
                     </span>
                 );
             }

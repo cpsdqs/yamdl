@@ -141,8 +141,14 @@ export default class Dialog extends Component {
                     </div>
                     {!this.state.fullScreen && this.props.actions ? (
                         <footer class="paper-dialog-actions">
-                            {this.props.actions.map(({ label, action }) => (
-                                <Button class="p-action" onClick={action}>{label}</Button>
+                            {this.props.actions.map(({ label, action, disabled, props }) => (
+                                <Button
+                                    class="p-action"
+                                    onClick={action}
+                                    disabled={disabled}
+                                    {...(props || {})}>
+                                    {label}
+                                </Button>
                             ))}
                         </footer>
                     ) : null}

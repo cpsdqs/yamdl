@@ -155,6 +155,7 @@ export default class Menu extends Component {
                             if (!this.props.persistent && this.props.onClose) this.props.onClose();
                             if (item.action) item.action(e);
                         }}
+                        hasAction={!!item.action}
                         cascadeDelay={(cascadeDown ? i : (this.props.items.length - 1 - i))
                             * 0.1 / (this.props.items.length ** 0.9)}
                         cascadeOffset={dy}>
@@ -227,7 +228,7 @@ export class MenuItem extends Button {
         delete props.innerRef;
 
         props.class = (props.class || '') + ' paper-menu-item';
-        if (this.props.onClick) props.class += ' has-action';
+        if (this.props.hasAction) props.class += ' has-action';
         if (this.props.selected) {
             props.class += ' is-selected';
             if (this.props.selectWithIcon) props.class += ' select-with-icon';
