@@ -1,6 +1,6 @@
 @import '../prelude';
 
-.paper-circular-progress-indicator {
+.ink-circular-progress-indicator {
     display: inline-block;
     width: 48px;
     height: 48px;
@@ -12,7 +12,7 @@
         transform-origin: 50% 50%;
 
         .p-path {
-            stroke: var(--md-circular-progress-color);
+            stroke: var(--md-progress-color);
             stroke-width: 4px;
             fill: none;
         }
@@ -30,5 +30,40 @@
                 stroke-width: 3px;
             }
         }
+    }
+}
+
+.ink-linear-progress-indicator {
+    display: inline-block;
+    position: relative;
+    width: 240px;
+    height: 4px;
+    vertical-align: middle;
+    overflow: hidden;
+    transition: transform 0.3s @easing;
+    transform-origin: 50% 100%;
+
+    .p-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--md-progress-color);
+        opacity: var(--md-linear-progress-background-opacity);
+    }
+
+    .p-span {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform-origin: 0 0;
+        background: var(--md-progress-color);
+    }
+
+    &.hide-none {
+        transform: scaleY(0);
     }
 }

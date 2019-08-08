@@ -1,5 +1,5 @@
 import { render, h, Component } from 'preact';
-import { Button, Checkbox, CircularProgress, TextField, Slider, Dialog } from '../src';
+import { Button, Checkbox, CircularProgress, LinearProgress, TextField, Slider, Dialog } from '../src';
 import { MenuIcon, AppBar, AppBarProvider, AppBarConsumer, AppBarProxy } from '../src';
 import Menu from '../src/menu';
 import './index.less';
@@ -93,7 +93,19 @@ class ProgressDemo extends Component {
                     <CircularProgress small indeterminate={!state.l} progress={1} />
                 </div>
                 <div class="demo-item">
-                    <CircularProgress indeterminate class="custom-progress-color" />
+                    <CircularProgress indeterminate={!state.l} class="custom-progress-color" />
+                </div>
+                <div class="demo-item" onClick={() => this.setState({ i: !state.i })}>
+                    <LinearProgress indeterminate={!state.i} hideIfNone />
+                </div>
+                <div class="demo-item" onClick={() => this.setState({ j: !state.j })}>
+                    <LinearProgress indeterminate={state.j} progress={0.7} />
+                </div>
+                <div class="demo-item" onClick={() => this.setState({ k: !state.k })}>
+                    <LinearProgress progress={state.k ? 1 : 0.2} />
+                </div>
+                <div class="demo-item">
+                    <LinearProgress indeterminate={!state.l} class="custom-progress-color" />
                 </div>
                 <p class="demo-description">
                     Tap to change state.

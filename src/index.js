@@ -3,7 +3,7 @@ export Button from './button';
 export Checkbox from './checkbox';
 export Dialog from './dialog';
 export Menu, { MenuItem } from './menu';
-export { CircularProgress } from './progress';
+export { CircularProgress, LinearProgress } from './progress';
 export Ripple from './ripple';
 export Slider from './slider';
 export TextField from './text-field';
