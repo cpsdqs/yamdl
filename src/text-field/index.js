@@ -47,12 +47,14 @@ export default class TextField extends Component {
     /// The leading container node.
     leadingNode = null;
 
-    onFocus = () => {
-        this.setState({ isFocused: true });
+    onFocus = e => {
+        if (this.props.onFocus) this.props.onFocus(e);
+        if (!e.defaultPrevented) this.setState({ isFocused: true });
     };
 
-    onBlur = () => {
-        this.setState({ isFocused: false });
+    onBlur = e => {
+        if (this.props.onBlur) this.props.onBlur(e);
+        if (!e.defaultPrevented) this.setState({ isFocused: false });
     };
 
     onInputMouseDown = e => {
