@@ -1,6 +1,6 @@
 {
-  "name": "yamdl",
-  "version": "1.0.0",
+  "name": "@cpsdqs/yamdl",
+  "version": "0.1.0",
   "description": "",
   "main": "src/index.js",
   "sideEffects": [
@@ -11,8 +11,12 @@
     "build-test": "cd test && webpack --env prod",
     "watch-test": "cd test && webpack --watch"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "author": "cpsdqs",
   "license": "MIT",
+  "repository": "git://github.com/cpsdqs/yamdl.git",
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
