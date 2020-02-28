@@ -1,0 +1,273 @@
+@import '../prelude';
+
+@background: var(--md-date-picker-background);
+@range: var(--md-date-picker-range);
+@range-opacity: var(--md-date-picker-range-opacity);
+@selection: var(--md-date-picker-selection);
+@today-border: var(--md-date-picker-today-border);
+@weekday-label-color: var(--md-date-picker-weekday-label-color);
+@month-dropdown-color: var(--md-date-picker-month-dropdown-color);
+@year-picker-selection: var(--md-date-picker-year-picker-selection);
+@year-picker-selection-color: var(--md-date-picker-year-picker-selection-color);
+
+.paper-date-picker {
+    border-radius: 4px;
+    background: @background;
+    .elevation(4);
+    overflow: hidden;
+}
+
+.ink-date-month {
+    width: 48px * 7;
+    user-select: none;
+
+    &.p-medium {
+        width: 44px * 7;
+    }
+
+    &.p-small {
+        width: 32px * 7;
+        padding: 0 16px;
+        padding-bottom: 8px;
+    }
+}
+
+.ink-date-weekday-labels, .ink-date-week {
+    width: 100%;
+    display: flex;
+    user-select: none;
+}
+
+.ink-date-weekday-labels .p-label,
+.ink-date-week .p-filler,
+.ink-date-week .p-day {
+    width: calc(100% / 7);
+    text-align: center;
+    line-height: 48px;
+}
+
+.ink-date-weekday-labels.p-medium .p-label,
+.ink-date-week.p-medium .p-filler,
+.ink-date-week.p-medium .p-day {
+    width: calc(100% / 7 - 4px);
+    margin-right: 4px;
+    line-height: 40px;
+
+    &:last-of-type {
+        margin-right: 0;
+    }
+}
+
+.ink-date-weekday-labels.p-small .p-label,
+.ink-date-week.p-small .p-filler,
+.ink-date-week.p-small .p-day {
+    line-height: 32px;
+}
+
+.ink-date-weekday-labels {
+    box-sizing: border-box;
+    user-select: none;
+    cursor: default;
+
+    .p-label {
+        color: @weekday-label-color;
+    }
+
+    &.p-small {
+        padding: 0 16px;
+        font-size: 12px;
+    }
+}
+
+.ink-date-week {
+    position: relative;
+
+    .p-day {
+        position: relative;
+        z-index: 1;
+        cursor: default;
+    }
+
+    .p-selection-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        .p-range-container {
+            opacity: @range-opacity;
+        }
+        .p-hover, .p-selection {
+            stroke-width: 40px;
+            stroke-linecap: round;
+        }
+        .p-selection {
+            stroke: @range;
+        }
+        .p-selection-circle, .p-today-circle {
+            r: 20px;
+            fill: @selection;
+        }
+        .p-today-circle {
+            fill: none;
+            stroke: @today-border;
+            stroke-width: 1px;
+        }
+    }
+    &.p-medium {
+        .p-hover, .p-selection {
+            stroke-width: 36px;
+            transform: translateX(-2px);
+        }
+        .p-selection-circle, .p-today-circle {
+            r: 18px;
+            transform: translateX(-2px);
+        }
+    }
+    &.p-small {
+        .p-hover, .p-selection {
+            stroke-width: 28px;
+        }
+        .p-selection-circle, .p-today-circle {
+            r: 14px;
+        }
+        .p-day {
+            font-size: 14px;
+        }
+    }
+}
+
+.ink-date-month-dropdown {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 24px;
+    padding-right: 8px;
+    margin: 16px 0;
+    user-select: none;
+    cursor: default;
+
+    .p-dropdown-inner {
+        flex-shrink: 0;
+        .p-dropdown-label {
+            color: @month-dropdown-color;
+            font-size: 14px;
+            font-weight: 500;
+        }
+    }
+
+    .p-month-nav {
+        flex-shrink: 0;
+        transition: opacity 0.1s @easing;
+
+        .p-prev-month-button {
+            margin-right: 24px;
+        }
+    }
+
+    .p-dropdown-expand-button,
+    .p-month-nav-button {
+        margin-left: 4px;
+        width: 24px;
+        height: 24px;
+        --md-button-color: @month-dropdown-color;
+
+        svg {
+            vertical-align: middle;
+            transition: transform 0.3s @easing;
+        }
+
+        svg path {
+            fill: currentColor;
+        }
+    }
+
+    &.is-expanded {
+        .p-dropdown-expand-button {
+            svg {
+                transform: rotate(-180deg);
+                transition: none;
+                animation: ink-date-month-dropdown-expand-button-expand 0.3s @easing;
+
+                @keyframes ink-date-month-dropdown-expand-button-expand {
+                    0% {
+                        transform: rotate(0);
+                    }
+                    100% {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+        }
+
+        .p-month-nav {
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+
+    &.p-small {
+        margin-bottom: 12px;
+    }
+}
+
+.ink-date-year-picker {
+    padding-bottom: 8px;
+    padding: 0 12px;
+
+    .p-scrollable {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-column-gap: 8px;
+        grid-row-gap: 8px;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        font-size: 14px;
+        padding-top: 4px;
+        height: calc(100% - 8px);
+        scrollbar-width: thin;
+
+        .p-year {
+            border-radius: 100px;
+            width: 52px;
+            text-align: center;
+            background: none;
+            border: none;
+            color: inherit;
+            font: inherit;
+            line-height: 28px;
+            padding: 0;
+            margin: 0;
+            transition: background 0.3s @easing, color 0.3s @easing;
+            user-select: none;
+
+            &.is-selected {
+                background: @year-picker-selection;
+                color: @year-picker-selection-color;
+            }
+        }
+    }
+}
+
+.ink-date-small-picker {
+    .p-picker-container {
+        position: relative;
+
+        .ink-date-year-picker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            background: @background;
+            transition: transform 0.3s @easing,opacity 0.3s @easing;
+        }
+    }
+
+    &:not(.is-expanded) .p-picker-container .ink-date-year-picker {
+        transform: translateY(-16px);
+        opacity: 0;
+        pointer-events: none;
+    }
+}

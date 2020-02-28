@@ -1,6 +1,7 @@
 export { MenuIcon, AppBar, AppBarProvider, AppBarConsumer, AppBarProxy } from './app';
 export Button from './button';
 export Checkbox from './checkbox';
+export DatePicker from './date';
 export Dialog from './dialog';
 export { DrawerItem, DrawerLabel } from './drawer';
 export Menu, { MenuItem } from './menu';

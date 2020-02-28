@@ -55,6 +55,7 @@ export default class TextField extends Component {
     onBlur = e => {
         if (this.props.onBlur) this.props.onBlur(e);
         if (!e.defaultPrevented) this.setState({ isFocused: false });
+        this.underlineX = null;
     };
 
     onInputMouseDown = e => {

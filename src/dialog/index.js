@@ -99,7 +99,7 @@ export default class Dialog extends Component {
             ? this.props.fixed
             : !this.props.container) ? ' is-fixed' : '';
 
-        props.style = props.style || {};
+        props.style = { ...(props.style || {}) };
         props.style.transform = props.style.transform || '';
         props.style.opacity = 'opacity' in props.style ? +props.style.opacity : 1;
 

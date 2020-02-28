@@ -1,6 +1,6 @@
 {
   "name": "@cpsdqs/yamdl",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "src/index.js",
   "sideEffects": [
@@ -10,9 +10,6 @@
   "scripts": {
     "build-test": "cd test && webpack --env prod",
     "watch-test": "cd test && webpack --watch"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
   },
   "author": "cpsdqs",
   "license": "MIT",

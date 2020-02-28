@@ -481,6 +481,52 @@ class DrawerListDemo extends Component {
     }
 }
 
+import { MonthView, MonthViewContainer } from '../src/date/month';
+import DatePicker from '../src/date';
+
+class DatePickerDemo extends Component {
+    state = { i: [null, null], j: new Date(2020, 1, 27) };
+    render ({}, { i, j }) {
+        return (
+            <div class="demo-region">
+                <h2>Date Pickers</h2>
+                <div class="demo-item">
+                    <MonthViewContainer value={i} onChange={i => this.setState({ i })}>
+                        <MonthView year={2020} month={1} weekStart={1} size="large" value={i} />
+                        <MonthView year={2020} month={2} weekStart={1} size="large" value={i} />
+                    </MonthViewContainer>
+                </div>
+                <div class="demo-item">
+                    <MonthView year={2020} month={2} weekStart={1} size="medium" value={i} />
+                </div>
+                <div class="demo-item">
+                    <MonthViewContainer value={i} onChange={i => this.setState({ i })}>
+                        <MonthView year={2020} month={1} weekStart={1} size="small" value={i} />
+                        <MonthView year={2020} month={2} weekStart={1} size="small" value={i} />
+                    </MonthViewContainer>
+                </div>
+                <div class="demo-item">
+                    <MonthViewContainer value={j} onChange={j => this.setState({ j })}>
+                        <MonthView
+                            year={2020}
+                            month={1}
+                            weekStart={1}
+                            size="small"
+                            value={j}
+                            today={new Date(2020, 1, 28)} />
+                    </MonthViewContainer>
+                </div>
+                <div class="demo-item">
+                    <DatePicker
+                        value={j}
+                        today={new Date(2020, 1, 28)}
+                        onChange={j => this.setState({ j })} />
+                </div>
+            </div>
+        );
+    }
+}
+
 function Gallery () {
     return (
         <div>
@@ -508,6 +554,7 @@ function Gallery () {
             <AppBarProxyDemo />
             <DialogDemo />
             <DrawerListDemo />
+            <DatePickerDemo />
         </div>
     );
 }

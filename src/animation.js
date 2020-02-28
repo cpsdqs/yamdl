@@ -129,7 +129,7 @@ export class SpringSolver {
             2 * initialVelocity + this.friction * initialValue,
             2 * initialValue * this.dampedAngularFrequency,
         );
-        this.amplitudeFactor = initialValue === 0
+        this.amplitudeFactor = Math.abs(initialValue) < 1e-5
             ? Math.sign(initialVelocity) * initialVelocity / this.dampedAngularFrequency
             : initialValue / Math.cos(this.angularOffset);
         this.dampedFriction = Math.max(

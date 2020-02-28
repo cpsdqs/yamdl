@@ -7,7 +7,8 @@ import './style';
 /// # Props
 /// - `icon`: the icon
 /// - `selected`: selection state
-export function DrawerItem (props) {
+export function DrawerItem (originalProps) {
+    const props = { ...originalProps };
     const { icon, selected } = props;
     delete props.icon;
     delete props.raised;
