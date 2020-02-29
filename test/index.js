@@ -137,6 +137,7 @@ class TextFieldDemo extends Component {
                 <div class="demo-item"><TextField label="With trailing" trailing="an icon?" {...sharedProps} /></div>
                 <div class="demo-item"><TextField outline label="With trailing" trailing="an icon?" {...sharedProps} /></div>
                 <div class="demo-item"><TextField center label="Centered" {...sharedProps} /></div>
+                <div class="demo-item"><TextField type="password" label="Password" {...sharedProps} /></div>
             </div>
         );
     }
