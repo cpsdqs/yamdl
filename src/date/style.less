@@ -4,7 +4,9 @@
 @range: var(--md-date-picker-range);
 @range-opacity: var(--md-date-picker-range-opacity);
 @selection: var(--md-date-picker-selection);
+@selection-color: var(--md-date-picker-selection-color);
 @today-border: var(--md-date-picker-today-border);
+@today-selected-border: var(--md-date-picker-today-selected-border);
 @weekday-label-color: var(--md-date-picker-weekday-label-color);
 @month-dropdown-color: var(--md-date-picker-month-dropdown-color);
 @year-picker-selection: var(--md-date-picker-year-picker-selection);
@@ -86,6 +88,11 @@
         position: relative;
         z-index: 1;
         cursor: default;
+        transition: color 0.1s @easing;
+
+        &.is-selected {
+            color: @selection-color;
+        }
     }
 
     .p-selection-container {
@@ -113,6 +120,11 @@
             fill: none;
             stroke: @today-border;
             stroke-width: 1px;
+            transition: stroke 0.3s @easing;
+
+            &.is-selected {
+                stroke: @today-selected-border;
+            }
         }
     }
     &.p-medium {

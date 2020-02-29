@@ -486,8 +486,8 @@ import { MonthView, MonthViewContainer } from '../src/date/month';
 import DatePicker from '../src/date';
 
 class DatePickerDemo extends Component {
-    state = { i: [null, null], j: new Date(2020, 1, 27) };
-    render ({}, { i, j }) {
+    state = { i: [null, null], j: new Date(2020, 1, 27), k: null };
+    render ({}, { i, j, k }) {
         return (
             <div class="demo-region">
                 <h2>Date Pickers</h2>
@@ -522,6 +522,12 @@ class DatePickerDemo extends Component {
                         value={j}
                         today={new Date(2020, 1, 28)}
                         onChange={j => this.setState({ j })} />
+                </div>
+                <div class="demo-item">
+                    <DatePicker
+                        value={k}
+                        today={new Date()}
+                        onChange={k => this.setState({ k })} />
                 </div>
             </div>
         );

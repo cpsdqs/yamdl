@@ -129,6 +129,8 @@ export default class WeekView extends Component {
         let makeSelectionGhost = false;
 
         const isFullRange = startDayOffset <= 0 && endDayOffset >= 6;
+        const isEmptyRange = startDayOffset < 0 && endDayOffset < 0
+            || startDayOffset > 6 && endDayOffset > 6;
 
         if (this.wasFullRange !== isFullRange) {
             this.selectionStart.value = this.selectionStart.target;
@@ -136,19 +138,47 @@ export default class WeekView extends Component {
             makeSelectionGhost = true;
         }
 
+        let shouldSlideIn = false;
+        let shouldSlideInAlt = false;
+        if (this.wasEmptyRange && !isEmptyRange && Array.isArray(this.props.value)) {
+            // animate in instead of fading in
+            shouldSlideIn = true;
+        }
+        if (this.wasFullRange && !isFullRange && Array.isArray(this.props.value)) {
+            // animate in instead of fading in
+            shouldSlideInAlt = true;
+        }
+
         this.wasFullRange = isFullRange;
+        this.wasEmptyRange = isEmptyRange;
 
         if (startDayOffsetInWeek && !startDayOffsetWasInWeek) {
             // fade in
-            this.selectionStart.value = this.selectionStart.target;
-            this.selectionStartInd.value = this.selectionStartInd.target;
-            makeSelectionGhost = true;
+            if (shouldSlideIn) {
+                this.selectionStart.value = 7;
+                this.selectionStartInd.value = 7;
+            } else if (shouldSlideInAlt) {
+                this.selectionStart.value = -1;
+                this.selectionStartInd.value = -1;
+            } else {
+                this.selectionStart.value = this.selectionStart.target;
+                this.selectionStartInd.value = this.selectionStartInd.target;
+                makeSelectionGhost = true;
+            }
         }
         if (endDayOffsetInWeek && !endDayOffsetWasInWeek) {
             // fade in
-            this.selectionEnd.value = this.selectionEnd.target;
-            this.selectionEndInd.value = this.selectionEndInd.target;
-            makeSelectionGhost = true;
+            if (shouldSlideIn) {
+                this.selectionEnd.value = -1;
+                this.selectionEndInd.value = -1;
+            } else if (shouldSlideInAlt) {
+                this.selectionEnd.value = 7;
+                this.selectionEndInd.value = 7;
+            } else {
+                this.selectionEnd.value = this.selectionEnd.target;
+                this.selectionEndInd.value = this.selectionEndInd.target;
+                makeSelectionGhost = true;
+            }
         }
         if (startDayOffsetWasInWeek && !startDayOffsetInWeek) makeSelectionGhost = true;
         if (endDayOffsetWasInWeek && !endDayOffsetInWeek) makeSelectionGhost = true;
@@ -256,6 +286,7 @@ export default class WeekView extends Component {
         let hasStartSelection = false;
         let hasEndSelection = false;
         let hasToday = false;
+        let isTodaySelected = false;
         let todayIndex = 0;
         const items = [];
         for (let i = 0; i < DAYS_IN_A_WEEK; i++) {
@@ -279,6 +310,7 @@ export default class WeekView extends Component {
                     hasToday = true;
                     className += ' is-today';
                     todayIndex = i;
+                    isTodaySelected = isSelected;
                 }
 
                 items.push(
@@ -361,7 +393,7 @@ export default class WeekView extends Component {
         if (hasToday) selection.push(
             <circle
                 key="today"
-                class="p-today-circle"
+                class={'p-today-circle' + (isTodaySelected ? ' is-selected' : '')}
                 cx={c(todayIndex + 0.5)}
                 cy={y} />,
         );

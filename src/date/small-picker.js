@@ -22,8 +22,12 @@ export default class SmallDatePicker extends Component {
     };
 
     resetPosition () {
-        const value = Array.isArray(this.props.value) ? this.props.value[0] : this.props.value;
-        if (!value) return;
+        // first, try resetting to the value
+        let value = Array.isArray(this.props.value) ? this.props.value[0] : this.props.value;
+        // then try the given today date
+        if (!value) value = this.props.today;
+        // then just try today
+        if (!value) value = new Date();
 
         this.setState({
             year: value.getFullYear(),
