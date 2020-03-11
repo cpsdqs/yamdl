@@ -49,7 +49,10 @@ export default class YearPicker extends Component {
                 <button
                     class={'p-year' + (isSelected ? ' is-selected' : '')}
                     key={yr}
-                    onClick={() => onChange(fixedYear)}
+                    onClick={e => {
+                        e.preventDefault();
+                        onChange(fixedYear);
+                    }}
                     ref={node => this.yearNodes.set(yr, node)}>
                     {yr}
                 </button>

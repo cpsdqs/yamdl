@@ -34,7 +34,10 @@ export default class MonthDropdown extends Component {
                     <Button
                         class="p-dropdown-expand-button"
                         icon
-                        onClick={() => onExpandedChange(!expanded)}>
+                        onClick={e => {
+                            e.preventDefault();
+                            onExpandedChange(!expanded);
+                        }}>
                         <svg width="24" height="24">
                             <path d="M7 10h10l-5 5z" />
                         </svg>
@@ -44,7 +47,10 @@ export default class MonthDropdown extends Component {
                     <Button
                         class="p-month-nav-button p-prev-month-button"
                         icon
-                        onClick={onPrev}>
+                        onClick={e => {
+                            e.preventDefault();
+                            onPrev && onPrev();
+                        }}>
                         <svg width="24" height="24">
                             <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
                         </svg>
@@ -52,7 +58,10 @@ export default class MonthDropdown extends Component {
                     <Button
                         class="p-month-nav-button"
                         icon
-                        onClick={onNext}>
+                        onClick={e => {
+                            e.preventDefault();
+                            onNext && onNext();
+                        }}>
                         <svg width="24" height="24">
                             <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
                         </svg>
