@@ -32,59 +32,41 @@ export default class Checkbox extends Component {
         draggingSwitch: false,
     };
 
-    ignoreMouse = 0;
+    capturedPointer = null;
 
-    onMouseDown = e => {
-        if (this.props.onMouseDown) this.props.onMouseDown(e);
-        if (this.ignoreMouse < Date.now() - 400) {
-            if (!this.props.switch) this.ripple.onMouseDown(e);
-            else if (!e.defaultPrevented) {
-                const x = e.clientX - this.node.getBoundingClientRect().left;
-                this.onSwitchDragStart(x);
-                window.addEventListener('mousemove', this.onWindowMouseMove);
-                window.addEventListener('mouseup', this.onWindowMouseUp);
-            }
+    onPointerDown = e => {
+        if (this.props.onPointerDown) this.props.onPointerDown(e);
+
+        if (!this.props.switch) this.ripple.onPointerDown(e);
+        else if (!e.defaultPrevented) {
+            const x = e.clientX - this.node.getBoundingClientRect().left;
+            this.onSwitchDragStart(x);
+            this.node.setPointerCapture(e.pointerId);
+            this.capturedPointer = e.pointerId;
         }
     };
 
-    onWindowMouseMove = e => {
-        if (this.state.draggingSwitch && this.ignoreMouse < Date.now() - 400) {
+    onPointerMove = e => {
+        if (this.state.draggingSwitch) {
             const x = e.clientX - this.node.getBoundingClientRect().left;
             this.onSwitchDragMove(x);
         }
     };
 
-    onWindowMouseUp = e => {
-        if (this.state.draggingSwitch && this.ignoreMouse < Date.now() - 400) {
-            this.onSwitchDragEnd();
-        }
-        window.removeEventListener('mousemove', this.onWindowMouseMove);
-        window.removeEventListener('mouseup', this.onWindowMouseUp);
-    };
-
-    onTouchStart = e => {
-        if (this.props.onTouchStart) this.props.onTouchStart(e);
-        if (!this.props.switch) this.ripple.onTouchStart(e);
-        else if (!e.defaultPrevented) {
-            const x = e.touches[0].clientX - this.node.getBoundingClientRect().left;
-            this.onSwitchDragStart(x);
-        }
-        this.ignoreMouse = Date.now();
-    };
-
-    onTouchMove = e => {
-        if (this.props.onTouchMove) this.props.onTouchMove(e);
+    onPointerUp = e => {
         if (this.state.draggingSwitch) {
-            const x = e.touches[0].clientX - this.node.getBoundingClientRect().left;
-            this.onSwitchDragMove(x);
+            this.onSwitchDragEnd(false);
+            this.node.releasePointerCapture(this.capturedPointer);
+            this.capturedPointer = null;
         }
-        this.ignoreMouse = Date.now();
     };
 
-    onTouchEnd = e => {
-        if (this.props.onTouchEnd) this.props.onTouchEnd(e);
-        if (this.state.draggingSwitch) this.onSwitchDragEnd();
-        this.ignoreMouse = Date.now();
+    onPointerCancel = e => {
+        if (this.state.draggingSwitch) {
+            this.onSwitchDragEnd(true);
+            this.node.releasePointerCapture(this.capturedPointer);
+            this.capturedPointer = null;
+        }
     };
 
     onKeyDown = e => {
@@ -148,15 +130,17 @@ export default class Checkbox extends Component {
         });
     }
 
-    onSwitchDragEnd () {
+    onSwitchDragEnd (cancel) {
         if (!this.state.draggingSwitch) return;
         const { moved, mayDrag, checked, lastX } = this.state.draggingSwitch;
-        if (moved && mayDrag) {
-            if (this.props.onChange) this.props.onChange(checked);
-            else this.setState({ checked });
-        } else if (lastX >= 0 && lastX < SWITCH_WIDTH) {
-            if (this.props.onChange) this.props.onChange(!this.props.checked);
-            else this.setState({ checked: !this.state.checked });
+        if (!cancel) {
+            if (moved && mayDrag) {
+                if (this.props.onChange) this.props.onChange(checked);
+                else this.setState({ checked });
+            } else if (lastX >= 0 && lastX < SWITCH_WIDTH) {
+                if (this.props.onChange) this.props.onChange(!this.props.checked);
+                else this.setState({ checked: !this.state.checked });
+            }
         }
 
         this.lastDragEnd = Date.now();
@@ -202,10 +186,10 @@ export default class Checkbox extends Component {
                 <span
                     {...props}
                     ref={node => this.node = node}
-                    onMouseDown={this.onMouseDown}
-                    onTouchStart={this.onTouchStart}
-                    onTouchMove={this.onTouchMove}
-                    onTouchEnd={this.onTouchEnd}
+                    onPointerDown={this.onPointerDown}
+                    onPointerMove={this.onPointerMove}
+                    onPointerUp={this.onPointerUp}
+                    onPointerCancel={this.onPointerCancel}
                     onKeyDown={this.onKeyDown}
                     onKeyUp={this.onKeyUp}>
                     <span class="p-background"></span>
@@ -236,9 +220,10 @@ export default class Checkbox extends Component {
                 <span
                     {...props}
                     ref={node => this.node = node}
-                    onMouseDown={this.onMouseDown}
-                    onTouchStart={this.onTouchStart}
-                    onTouchEnd={this.onTouchEnd}
+                    onPointerDown={this.onPointerDown}
+                    onPointerMove={this.onPointerMove}
+                    onPointerUp={this.onPointerUp}
+                    onPointerCancel={this.onPointerCancel}
                     onKeyDown={this.onKeyDown}
                     onKeyUp={this.onKeyUp}>
                     <input

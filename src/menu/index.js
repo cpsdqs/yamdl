@@ -262,10 +262,7 @@ export class MenuItem extends Button {
                     this.button = node;
                     if (this.props.innerRef) this.props.innerRef(node);
                 }}
-                onMouseDown={this.onMouseDown}
-                onMouseMove={this.onMouseMove}
-                onTouchStart={this.onTouchStart}
-                onTouchEnd={this.onTouchEnd}
+                onPointerDown={this.onPointerDown}
                 onKeyDown={this.onKeyDown}
                 onKeyUp={this.onKeyUp}
                 onFocus={this.onFocus}

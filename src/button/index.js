@@ -23,20 +23,9 @@ export default class Button extends Component {
     /// The ripple instance.
     ripple = null;
 
-    onMouseDown = e => {
-        if (this.props.onMouseDown) this.props.onMouseDown(e);
-        if (!this.ignoreMouse && this.ripple) this.ripple.onMouseDown(e);
-    };
-
-    onMouseMove = e => {
-        this.ignoreMouse = false;
-        if (this.props.onMouseMove) this.props.onMouseMove(e);
-    };
-
-    onTouchStart = e => {
-        if (this.props.onTouchStart) this.props.onTouchStart(e);
-        this.ripple && this.ripple.onTouchStart(e);
-        this.ignoreMouse = true;
+    onPointerDown = e => {
+        if (this.props.onPointerDown) this.props.onPointerDown(e);
+        if (this.ripple) this.ripple.onPointerDown(e);
     };
 
     onKeyDown = e => {
@@ -99,10 +88,7 @@ export default class Button extends Component {
             <Component
                 {...props}
                 ref={node => this.button = node}
-                onMouseDown={this.onMouseDown}
-                onMouseMove={this.onMouseMove}
-                onTouchStart={this.onTouchStart}
-                onTouchEnd={this.onTouchEnd}
+                onPointerDown={this.onPointerDown}
                 onKeyDown={this.onKeyDown}
                 onKeyUp={this.onKeyUp}
                 onFocus={this.onFocus}

@@ -87,6 +87,7 @@ export default class TextField extends Component {
 
     componentDidMount () {
         this.updateFloatingSpring();
+        this.floatingSpring.finish();
         this.forceUpdate();
     }
 
@@ -203,7 +204,7 @@ class TextFieldDecoration extends Component {
         const breakX = this.props.center
             ? (this.props.inputNode.offsetWidth - labelWidth * FLOATING_LABEL_SCALE) / 2 - 2
             : x - 2;
-        const breakWidth = labelWidth * FLOATING_LABEL_SCALE + 4;
+        const breakWidth = labelWidth ? labelWidth * FLOATING_LABEL_SCALE + 4 : 0;
 
         let labelX = x;
         const easeOutSine = t => Math.sin(Math.PI / 2 * t);

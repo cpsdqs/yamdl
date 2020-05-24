@@ -117,9 +117,10 @@ class ProgressDemo extends Component {
 }
 
 class TextFieldDemo extends Component {
-    state = { s: '' };
+    state = { s: '', q: 'cats' };
     render (props, state) {
         const sharedProps = { value: state.s, onChange: e => this.setState({ s: e.target.value }) };
+        const sharedProps2 = { value: state.q, onChange: e => this.setState({ q: e.target.value }) };
 
         return (
             <div class="demo-region">
@@ -138,6 +139,8 @@ class TextFieldDemo extends Component {
                 <div class="demo-item"><TextField outline label="With trailing" trailing="an icon?" {...sharedProps} /></div>
                 <div class="demo-item"><TextField center label="Centered" {...sharedProps} /></div>
                 <div class="demo-item"><TextField type="password" label="Password" {...sharedProps} /></div>
+                <div class="demo-item"><TextField outline {...sharedProps2} /></div>
+                <div class="demo-item"><TextField label="Init label" {...sharedProps2} /></div>
             </div>
         );
     }

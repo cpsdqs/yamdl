@@ -8,6 +8,11 @@ const RIPPLE_DURATION = 0.5;
 /// Duration of a single ripple effect while the pointer is held down.
 const RIPPLE_HOLD_DURATION = 3;
 
+/// Duration of a single ripple effect fading in (required when its starting size is not 0)
+const RIPPLE_FADE_IN_DURATION = 0.4;
+
+const TOUCH_RIPPLE_SIZE = 20;
+
 ///
 /// Draws a material ripple in the parent container.
 ///
@@ -39,6 +44,7 @@ export default class Ripple extends Component {
         for (const ripple of this.state.ripples) {
             ripple.sizeSpring.update(dt);
             ripple.opacitySpring.update(dt);
+            ripple.fadeInSpring.update(dt);
         }
 
         const indicesToRemove = [];
@@ -71,30 +77,23 @@ export default class Ripple extends Component {
         globalAnimator.deregister(this);
     }
 
-    onMouseDown = e => {
+    onPointerDown = e => {
         if (e.defaultPrevented) return;
-        this.onPointerDown(e.clientX, e.clientY);
-        window.addEventListener('mouseup', this.onMouseUp);
+        this.onDown(e.clientX, e.clientY, e.pointerType === 'touch' ? TOUCH_RIPPLE_SIZE : 0);
+        window.addEventListener('pointerup', this.onPointerUp);
+        window.addEventListener('pointercancel', this.onPointerCancel);
     };
 
     /// Will be bound automatically---should not be called directly.
-    onMouseUp = () => {
-        this.onPointerUp();
-        window.removeEventListener('mouseup', this.onMouseUp);
-    };
-
-    onTouchStart = e => {
-        if (e.defaultPrevented) return;
-        this.onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
-        window.addEventListener('touchcancel', this.onTouchEnd);
-        window.addEventListener('touchend', this.onTouchEnd);
+    onPointerUp = () => {
+        this.onUp();
+        window.removeEventListener('pointerup', this.onPointerUp);
+        window.removeEventListener('pointercancel', this.onPointerCancel);
     };
 
     /// Will be bound automatically---should not be called directly.
-    onTouchEnd = () => {
+    onPointerCancel = () => {
         this.onPointerUp();
-        window.removeEventListener('touchcancel', this.onTouchEnd);
-        window.removeEventListener('touchend', this.onTouchEnd);
     };
 
     onFocus = () => {
@@ -113,7 +112,7 @@ export default class Ripple extends Component {
     /// Anonymous down event---will render a centered ripple.
     onAnonymousDown = () => {
         if (!this.anonDown) {
-            this.onPointerDown();
+            this.onDown();
             this.anonDown = true;
         }
     };
@@ -122,7 +121,7 @@ export default class Ripple extends Component {
     /// call.
     onAnonymousUp = () => {
         if (this.anonDown) {
-            this.onPointerUp();
+            this.onUp();
             this.anonDown = false;
         }
     };
@@ -132,7 +131,7 @@ export default class Ripple extends Component {
             .getPropertyValue('--md-ripple-highlight-opacity');
     }
 
-    onPointerDown (clientX, clientY) {
+    onDown (clientX, clientY, size) {
         const nodeRect = this.node.getBoundingClientRect();
         this.updateHighlightOpacity();
 
@@ -146,11 +145,21 @@ export default class Ripple extends Component {
             y: offsetY,
             sizeSpring: new Spring(1, RIPPLE_HOLD_DURATION),
             opacitySpring: new Spring(1, RIPPLE_HOLD_DURATION),
+            fadeInSpring: new Spring(1, RIPPLE_FADE_IN_DURATION),
         };
+
+        if (size > 1) {
+            const { targetScale } = this._getParameters();
+            ripple.sizeSpring.value = size / targetScale;
+            ripple.fadeInSpring.value = 0;
+        } else {
+            ripple.fadeInSpring.value = 1;
+        }
 
         ripple.sizeSpring.target = 1;
         ripple.opacitySpring.value = 1;
         ripple.opacitySpring.target = 0.3;
+        ripple.fadeInSpring.target = 1;
 
         ripples.push(ripple);
         this.setState({
@@ -159,7 +168,7 @@ export default class Ripple extends Component {
         }, () => globalAnimator.register(this));
     }
 
-    onPointerUp () {
+    onUp () {
         let currentRippleIndex = null;
         for (let i = 0; i < this.state.ripples.length; i++) {
             if (this.state.ripples[i].id === this.state.currentRippleID) {
@@ -182,10 +191,7 @@ export default class Ripple extends Component {
         }
     }
 
-    render () {
-        let highlight = null;
-        const ripples = [];
-
+    _getParameters () {
         const nodeRect = this.node ? this.node.getBoundingClientRect() : null;
         const centerX = nodeRect ? nodeRect.width / 2 : 0;
         const centerY = nodeRect ? nodeRect.height / 2 : 0;
@@ -194,6 +200,14 @@ export default class Ripple extends Component {
                 ? Math.max(nodeRect.width, nodeRect.height)
                 : Math.hypot(nodeRect.width, nodeRect.height)
             : 0;
+        return { centerX, centerY, targetScale };
+    }
+
+    render () {
+        let highlight = null;
+        const ripples = [];
+
+        const { centerX, centerY, targetScale } = this._getParameters();
 
         let maxHighlight = this.focusSpring.value;
 
@@ -202,10 +216,10 @@ export default class Ripple extends Component {
             const posX = sizeProgress * (centerX - ripple.x) + ripple.x;
             const posY = sizeProgress * (centerY - ripple.y) + ripple.y;
             const scale = sizeProgress;
-            const opacity = ripple.opacitySpring.value;
+            const opacity = ripple.opacitySpring.value * ripple.fadeInSpring.value;
 
             const rippleHighlight = 1 - 4 * Math.abs(sizeProgress - 0.5) ** 2;
-            maxHighlight = Math.max(rippleHighlight, maxHighlight);
+            maxHighlight = Math.max(rippleHighlight * ripple.fadeInSpring.value, maxHighlight);
 
             ripples.push(
                 <div
