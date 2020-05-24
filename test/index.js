@@ -166,6 +166,14 @@ class MenuIconDemo extends Component {
                 }}>
                     <MenuIcon type={state.k ? 'close' : 'back'} />
                 </div>
+                <div class="demo-item" onClick={() => {
+                    this.setState({ l: ((state.l | 0) + 1) % 4 });
+                }}>
+                    <MenuIcon
+                        type={[
+                            'close', 'back', 'close', ''
+                        ][state.l | 0]} />
+                </div>
                 <p class="demo-description">Tap to change state.</p>
             </div>
         );

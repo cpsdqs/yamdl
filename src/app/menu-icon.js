@@ -87,6 +87,10 @@ export default class MenuIcon extends Component {
     back = new Spring(1, 0.5);
     rotateOut = false;
 
+    // if true, then the close state is rotated.
+    // used to ensure that close<->back also rotates.
+    rotateClose = true;
+
     update (dt) {
         this.back.update(dt);
         this.close.update(dt);
@@ -119,6 +123,11 @@ export default class MenuIcon extends Component {
             this.back.target = this.back.value = this.props.type.back;
             this.close.target = this.close.value = this.props.type.close;
         }
+
+        if (this.rotateClose === null && this.back.target === 0 && this.close.target === 0) {
+            // target is menu
+            this.rotateClose = true;
+        }
     }
 
     render (props) {
@@ -129,13 +138,28 @@ export default class MenuIcon extends Component {
 
         delete props.type;
 
-        let rotation = (this.back.value + this.close.value) / 2;
+        let rotation = this.rotateClose
+            ? (this.back.value + this.close.value) / 2
+            : this.back.value / 2;
         if (this.rotateOut) rotation = -rotation;
 
         if (this.rotateOut && Math.abs(rotation) < 0.001) {
             this.rotateOut = false;
         } else if (!this.rotateOut && Math.abs(rotation - 0.5) < 0.001) {
             this.rotateOut = true;
+        }
+
+        if (this.back.value < 1e-3 && this.close.value < 1e-3) {
+            // we're at the hamburger
+            this.rotateClose = true;
+        }
+        if (Math.abs(this.back.value - 1) < 1e-3 && this.close.value < 1e-3) {
+            // we're at back
+            this.rotateClose = false;
+        }
+        if (this.back.value < 1e-3 && Math.abs(this.close.value - 1) < 1e-3) {
+            // we're at close
+            this.rotateClose = null;
         }
 
         const styles = ['a', 'b', 'c'].map(key => {
