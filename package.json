@@ -9,29 +9,37 @@
   ],
   "scripts": {
     "build-test": "cd test && webpack --env prod",
-    "watch-test": "cd test && webpack --watch"
+    "watch-test": "cd test && webpack --watch",
+    "prepare": "rollup -c"
   },
   "author": "cpsdqs",
   "license": "MIT",
   "repository": "git://github.com/cpsdqs/yamdl.git",
   "devDependencies": {
-    "@babel/core": "^7.4.5",
+    "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/plugin-proposal-export-default-from": "^7.2.0",
+    "@babel/preset-env": "^7.9.6",
     "@babel/preset-react": "^7.0.0",
-    "autoprefixer": "^9.6.0",
+    "@rollup/plugin-node-resolve": "^8.0.0",
+    "autoprefixer": "^9.8.0",
     "babel-loader": "^8.0.6",
     "css-loader": "^2.1.1",
-    "less": "^3.9.0",
+    "less": "^3.11.1",
     "less-loader": "^5.0.0",
     "mini-css-extract-plugin": "^0.7.0",
     "postcss-loader": "^3.0.0",
     "preact": "^10.4.4",
+    "rollup": "^2.10.9",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-postcss": "^3.1.1",
     "webpack": "^4.35.0",
     "webpack-cli": "^3.3.5"
   },
   "peerDependencies": {
     "preact": "*"
   },
-  "dependencies": {}
+  "dependencies": {
+    "core-js": "^3.6.5"
+  }
 }
