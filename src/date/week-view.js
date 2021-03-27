@@ -19,6 +19,7 @@ import {
 /// - unboundedSelection: bool
 /// - size: size class
 /// - today: today date
+/// - min/max: date bounds (values outside will be faded)
 export default class WeekView extends Component {
     selectionStart = new Spring(1, 0.15);
     selectionStartInd = new Spring(1, 0.15);
@@ -275,11 +276,18 @@ export default class WeekView extends Component {
 
     getDayAt (offset) {
         const { baseDate, startOffset, endOffset } = this.getParams();
-        return offset >= startOffset && offset <= endOffset ? baseDate + offset : null;
+        if (offset >= startOffset && offset <= endOffset) {
+            const day = baseDate + offset;
+            const date = new Date(this.props.year, this.props.month, day);
+            if (this.props.min && dateCmp(date, this.props.min) < 0) return null;
+            if (this.props.max && dateCmp(date, this.props.max) > 0) return null;
+            return day;
+        }
+        return null;
     }
 
     render ({
-        year, month, value, unboundedSelection, size, today, ...extra
+        year, month, value, unboundedSelection, size, today, min, max, ...extra
     }) {
         const { baseDate, startOffset, endOffset } = this.getParams();
 
@@ -311,6 +319,9 @@ export default class WeekView extends Component {
                     className += ' is-today';
                     todayIndex = i;
                     isTodaySelected = isSelected;
+                }
+                if ((min && dateCmp(date, min) < 0) || (max && dateCmp(date, max) > 0)) {
+                    className += ' is-disabled';
                 }
 
                 items.push(

@@ -164,6 +164,8 @@ export class MonthViewContainer extends Component {
 /// - `value`: Date | Date[2] ∈ { [a, b] : a ≤ b } - will show a selected date/date range
 /// - `size`: large, medium, or small
 /// - `today`: today date to mark on the calendar
+/// - `min`: min date (dates beyond this point will be faded)
+/// - `max`: max date (dates beyond this point will be faded)
 export class MonthView extends Component {
     state = {
         hover: null,
@@ -198,7 +200,7 @@ export class MonthView extends Component {
     }
 
     render ({
-        month, year, weekStart = 0, value, size, today,
+        month, year, weekStart = 0, value, size, today, min, max,
     }) {
         const className = size === 'medium' ? 'p-medium' : size === 'small' ? 'p-small' : '';
 
@@ -217,7 +219,9 @@ export class MonthView extends Component {
                     hover={this.state.hover}
                     size={size}
                     unboundedSelection={size !== 'small'}
-                    today={today} />
+                    today={today}
+                    min={min}
+                    max={max} />
             );
         }
         while (this.weekRefs.length > lineCount) this.weekRefs.pop();

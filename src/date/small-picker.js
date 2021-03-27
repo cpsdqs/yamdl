@@ -39,9 +39,17 @@ export default class SmallDatePicker extends Component {
         let { month, year } = this.state;
         month--;
         if (month < 0) {
+            if (year === this.props.min.getFullYear()) return;
+
             year--;
             month = 11;
         }
+
+        year = Math.max(year, this.props.min.getFullYear());
+        if (year === this.props.min.getFullYear()) {
+            month = Math.max(month, this.props.min.getMonth());
+        }
+
         this.setState({ month, year });
     }
 
@@ -49,10 +57,34 @@ export default class SmallDatePicker extends Component {
         let { month, year } = this.state;
         month++;
         if (month > 11) {
+            if (year === this.props.max.getFullYear()) return;
+
             year++;
             month = 0;
         }
+
+        year = Math.min(year, this.props.max.getFullYear());
+        if (year === this.props.max.getFullYear()) {
+            month = Math.min(month, this.props.max.getMonth());
+        }
+
         this.setState({ month, year });
+    }
+
+    setYear (year) {
+        let month = this.state.month;
+        if (year === this.props.min.getFullYear()) {
+            month = Math.max(month, this.props.min.getMonth());
+        }
+        if (year === this.props.max.getFullYear()) {
+            month = Math.min(month, this.props.max.getMonth());
+        }
+
+        this.setState({
+            year,
+            month,
+            expanded: false,
+        });
     }
 
     componentDidMount () {
@@ -95,12 +127,14 @@ export default class SmallDatePicker extends Component {
                             month={month}
                             weekStart={1}
                             value={value}
-                            today={today} />
+                            today={today}
+                            min={min}
+                            max={max} />
                     </MonthViewContainer>
                     <YearPicker
                         size="small"
                         value={year}
-                        onChange={year => this.setState({ year })}
+                        onChange={year => this.setYear(year)}
                         min={min.getFullYear()}
                         max={max.getFullYear()}
                         visible={expanded} />

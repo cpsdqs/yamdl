@@ -538,6 +538,8 @@ class DatePickerDemo extends Component {
                     <DatePicker
                         value={k}
                         today={new Date()}
+                        min={new Date(2019, 5, 23)}
+                        max={new Date(2025, 2, 2)}
                         onChange={k => this.setState({ k })} />
                 </div>
             </div>

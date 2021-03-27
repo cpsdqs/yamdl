@@ -93,6 +93,10 @@
         &.is-selected {
             color: @selection-color;
         }
+
+        &.is-disabled {
+            opacity: 0.5;
+        }
     }
 
     .p-selection-container {
@@ -232,6 +236,7 @@
         grid-template-columns: 1fr 1fr 1fr 1fr;
         grid-column-gap: 8px;
         grid-row-gap: 8px;
+        align-items: start;
         overflow-x: hidden;
         overflow-y: scroll;
         font-size: 14px;
@@ -253,7 +258,7 @@
             transition: background 0.3s @easing, color 0.3s @easing;
             user-select: none;
 
-            &.is-selected {
+            &:active, &.is-selected {
                 background: @year-picker-selection;
                 color: @year-picker-selection-color;
             }
