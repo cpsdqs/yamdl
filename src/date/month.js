@@ -16,7 +16,7 @@ export class MonthViewContainer extends Component {
             [CONTEXT_KEY]: {
                 register: this.register,
                 deregister: this.deregister,
-            }
+            },
         };
     }
 

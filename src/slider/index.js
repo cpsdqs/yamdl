@@ -151,8 +151,8 @@ export default class Slider extends Component {
             this.isDragging = true;
 
             this.dragPos = this.dragPrevPos = this.draggingThumb === 'left'
-                    ? this.leftThumbX.value
-                    : this.rightThumbX.value;
+                ? this.leftThumbX.value
+                : this.rightThumbX.value;
         }
 
         if (this.isDragging) {
@@ -466,7 +466,6 @@ export default class Slider extends Component {
             highlightTransform = `translateX(${leftThumbX * 100}%)`
                 + ` scaleX(${rightThumbX - leftThumbX})`;
         } else {
-            const right = this.transferToScreen(this.props.value);
             highlightTransform = `scaleX(${rightThumbX})`;
         }
 
@@ -474,8 +473,8 @@ export default class Slider extends Component {
 
         const trackStyle = {};
 
-        let leftThumbXpx = leftThumbX * width;
-        let rightThumbXpx = rightThumbX * width;
+        const leftThumbXpx = leftThumbX * width;
+        const rightThumbXpx = rightThumbX * width;
         let leftThumbScale = 1;
         let rightThumbScale = 1;
 
@@ -639,11 +638,11 @@ export default class Slider extends Component {
                             class="p-thumb-popout-text"
                             x={0}
                             y={0}
-                            text-anchor="middle"
-                            dominant-baseline="middle"
+                            textAnchor="middle"
+                            dominantBaseline="middle"
                             transform={[
                                 `translate(${leftDiscretePopout.x} ${leftDiscretePopout.y})`,
-                                `scale(${leftDiscretePopout.textScale})`
+                                `scale(${leftDiscretePopout.textScale})`,
                             ].join(' ')}>
                             {leftDiscretePopout.text}
                         </text>
@@ -653,11 +652,11 @@ export default class Slider extends Component {
                             class="p-thumb-popout-text"
                             x={0}
                             y={0}
-                            text-anchor="middle"
-                            dominant-baseline="middle"
+                            textAnchor="middle"
+                            dominantBaseline="middle"
                             transform={[
                                 `translate(${rightDiscretePopout.x} ${rightDiscretePopout.y})`,
-                                `scale(${rightDiscretePopout.textScale})`
+                                `scale(${rightDiscretePopout.textScale})`,
                             ].join(' ')}>
                             {rightDiscretePopout.text}
                         </text>

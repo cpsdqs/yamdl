@@ -103,7 +103,6 @@ export default class CircularProgress extends Component {
         this.end.target = (this.props.progress || 0) * 2 * Math.PI;
 
         if (this.indeterminateState !== this.props.indeterminate) {
-
             if (this.props.indeterminate) {
                 this.indeterminateState = true;
                 this.indeterminateTime = 0.5;
@@ -125,7 +124,6 @@ export default class CircularProgress extends Component {
                 if (matchingStart && congruentMotion) {
                     this.indeterminateState = false;
                     this.indeterminate.value = 0;
-                    const xdt = Math.max(dt, 1 / 144);
                     this.indeterminateTime += dt / 4 * 3;
                     const [iStartAngle, iEndAngle] = this.getIndeterminateAngles();
                     this.start.value = modTau(iStartAngle);

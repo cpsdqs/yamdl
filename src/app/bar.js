@@ -39,7 +39,7 @@ export default class AppBar extends Component {
             </div>
         );
     }
-};
+}
 
 /// Contains a menu and animates width.
 class MenuContainer extends Component {

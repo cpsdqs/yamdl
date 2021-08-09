@@ -37,6 +37,8 @@ export default class LinearProgress extends Component {
     update (dt) {
         let wantsUpdate = false;
 
+        if (!this.spans.length) this.spans.push(new Span(this.indeterminate, 0, this.props.progress));
+
         for (const span of this.spans) span.update(dt);
 
         if (this.indeterminate) {
@@ -81,7 +83,7 @@ export default class LinearProgress extends Component {
         }
 
         // delete dead spans
-        let marked = [];
+        const marked = [];
         for (let i = this.spans.length - 1; i >= 0; i--) {
             if (this.spans[i].isDead) marked.push(i);
         }

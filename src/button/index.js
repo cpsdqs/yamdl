@@ -86,6 +86,7 @@ export default class Button extends Component {
 
         return (
             <Component
+                type="button"
                 {...props}
                 ref={node => this.button = node}
                 onPointerDown={this.onPointerDown}

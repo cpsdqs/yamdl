@@ -133,6 +133,7 @@ export default class TextField extends Component {
                         {this.props.leading}
                     </span>
                     <input
+                        autoComplete="off"
                         {...props}
                         id={this.props.id || this.inputID}
                         class="p-input"

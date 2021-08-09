@@ -1,0 +1,18 @@
+{
+    "parser": "babel-eslint",
+    "env": {
+        "browser": true,
+        "node": true,
+        "es6": true
+    },
+    "extends": [],
+    "rules": {
+        "no-unused-vars": 0
+    },
+    "settings": {
+        "react": {
+            "version": "16",
+            "pragma": "h",
+        }
+    }
+}

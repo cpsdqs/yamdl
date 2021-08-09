@@ -377,7 +377,7 @@ export class Spring extends EventEmitter {
         const startTime = this.getTime();
         let t = startTime;
         const values = [];
-        while (true) {
+        while (true) { // eslint-disable-line no-constant-condition
             const value = this.inner.getValue(t);
             const velocity = this.inner.getVelocity(t);
             values.push([value, t - startTime]);
