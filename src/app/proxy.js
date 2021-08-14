@@ -85,12 +85,14 @@ export class AppBarProvider extends Component {
 
 /// # Props
 /// - `prependedProps`: props to prepend to the app bar props instead of appending
+/// - `onData`: (data, allProps) => void - additional data from the proxy, or null
 export class AppBarConsumer extends Component {
     state = {
         appBar: null,
     }
 
     update (appBar) {
+        if (this.props.onData) this.props.onData(appBar?.data || null, appBar);
         this.setState({ appBar });
     }
 
@@ -113,6 +115,8 @@ export class AppBarConsumer extends Component {
         };
         delete props.priority;
         delete props.prependedProps;
+        delete props.onData;
+        delete props.data;
 
         props.class = (this.state.appBar.class || '') + ' ' + (this.props.class || '');
         props.style = Object.assign({}, this.state.appBar.style || {}, this.props.style || {});
@@ -139,6 +143,7 @@ export class AppBarConsumer extends Component {
 /// - `local`: if true, will cause the app bar not to be proxied. Useful for dialogs that are
 ///   conditionally full-screen
 /// - `proxied`: will be returned when the app bar is proxied. null by default.
+/// - `data`: additional data, retrievable from the consumer with the onData callback.
 export class AppBarProxy extends Component {
     id = Math.random().toString();
 
