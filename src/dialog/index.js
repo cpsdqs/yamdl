@@ -27,20 +27,15 @@ export default class Dialog extends Component {
         fullScreen: false,
     };
 
-    updateFullScreen () {
-        const wasFullScreen = this.state.fullScreen;
-        const onSet = () => {
-            if (wasFullScreen !== this.state.fullScreen) {
-                this.presence.setPeriod(this.state.fullScreen ? 0.5 : 0.3);
-            }
-        };
+    updatePeriod () {
+        this.presence.setPeriod(this.state.fullScreen ? 0.5 : 0.3);
+    }
 
-        if (typeof this.props.fullScreen === 'function') {
-            this.setState({ fullScreen: this.props.fullScreen(window.innerWidth) }, onSet);
-            this.presence.setPeriod(0.5);
-        } else {
-            this.setState({ fullScreen: this.props.fullScreen }, onSet);
-        }
+    updateFullScreen () {
+        const fullScreen = typeof this.props.fullScreen === 'function'
+            ? this.props.fullScreen(window.innerWidth)
+            : this.props.fullScreen;
+        this.setState({ fullScreen }, () => this.updatePeriod());
     }
 
     update (dt) {
@@ -77,6 +72,27 @@ export default class Dialog extends Component {
         globalAnimator.deregister(this);
     }
 
+    renderStyle (props) {
+        if (this.state.fullScreen) {
+            props.style.transform += ` translateY(${lerp(100, 0, this.presence.value)}%)`;
+            props.style.opacity *= clamp(lerp(0, 50, this.presence.value), 0, 1);
+        } else {
+            props.style.opacity *= this.presence.value;
+        }
+    }
+
+    renderAppBarMenu () {
+        return this.state.fullScreen ? (
+            <Button icon small onClick={this.props.onClose}>
+                <MenuIcon type="close" />
+            </Button>
+        ) : null;
+    }
+
+    get container () {
+        return this.props.container || document.body;
+    }
+
     render () {
         const props = { ...this.props };
         delete props.open;
@@ -103,12 +119,7 @@ export default class Dialog extends Component {
         props.style.transform = props.style.transform || '';
         props.style.opacity = 'opacity' in props.style ? +props.style.opacity : 1;
 
-        if (this.state.fullScreen) {
-            props.style.transform += ` translateY(${lerp(100, 0, this.presence.value)}%)`;
-            props.style.opacity *= clamp(lerp(0, 50, this.presence.value), 0, 1);
-        } else {
-            props.style.opacity *= this.presence.value;
-        }
+        this.renderStyle(props);
 
         return this.presence.value > 1 / 100 ? createPortal((
             <div
@@ -126,11 +137,7 @@ export default class Dialog extends Component {
                                 ? (this.props.appBarPriority || 1000)
                                 : -Infinity}
                             class="paper-dialog-app-bar"
-                            menu={this.state.fullScreen ? (
-                                <Button icon small onClick={this.props.onClose}>
-                                    <MenuIcon type="close" />
-                                </Button>
-                            ) : null}
+                            menu={this.renderAppBarMenu()}
                             title={this.props.title}
                             actions={this.state.fullScreen ? this.props.actions : null}
                             proxied={<div class="p-app-bar-placeholder" />}
@@ -155,6 +162,6 @@ export default class Dialog extends Component {
                     ) : null}
                 </div>
             </div>
-        ), this.props.container || document.body) : null;
+        ), this.container) : null;
     }
 }
