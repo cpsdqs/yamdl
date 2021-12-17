@@ -89,7 +89,7 @@ export class AppBarProvider extends Component {
 export class AppBarConsumer extends Component {
     state = {
         appBar: null,
-    }
+    };
 
     update (appBar) {
         if (this.props.onData) this.props.onData(appBar?.data || null, appBar);
