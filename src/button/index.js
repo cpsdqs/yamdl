@@ -63,6 +63,10 @@ export default class Button extends Component {
             if (this.props.selected) this.ripple.onFocus();
             else this.ripple.onBlur();
         }
+        if (!prevProps.disabled && this.props.disabled) {
+            // fix weird bug where focus highlight gets stuck in firefox
+            this.ripple.onBlur();
+        }
     }
 
     render () {
