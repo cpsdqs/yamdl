@@ -3,6 +3,12 @@
 @dialog-backdrop: var(--md-dialog-backdrop);
 @dialog-bg: var(--md-dialog-background);
 
+.paper-dialog-modal-portal {
+    &.is-full-screen {
+        z-index: 200;
+    }
+}
+
 .paper-dialog-container {
     position: absolute;
     display: flex;
@@ -22,7 +28,6 @@
 
     &.is-full-screen {
         padding: 0;
-        z-index: 200;
     }
 
     .paper-dialog-backdrop {

@@ -3,6 +3,7 @@ import { createPortal } from 'preact/compat';
 import { Spring, globalAnimator, lerp, clamp } from '../animation';
 import { AppBarProxy, MenuIcon } from '../app';
 import Button from '../button';
+import ModalPortal from '../modal-portal';
 import './style';
 
 /// A dialog.
@@ -121,7 +122,7 @@ export default class Dialog extends Component {
 
         this.renderStyle(props);
 
-        return this.presence.value > 1 / 100 ? createPortal((
+        const dialog = (
             <div
                 class={containerClass}
                 ref={node => this.containerNode = node}
@@ -162,6 +163,16 @@ export default class Dialog extends Component {
                     ) : null}
                 </div>
             </div>
-        ), this.container) : null;
+        );
+
+        return (
+            <ModalPortal
+                class={'paper-dialog-modal-portal' + (this.state.fullScreen ? ' is-full-screen' : '')}
+                disableModal={this.state.fullScreen || ('fixed' in this.props && !this.props.fixed)}
+                mounted={this.presence.value > 1 / 100}
+                onCancel={this.props.onClose}>
+                {dialog}
+            </ModalPortal>
+        );
     }
 }
