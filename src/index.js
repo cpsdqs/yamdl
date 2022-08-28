@@ -5,6 +5,8 @@ export DatePicker from './date';
 export Dialog from './dialog';
 export { DrawerItem, DrawerLabel } from './drawer';
 export Menu, { MenuItem } from './menu';
+export ModalPortal from './modal-portal';
+export { RootContext } from './modal-portal/root-context';
 export { CircularProgress, LinearProgress } from './progress';
 export Ripple from './ripple';
 export Slider from './slider';

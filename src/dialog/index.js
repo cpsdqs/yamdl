@@ -94,6 +94,10 @@ export default class Dialog extends Component {
         return this.props.container || document.body;
     }
 
+    onCancel = () => {
+        this.props.onClose();
+    };
+
     render () {
         const props = { ...this.props };
         delete props.open;
@@ -170,7 +174,7 @@ export default class Dialog extends Component {
                 class={'paper-dialog-modal-portal' + (this.state.fullScreen ? ' is-full-screen' : '')}
                 disableModal={this.state.fullScreen || ('fixed' in this.props && !this.props.fixed)}
                 mounted={this.presence.value > 1 / 100}
-                onCancel={this.props.onClose}>
+                onCancel={this.onCancel}>
                 {dialog}
             </ModalPortal>
         );

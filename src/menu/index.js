@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import { createPortal } from 'preact/compat';
+import ModalPortal from '../modal-portal';
 import Button from '../button';
 import Ripple from '../ripple';
 import { Spring, globalAnimator } from '../animation';
@@ -164,7 +165,7 @@ export default class Menu extends Component {
                 );
             });
 
-        return this.presence.value > 1 / 100 ? createPortal((
+        const contents = (
             <div
                 class="paper-menu-container"
                 ref={node => this.containerNode = node}
@@ -174,7 +175,19 @@ export default class Menu extends Component {
                     {this.props.children}
                 </div>
             </div>
-        ), this.props.container || document.body) : null;
+        );
+
+        if (this.props.container) {
+            return this.presence.value > 1 / 100
+                ? createPortal(contents, this.props.container || document.body)
+                : null;
+        }
+
+        return (
+            <ModalPortal mounted={this.presence.value > 1 / 100} onCancel={this.props.onClose}>
+                {contents}
+            </ModalPortal>
+        );
     }
 }
 

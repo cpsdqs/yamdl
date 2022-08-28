@@ -1,5 +1,6 @@
 import { h, createRef } from 'preact';
 import { createPortal, PureComponent } from 'preact/compat';
+import { RootContext } from './root-context';
 import './style.less';
 
 const DIALOG_SUPPORTED = 'HTMLDialogElement' in window
@@ -78,6 +79,10 @@ export default class ModalPortal extends PureComponent {
         }
     }
 
+    componentDidMount () {
+        this.dialog.current.addEventListener('cancel', this.onCancel);
+    }
+
     componentDidUpdate (prevProps) {
         if (prevProps.mounted !== this.props.mounted || prevProps.disableModal !== this.props.disableModal) {
             if (this.props.mounted) {
@@ -105,9 +110,10 @@ export default class ModalPortal extends PureComponent {
         return createPortal(
             <dialog
                 class={'md-modal-portal-dialog ' + (DIALOG_SUPPORTED ? '' : 'dialog-is-unsupported ') + (className || '')}
-                ref={this.dialog}
-                onCancel={this.onCancel}>
-                {mounted && this.state.mounted ? children : null}
+                ref={this.dialog}>
+                <RootContext.Provider value={this.dialog.current}>
+                    {mounted && this.state.mounted ? children : null}
+                </RootContext.Provider>
             </dialog>,
             this.container,
         );
