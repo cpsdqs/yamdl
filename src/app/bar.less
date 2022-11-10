@@ -8,15 +8,17 @@
     width: 100%;
     min-height: calc(56px + var(--md-app-bar-extra-padding-top));
     padding-top: var(--md-app-bar-extra-padding-top);
-    background: @bar-bg;
-    color: @bar-fg;
+    background: rgb(@bar-bg);
     box-sizing: border-box;
     display: flex;
     align-items: center;
     transition: background 0.4s @easing;
     .elevation(4);
 
-    --md-button-color: currentColor;
+    --bar-fg: @bar-fg;
+    color: rgb(var(--bar-fg));
+    --md-button-color: var(--bar-fg);
+    --md-button-ripple-opacity: 0.6;
 
     .p-menu {
         margin: 0 8px;

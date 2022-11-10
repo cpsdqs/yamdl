@@ -47,6 +47,7 @@ export default class YearPicker extends Component {
 
             items.push(
                 <button
+                    type="button"
                     class={'p-year' + (isSelected ? ' is-selected' : '')}
                     key={yr}
                     onClick={e => {

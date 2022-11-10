@@ -1,109 +1,138 @@
-.md-light-theme(@primary, @secondary, @error: #f44336) {
-    --md-app-bar-bg: @primary;
-    --md-app-bar-ink: #fff;
+.md-light-theme(@primary-rgb, @secondary-rgb, @error-rgb: 244 67 54) {
+    --md-base-bg: 255 255 255;
+    --md-base-fg: 0 0 0;
+    --md-base-fg-on-primary: 255 255 255;
+    --md-base-fg-on-secondary: 255 255 255;
+
+    --md-app-bar-bg: @primary-rgb;
+    --md-app-bar-ink: var(--md-base-fg-on-primary);
     --md-app-bar-extra-padding-top: 0px;
 
-    --md-button-color: @secondary;
-    --md-button-raised-text: #fff;
+    --md-button-color: @secondary-rgb;
+    --md-button-color-opacity: 1;
     --md-button-highlight-opacity: 0.15;
-    --md-button-raised-ripple: #fff;
-    --md-button-raised-ripple-highlight: fade(#fff, 20%);
-    --md-button-disabled: fade(#000, 30%);
-    --md-button-disabled-bg: fade(#000, 10%);
+    --md-button-ripple-opacity: 1;
+    --md-button-raised-text: var(--md-base-fg-on-secondary);
+    --md-button-raised-ripple: var(--md-base-fg-on-secondary);
+    --md-button-raised-ripple-opacity: 1;
+    --md-button-raised-ripple-highlight: var(--md-base-fg-on-secondary);
+    --md-button-raised-ripple-highlight-opacity: 0.2;
+    --md-button-disabled: var(--md-base-fg);
+    --md-button-disabled-opacity: 0.3;
+    --md-button-disabled-bg: var(--md-base-fg);
+    --md-button-disabled-bg-opacity: 0.1;
 
-    --md-checkbox-color: @secondary;
-    --md-checkbox-idle: fade(#000, 60%);
-    --md-checkbox-check: #fff;
-    --md-checkbox-disabled: fade(#000, 40%);
+    --md-checkbox-color: @secondary-rgb;
+    --md-checkbox-idle: var(--md-base-fg);
+    --md-checkbox-idle-opacity: 0.6;
+    --md-checkbox-check: var(--md-base-fg-on-secondary);
+    --md-checkbox-disabled: var(--md-base-fg);
+    --md-checkbox-disabled-opacity: 0.4;
     --md-checkbox-disabled-check: var(--md-checkbox-check);
 
-    --md-switch-idle: fade(#000, 40%);
-    --md-switch-idle-thumb: #fff;
-    --md-switch-active: fade(@secondary, 40%);
-    --md-switch-active-thumb: @secondary;
+    --md-switch-idle: var(--md-base-fg);
+    --md-switch-idle-opacity: 0.4;
+    --md-switch-idle-thumb: var(--md-base-bg);
+    --md-switch-active: @secondary-rgb;
+    --md-switch-active-opacity: 0.4;
+    --md-switch-active-thumb: @secondary-rgb;
 
     --md-date-picker-background: var(--md-dialog-background);
-    --md-date-picker-range: @secondary;
+    --md-date-picker-range: @secondary-rgb;
     --md-date-picker-range-opacity: 0.2;
-    --md-date-picker-selection: @secondary;
-    --md-date-picker-selection-color: #fff;
-    --md-date-picker-today-border: #000;
+    --md-date-picker-selection: @secondary-rgb;
+    --md-date-picker-selection-color: var(--md-base-bg);
+    --md-date-picker-today-border: var(--md-base-fg);
     --md-date-picker-today-selected-border: var(--md-date-picker-today-border);
-    --md-date-picker-weekday-label-color: fade(#000, 50%);
-    --md-date-picker-month-dropdown-color: fade(#000, 70%);
-    --md-date-picker-year-picker-selection: @secondary;
-    --md-date-picker-year-picker-selection-color: #fff;
+    --md-date-picker-weekday-label-color: var(--md-base-fg);
+    --md-date-picker-weekday-label-color-opacity: 0.5;
+    --md-date-picker-month-dropdown-color: var(--md-base-fg);
+    --md-date-picker-month-dropdown-color-opacity: 0.7;
+    --md-date-picker-year-picker-selection: @secondary-rgb;
+    --md-date-picker-year-picker-selection-color: var(--md-base-bg);
 
-    --md-dialog-backdrop: fade(#000, 40%);
-    --md-dialog-background: #fff;
+    --md-dialog-backdrop: 0 0 0;
+    --md-dialog-backdrop-opacity: 0.4;
+    --md-dialog-background: var(--md-base-bg);
 
-    --md-drawer-divider-color: fade(#000, 20%);
-    --md-drawer-label-color: fade(#000, 70%);
-    --md-drawer-item-color: fade(#000, 70%);
+    --md-drawer-divider-color: var(--md-base-fg);
+    --md-drawer-divider-color-opacity: 0.2;
+    --md-drawer-label-color: var(--md-base-fg);
+    --md-drawer-label-color-opacity: 0.7;
+    --md-drawer-item-color: var(--md-base-fg);
+    --md-drawer-item-color-opacity: 0.7;
 
-    --md-menu-background: #fff;
-    --md-menu-selected-background: fade(#000, 20%);
+    --md-menu-background: var(--md-base-bg);
+    --md-menu-selected-background: var(--md-base-fg);
+    --md-menu-selected-background-opacity: 0.2;
 
-    --md-progress-color: @secondary;
+    --md-progress-color: @secondary-rgb;
     --md-linear-progress-background-opacity: 0.4;
 
-    --md-ripple-color: fade(#000, 20%);
-    --md-ripple-highlight: fade(#000, 8%);
-    --md-ripple-highlight-opacity: 1;
+    --md-ripple-color: var(--md-base-fg);
+    --md-ripple-color-opacity: 0.2;
+    --md-ripple-highlight: var(--md-base-fg);
+    --md-ripple-highlight-opacity: 0.08;
 
-    --md-slider-track: fade(@secondary, 50%);
-    --md-slider-track-highlight: @secondary;
-    --md-slider-track-tick: @secondary;
-    --md-slider-track-highlight-tick: fade(#fff, 50%);
-    --md-slider-track-disabled: fade(#000, 10%);
-    --md-slider-track-highlight-disabled: fade(#000, 40%);
-    --md-slider-track-tick-disabled: fade(#000, 20%);
-    --md-slider-track-highlight-tick-disabled: fade(#fff, 50%);
-    --md-slider-thumb: @secondary;
+    --md-slider-track: @secondary-rgb;
+    --md-slider-track-opacity: 0.5;
+    --md-slider-track-highlight: @secondary-rgb;
+    --md-slider-track-tick: @secondary-rgb;
+    --md-slider-track-highlight-tick: var(--md-base-bg);
+    --md-slider-track-highlight-tick-opacity: 0.5;
+    --md-slider-track-disabled: var(--md-base-fg);
+    --md-slider-track-disabled-opacity: 0.1;
+    --md-slider-track-highlight-disabled: var(--md-base-fg);
+    --md-slider-track-highlight-disabled-opacity: 0.4;
+    --md-slider-track-tick-disabled: var(--md-base-fg);
+    --md-slider-track-tick-disabled-opacity: 0.2;
+    --md-slider-track-highlight-tick-disabled: var(--md-base-bg);
+    --md-slider-track-highlight-tick-disabled-opacity: 0.5;
+    --md-slider-thumb: @secondary-rgb;
     --md-slider-thumb-disabled: var(--md-slider-track-highlight-disabled);
-    --md-slider-text: #fff;
+    --md-slider-thumb-disabled-opacity: var(--md-slider-track-highlight-disabled-opacity);
+    --md-slider-text: var(--md-base-bg);
 
-    --md-text-field-idle: fade(#000, 60%);
-    --md-text-field-focus: @secondary;
-    --md-text-field-error: @error;
-    --md-text-field-disabled: fade(#000, 30%);
-    --md-text-field-disabled-text: fade(#000, 70%);
-    --md-text-field-placeholder: fade(#000, 60%);
+    --md-text-field-idle: var(--md-base-fg);
+    --md-text-field-idle-opacity: 0.6;
+    --md-text-field-focus: @secondary-rgb;
+    --md-text-field-error: @error-rgb;
+    --md-text-field-disabled: var(--md-base-fg);
+    --md-text-field-disabled-opacity: 0.3;
+    --md-text-field-disabled-text: var(--md-base-fg);
+    --md-text-field-disabled-text-opacity: 0.7;
+    --md-text-field-placeholder: var(--md-base-fg);
+    --md-text-field-placeholder-opacity: 0.6;
 }
 
-.md-dark-theme(@primary, @secondary, @error: #f44336) {
-    .md-light-theme(@primary, @secondary, @error);
+.md-dark-theme(@primary-rgb, @secondary-rgb, @error-rgb: 244 67 54) {
+    .md-light-theme(@primary-rgb, @secondary-rgb, @error-rgb);
 
-    --md-button-disabled: fade(#fff, 30%);
-    --md-button-raised-highlight: lighten(@secondary, 10%);
-    --md-button-disabled-bg: fade(#fff, 10%);
-    --md-checkbox-idle: fade(#fff, 50%);
-    --md-checkbox-disabled: fade(#fff, 20%);
-    --md-checkbox-disabled-check: #999;
-    --md-switch-idle: fade(#fff, 20%);
-    --md-switch-idle-thumb: #777;
-    --md-dialog-background: #333;
-    --md-date-picker-today-border: #fff;
-    --md-date-picker-weekday-label-color: fade(#fff, 50%);
-    --md-date-picker-month-dropdown-color: fade(#fff, 70%);
-    --md-drawer-divider-color: fade(#fff, 20%);
-    --md-drawer-label-color: fade(#fff, 70%);
-    --md-drawer-item-color: fade(#fff, 80%);
-    --md-menu-background: #333;
-    --md-menu-selected-background: fade(#fff, 10%);
-    --md-ripple-color: fade(#fff, 60%);
-    --md-ripple-highlight: fade(#fff, 12%);
-    --md-slider-track-disabled: fade(#fff, 10%);
-    --md-slider-track-highlight-disabled: fade(#fff, 30%);
-    --md-slider-track-tick-disabled: fade(#fff, 20%);
-    --md-text-field-idle: fade(#fff, 40%);
-    --md-text-field-disabled: fade(#fff, 20%);
-    --md-text-field-disabled-text: fade(#fff, 30%);
-    --md-text-field-placeholder: fade(#fff, 40%);
+    --md-base-bg: 0 0 0;
+    --md-base-fg: 255 255 255;
+
+    --md-checkbox-idle-opacity: 0.5;
+    --md-checkbox-disabled-opacity: 0.2;
+    --md-checkbox-disabled-check: 153 153 153;
+    --md-switch-idle-opacity: 0.2;
+    --md-switch-idle-thumb: 119 119 119;
+    --md-dialog-background: 51 51 51;
+    --md-drawer-item-opacity: 0.8;
+    --md-menu-background: 51 51 51;
+    --md-menu-selected-background-opacity: 0.1;
+
+    --md-ripple-color-opacity: 0.6;
+    --md-ripple-highlight-opacity: 0.12;
+
+    --md-slider-track-highlight-disabled-opacity: 0.3;
+    --md-text-field-idle-opacity: 0.4;
+    --md-text-field-disabled-opacity: 0.2;
+    --md-text-field-disabled-text-opacity: 0.3;
+    --md-text-field-placeholder-opacity: 0.4;
 }
 
 :root {
-    .md-light-theme(#015454, #018786);
+    .md-light-theme(1 84 84, 1 135 134);
 }
 
 @easing: cubic-bezier(0.2, 0.3, 0, 1);

@@ -28,7 +28,7 @@
     }
 
     &:not(.is-selected) {
-        color: var(--md-drawer-item-color);
+        color: rgb(var(--md-drawer-item-color) / var(--md-drawer-item-color-opacity));
     }
 }
 
@@ -39,6 +39,6 @@
     padding-top: 15px;
     padding-left: 12px;
     padding-right: 8px;
-    border-top: 1px solid var(--md-drawer-divider-color);
-    color: var(--md-drawer-label-color);
+    border-top: 1px solid rgb(var(--md-drawer-divider-color) / var(--md-drawer-divider-color-opacity));
+    color: rgb(var(--md-drawer-label-color) / var(--md-drawer-label-color-opacity));
 }

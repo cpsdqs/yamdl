@@ -1,11 +1,11 @@
 @import '../prelude';
 
-@text-field-idle: var(--md-text-field-idle);
-@text-field-focus: var(--md-text-field-focus);
-@text-field-error: var(--md-text-field-error);
-@text-field-disabled: var(--md-text-field-disabled);
-@text-field-disabled-text: var(--md-text-field-disabled-text);
-@text-field-placeholder: var(--md-text-field-placeholder);
+@text-field-idle: rgb(var(--md-text-field-idle) / var(--md-text-field-idle-opacity));
+@text-field-focus: rgb(var(--md-text-field-focus));
+@text-field-error: rgb(var(--md-text-field-error));
+@text-field-disabled: rgb(var(--md-text-field-disabled) / var(--md-text-field-disabled-opacity));
+@text-field-disabled-text: rgb(var(--md-text-field-disabled-text) / var(--md-text-field-disabled-text-opacity));
+@text-field-placeholder: rgb(var(--md-text-field-placeholder) / var(--md-text-field-placeholder-opacity));
 
 .paper-text-field {
     display: inline-block;

@@ -1,7 +1,7 @@
 @import '../prelude';
 
-@dialog-backdrop: var(--md-dialog-backdrop);
-@dialog-bg: var(--md-dialog-background);
+@dialog-backdrop: rgb(var(--md-dialog-backdrop) / var(--md-dialog-backdrop-opacity));
+@dialog-bg: rgb(var(--md-dialog-background));
 
 .paper-dialog-modal-portal {
     &.is-full-screen {
@@ -59,7 +59,7 @@
         &:not(.is-full-screen) .paper-dialog-app-bar {
             background: none;
             box-shadow: none;
-            color: inherit;
+            --bar-fg: var(--md-base-fg);
 
             .p-title {
                 margin-left: 8px;
