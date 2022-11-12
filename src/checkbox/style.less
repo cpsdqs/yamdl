@@ -4,6 +4,7 @@
 @checkbox-idle-border-opacity: var(--md-checkbox-idle-opacity);
 @checkbox-check-color: var(--md-checkbox-check);
 @checkbox-checked-color: var(--md-checkbox-color);
+@checkbox-checked-color-opacity: var(--md-checkbox-color-opacity);
 @checkbox-ripple-color: @checkbox-checked-color;
 @checkbox-ripple-highlight: transparent;
 @checkbox-highlight: @checkbox-checked-color;
@@ -185,7 +186,7 @@
     }
 
     &.is-checked .p-background, &.is-indeterminate .p-background {
-        background: rgb(@checkbox-checked-color);
+        background: rgb(@checkbox-checked-color / @checkbox-checked-color-opacity);
         .clip-path-frame(9.99px, 9.99px, 9.99px, 9.99px);
 
         transition: background 0.3s @easing;
