@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import Button from '../button';
-import './style';
+import './style.less';
 
 /// A navigation drawer item.
 ///

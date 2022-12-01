@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator, lerp } from '../animation';
-import './style';
+import './style.less';
 
 /// Circle radius for the progress indicator.
 const CIRCLE_RADIUS = 16;

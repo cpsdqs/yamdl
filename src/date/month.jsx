@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import WeekView from './week-view';
 import { DAYS_IN_A_WEEK, mod, getLinesInMonth, dateCmp } from './util';
-import './style';
+import './style.less';
 
 const CONTEXT_KEY = 'yamdl-month-view-events';
 

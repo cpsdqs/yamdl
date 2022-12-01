@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Spring, lerp } from '../animation';
-import './style';
+import './style.less';
 
 /// Scaling factor that will be applied to the label when it floats.
 const FLOATING_LABEL_SCALE = 0.75;

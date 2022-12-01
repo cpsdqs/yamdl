@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import Ripple from '../ripple';
-import './style';
+import './style.less';
 
 function isButtonPressKey (key) {
     return key === ' ' || key === 'Enter';

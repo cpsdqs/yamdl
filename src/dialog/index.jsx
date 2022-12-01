@@ -4,7 +4,7 @@ import { Spring, globalAnimator, lerp, clamp } from '../animation';
 import { AppBarProxy, MenuIcon } from '../app';
 import Button from '../button';
 import ModalPortal from '../modal-portal';
-import './style';
+import './style.less';
 
 /// A dialog.
 ///

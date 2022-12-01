@@ -4,7 +4,7 @@ import ModalPortal from '../modal-portal';
 import Button from '../button';
 import Ripple from '../ripple';
 import { Spring, globalAnimator } from '../animation';
-import './style';
+import './style.less';
 
 /// A context menu.
 ///

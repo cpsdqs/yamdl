@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { clamp } from '../animation';
-import './style';
+import './style.less';
 
 /// Renders a year picker.
 ///

@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator, lerp, clamp } from '../animation';
 import metaball from './metaball';
-import './style';
+import './style.less';
 
 // horizontal padding on either side
 const PAD_X = 8;

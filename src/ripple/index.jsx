@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator } from '../animation';
-import './style';
+import './style.less';
 
 /// Duration of a single ripple effect.
 const RIPPLE_DURATION = 0.5;

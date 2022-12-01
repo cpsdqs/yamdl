@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import Button from '../button';
-import './style';
+import './style.less';
 
 /// The month dropdown at the top of some date picker versions.
 ///
