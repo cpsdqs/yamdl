@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator, lerp, clamp } from '../animation';
 import metaball from './metaball';
 import './style';
@@ -48,7 +49,7 @@ const measureTextWidth = (font, text) => {
 /// - `tickDistance`: distance for tick marks. 1 by default
 /// - `popout`: if true, will show popout with rounded values despite not being discrete
 /// - `disabled`: disabled state
-export default class Slider extends Component {
+export default class Slider extends PureComponent {
     // thumb positions in [0, 1]
     leftThumbX = new Spring(1, 0.3);
     rightThumbX = new Spring(1, 0.3);

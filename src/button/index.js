@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import Ripple from '../ripple';
 import './style';
 
@@ -16,7 +17,7 @@ function isButtonPressKey (key) {
 /// - `small`: will use the smaller icon button size
 /// - `href`: if given, will use a <a> instead
 /// - `selected`: if true, will pretend it’s focused
-export default class Button extends Component {
+export default class Button extends PureComponent {
     /// The button node.
     button = null;
 

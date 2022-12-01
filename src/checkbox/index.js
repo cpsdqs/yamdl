@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import Ripple from '../ripple';
 import './style';
 
@@ -17,7 +18,7 @@ const THUMB_SIZE = 24;
 /// - `onChange`: change handler
 /// - `disabled`: disabled state
 /// - `switch`: if true, will render a switch
-export default class Checkbox extends Component {
+export default class Checkbox extends PureComponent {
     /// The DOM node
     node = null;
 

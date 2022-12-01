@@ -1,5 +1,5 @@
-import { h, Component } from 'preact';
-import { createPortal } from 'preact/compat';
+import { h } from 'preact';
+import { createPortal, PureComponent } from 'preact/compat';
 import ModalPortal from '../modal-portal';
 import Button from '../button';
 import Ripple from '../ripple';
@@ -20,7 +20,7 @@ import './style';
 /// - `cascadeUp`: set to cascade up instead of cascading down
 /// - `selectionIcon`: icon to use for selection
 /// - `persistent`: if true, will not automatically close once an item is selected
-export default class Menu extends Component {
+export default class Menu extends PureComponent {
     presence = new Spring(1, 0.3);
 
     state = {

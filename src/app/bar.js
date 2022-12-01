@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import Button from '../button';
 import Menu from '../menu';
 import { Spring, globalAnimator } from '../animation';
@@ -15,7 +16,7 @@ import './bar.less';
 ///        - `label`: label in the overflow menu
 ///        - `action`: action callback
 ///        - `overflow`: if true, will always stay in the overflow menu
-export default class AppBar extends Component {
+export default class AppBar extends PureComponent {
     render (props) {
         props = { ...props };
         const { menu, title, actions } = props;
@@ -42,7 +43,7 @@ export default class AppBar extends Component {
 }
 
 /// Contains a menu and animates width.
-class MenuContainer extends Component {
+class MenuContainer extends PureComponent {
     width = new Spring(1, 0.5);
     opacity = new Spring(1, 0.5);
     node = null;
@@ -62,7 +63,13 @@ class MenuContainer extends Component {
     }
 
     componentDidUpdate (prevProps) {
-        if (prevProps.children !== this.props.children) {
+        // conservative heuristics
+        // TODO: use a resizeobserver...
+        let childrenDefintelyChanged = false;
+        if (!!prevProps.children !== !!this.props.children) childrenDefintelyChanged = true;
+        if (prevProps.children?.length !== this.props.children?.length) childrenDefintelyChanged = true;
+
+        if (childrenDefintelyChanged) {
             this.updateWidth();
             globalAnimator.register(this);
         }
@@ -95,7 +102,7 @@ class MenuContainer extends Component {
 }
 
 /// Renders a title string and animates changes with a crossfade.
-class TitleText extends Component {
+class TitleText extends PureComponent {
     state = {
         text: this.props.title,
         newText: null,
@@ -132,7 +139,7 @@ class TitleText extends Component {
 }
 
 // TODO: autosizing magic?
-class Actions extends Component {
+class Actions extends PureComponent {
     state = {
         overflowOpen: false,
     };

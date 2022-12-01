@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import AppBar from './bar';
 
 const contextKey = 'md-app-bar-provider';
@@ -27,7 +28,7 @@ const contextKey = 'md-app-bar-provider';
 /// In this setup, the dialog uses an app bar proxy to control the global app bar.
 ///
 /// AppBarProviders may also be nested without causing additional app bars to appear.
-export class AppBarProvider extends Component {
+export class AppBarProvider extends PureComponent {
     getChildContext () {
         return {
             [contextKey]: this.context[contextKey] || this,
@@ -86,7 +87,7 @@ export class AppBarProvider extends Component {
 /// # Props
 /// - `prependedProps`: props to prepend to the app bar props instead of appending
 /// - `onData`: (data, allProps) => void - additional data from the proxy, or null
-export class AppBarConsumer extends Component {
+export class AppBarConsumer extends PureComponent {
     state = {
         appBar: null,
     };
@@ -144,7 +145,7 @@ export class AppBarConsumer extends Component {
 ///   conditionally full-screen
 /// - `proxied`: will be returned when the app bar is proxied. null by default.
 /// - `data`: additional data, retrievable from the consumer with the onData callback.
-export class AppBarProxy extends Component {
+export class AppBarProxy extends PureComponent {
     id = Math.random().toString();
 
     componentDidMount () {

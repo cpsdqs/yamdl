@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator } from '../animation';
 import './style';
 
@@ -21,7 +22,7 @@ const TOUCH_RIPPLE_SIZE = 20;
 ///
 /// # Props
 /// - `circle`: will use radius instead of bounding box diagonal for ripple size if true
-export default class Ripple extends Component {
+export default class Ripple extends PureComponent {
     state = {
         /// List of current ripples.
         ripples: [],

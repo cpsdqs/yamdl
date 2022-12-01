@@ -1,5 +1,5 @@
-import { h, Component } from 'preact';
-import { createPortal } from 'preact/compat';
+import { h } from 'preact';
+import { createPortal, PureComponent } from 'preact/compat';
 import { Spring, globalAnimator, lerp, clamp } from '../animation';
 import { AppBarProxy, MenuIcon } from '../app';
 import Button from '../button';
@@ -21,7 +21,7 @@ import './style';
 /// - `priority`: app bar proxy priority. 1000 by default.
 /// - `appBarProps`: additional app bar props
 /// - `fixed`: pass to override whether or not the container is `position: fixed`.
-export default class Dialog extends Component {
+export default class Dialog extends PureComponent {
     presence = new Spring(1, 0.3);
 
     state = {

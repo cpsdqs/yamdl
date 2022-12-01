@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Spring, lerp } from '../animation';
 import './style';
 
@@ -21,7 +22,7 @@ let inputIDCounter = 0;
 /// - `helperLabel`: helper label shown when there is no error
 /// - `leading`: leading icon
 /// - `trailing`: trailing icon
-export default class TextField extends Component {
+export default class TextField extends PureComponent {
     state = {
         isFocused: false,
     };
@@ -172,7 +173,7 @@ export default class TextField extends Component {
 
 /// Renders text field decoration.
 /// This is a separate component to avoid frequent re-rendering of the main TextField component.
-class TextFieldDecoration extends Component {
+class TextFieldDecoration extends PureComponent {
     state = {
         float: 0,
     };

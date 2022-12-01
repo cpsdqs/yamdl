@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator } from '../animation';
 
 /// A linear progress indicator.
@@ -7,7 +8,7 @@ import { Spring, globalAnimator } from '../animation';
 /// - `progress`: progress value
 /// - `indeterminate`: will be indeterminate if true
 /// - `hideIfNone`: if true, will hide itself when indeterminate is false and progress is zero
-export default class LinearProgress extends Component {
+export default class LinearProgress extends PureComponent {
     componentWillMount () {
         globalAnimator.register(this);
         this.isMounted = true;

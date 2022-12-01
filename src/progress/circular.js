@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator, lerp } from '../animation';
 import './style';
 
@@ -85,7 +86,7 @@ function sweepAnglesForStageProgress (stageProgress) {
 /// - `progress`: progress value
 /// - `indeterminate`: will render as indeterminate progress if true
 /// - `small`: will be 24px instead of 48px in size
-export default class CircularProgress extends Component {
+export default class CircularProgress extends PureComponent {
     start = new Spring(1, 0.5, 0);
     end = new Spring(1, 0.5, (this.props.progress || 0) * 2 * Math.PI);
     indeterminate = new Spring(1, 0.5, this.props.indeterminate ? 1 : 0);

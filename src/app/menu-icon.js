@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Spring, lerp, globalAnimator } from '../animation';
 import './menu-icon.less';
 
@@ -82,7 +83,7 @@ const positions = {
 ///    - an object like `{ close: 0, back: 0 }` indicating with a number from 0 to 1 which type to
 ///      show (or interpolate between).
 ///      To avoid strange behavior, the sum of the components should be about 1.
-export default class MenuIcon extends Component {
+export default class MenuIcon extends PureComponent {
     close = new Spring(1, 0.5);
     back = new Spring(1, 0.5);
     rotateOut = false;
