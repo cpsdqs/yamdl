@@ -3,8 +3,8 @@ import { createPortal, PureComponent } from 'preact/compat';
 import { RootContext } from './root-context';
 import './style.less';
 
-const DIALOG_SUPPORTED = 'HTMLDialogElement' in window
-    && typeof window.HTMLDialogElement.prototype.showModal === 'function';
+const DIALOG_SUPPORTED = ('HTMLDialogElement' in window)
+    && (typeof window.HTMLDialogElement.prototype.showModal === 'function');
 
 /// Provides a modal portal element that steals focus if &lt;dialog&gt; is supported.
 ///
@@ -107,14 +107,16 @@ export default class ModalPortal extends PureComponent {
         if (mounted) this.mountContainer();
         else this.unmountContainer();
 
+        const DialogElement = DIALOG_SUPPORTED ? 'dialog' : 'div';
+
         return createPortal(
-            <dialog
+            <DialogElement
                 class={'md-modal-portal-dialog ' + (DIALOG_SUPPORTED ? '' : 'dialog-is-unsupported ') + (className || '')}
                 ref={this.dialog}>
                 <RootContext.Provider value={this.dialog.current}>
                     {mounted && this.state.mounted ? children : null}
                 </RootContext.Provider>
-            </dialog>,
+            </DialogElement>,
             this.container,
         );
     }
