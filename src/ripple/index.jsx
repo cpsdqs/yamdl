@@ -30,13 +30,13 @@ export default class Ripple extends PureComponent {
         /// The ID of the current ripple. Used to identify which ripple to modify when the
         /// pointer is released.
         currentRippleID: null,
+
+        focused: false,
     };
 
     resizeObserver = new ResizeObserver(() => {
         this.updateParameters();
     });
-
-    focusSpring = new Spring(1, 0.3);
 
     /// The DOM node.
     node = createRef();
@@ -66,15 +66,11 @@ export default class Ripple extends PureComponent {
     };
 
     onFocus = () => {
-        this.focusSpring.target = 1;
-        this.lastRender = getNow();
-        this.forceUpdate();
+        this.setState({ focused: true });
     };
 
     onBlur = () => {
-        this.focusSpring.target = 0;
-        this.lastRender = getNow();
-        this.forceUpdate();
+        this.setState({ focused: false });
     };
 
     anonDown = false;
@@ -188,33 +184,15 @@ export default class Ripple extends PureComponent {
         this.memoizedParameters = this.getParameters(rect);
     }
 
-    lastRender = null;
     render () {
-        let highlight = null;
         const ripples = [];
-
-        const now = getNow();
-        if (this.lastRender) {
-            const dt = now - this.lastRender;
-            this.lastRender = now;
-            this.focusSpring.update(dt);
-        } else {
-            this.lastRender = now;
-        }
 
         if (!this.memoizedParameters) this.updateParameters();
         let centerX = this.memoizedParameters?.centerX || 0;
         let centerY = this.memoizedParameters?.centerY || 0;
         let targetScale = this.memoizedParameters?.targetScale || 0;
 
-        let maxHighlight = this.focusSpring.value;
-
         for (const ripple of this.state.ripples) {
-            const sizeProgress = ripple.sizeSpring.value;
-
-            const rippleHighlight = 1 - 4 * Math.abs(sizeProgress - 0.5) ** 2;
-            maxHighlight = Math.max(rippleHighlight * ripple.fadeInSpring.value, maxHighlight);
-
             ripples.push(
                 <SingleRipple
                     key={ripple.id}
@@ -231,18 +209,13 @@ export default class Ripple extends PureComponent {
             );
         }
 
-        if (maxHighlight) {
-            highlight = <RippleHighlight
-                lastSync={this.lastRender}
-                focus={this.focusSpring}
-                ripples={this.state.ripples}
-                onFinish={() => this.forceUpdate()} />
-        }
-
         return (
             <div class="ink-ripple" ref={this.node}>
+                <RippleHighlight
+                    key="highlight"
+                    focused={this.state.focused}
+                    ripples={this.state.ripples} />
                 {ripples}
-                {highlight}
             </div>
         );
     }
@@ -250,13 +223,15 @@ export default class Ripple extends PureComponent {
 
 class RippleHighlight extends PureComponent {
     node = createRef();
+    focusSpring = new Spring(1, 0.3);
 
-    computeStyle (focus, ripples, t) {
-        let maxHighlight = focus.getValueAfter(t);
+    computeStyle (t, now) {
+        let maxHighlight = this.focusSpring.getValueAfter(t);
 
-        for (const ripple of ripples) {
-            const rippleHighlight = 1 - 4 * Math.abs(ripple.sizeSpring.getValueAfter(t) - 0.5) ** 2;
-            const fadeIn = ripple.fadeInSpring.getValueAfter(t);
+        for (const ripple of this.props.ripples) {
+            const rt = t + (now - ripple.lastSync);
+            const rippleHighlight = 1 - 4 * Math.abs(ripple.sizeSpring.getValueAfter(rt) - 0.5) ** 2;
+            const fadeIn = ripple.fadeInSpring.getValueAfter(rt);
             maxHighlight = Math.max(rippleHighlight * fadeIn, maxHighlight);
         }
 
@@ -271,33 +246,43 @@ class RippleHighlight extends PureComponent {
         this.didUpdate();
     }
 
+    lastSync = null;
     scheduledTimeout = null;
     animation = null;
     didUpdate () {
+        const now = getNow();
+        if (this.lastSync) {
+            this.focusSpring.update(now - this.lastSync);
+            this.lastSync = now;
+        } else {
+            this.lastSync = now;
+        }
+
+        this.focusSpring.target = this.props.focused ? 1 : 0;
+
         if (!this.node.current) return;
         clearTimeout(this.scheduledTimeout);
         const timeout = 1;
         const timeStep = 1 / 60;
         let doScheduleTimeout = true;
-        let doScheduleFinish = false;
 
         // generate animation keyframes
         const keyframes = [];
-        const startT = getNow() - this.props.lastSync;
         let dt = 0;
 
         for (; dt < timeout; dt += timeStep) {
-            const t = startT + dt;
-            const style = this.computeStyle(this.props.focus, this.props.ripples, t);
+            const t = dt;
+            const style = this.computeStyle(t, now);
             keyframes.push(style);
 
-            const stopFocus = Math.abs(this.props.focus.target - this.props.focus.getValueAfter(t))
-                + Math.abs(this.props.focus.getVelocityAfter(t)) < this.props.focus.tolerance;
+            const stopFocus = Math.abs(this.focusSpring.target - this.focusSpring.getValueAfter(t))
+                + Math.abs(this.focusSpring.getVelocityAfter(t)) < this.focusSpring.tolerance;
 
             let stopRipples = true;
             for (const ripple of this.props.ripples) {
-                const stopRipple = Math.abs(ripple.sizeSpring.target - ripple.sizeSpring.getValueAfter(t))
-                    + Math.abs(ripple.sizeSpring.getVelocityAfter(t)) < ripple.sizeSpring.tolerance;
+                const rt = t + (now - ripple.lastSync);
+                const stopRipple = Math.abs(ripple.sizeSpring.target - ripple.sizeSpring.getValueAfter(rt))
+                    + Math.abs(ripple.sizeSpring.getVelocityAfter(rt)) < ripple.sizeSpring.tolerance;
                 if (!stopRipple) {
                     stopRipples = false;
                     break;
@@ -306,29 +291,21 @@ class RippleHighlight extends PureComponent {
 
             if (stopFocus && stopRipples) {
                 doScheduleTimeout = false;
-                doScheduleFinish = true;
                 break;
             }
         }
 
-        if (this.animation) {
-            this.animation.cancel();
-            this.animation = null;
-        }
-        this.animation = this.node.current.animate(keyframes, {
+        for (const animation of this.node.current.getAnimations()) animation.cancel();
+        const animation = this.node.current.animate(keyframes, {
             duration: dt * 1000,
             easing: 'linear',
             fill: 'forwards',
         });
-        this.animation.play();
+        animation.play();
 
         if (doScheduleTimeout) {
-            this.animation.addEventListener('finish', () => {
+            animation.addEventListener('finish', () => {
                 this.didUpdate();
-            });
-        } else if (doScheduleFinish) {
-            this.animation.addEventListener('finish', () => {
-                this.props.onFinish();
             });
         }
     }
@@ -337,9 +314,9 @@ class RippleHighlight extends PureComponent {
         clearTimeout(this.scheduledTimeout);
     }
 
-    render ({ focus, ripples }) {
+    render () {
         return (
-            <div ref={this.node} class="ink-ripple-highlight" style={this.computeStyle(focus, ripples, 0)} />
+            <div ref={this.node} class="ink-ripple-highlight" style={this.computeStyle(0, getNow())} />
         );
     }
 }
