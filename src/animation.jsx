@@ -7,6 +7,10 @@ if (!window.requestAnimationFrame) {
         || (f => setTimeout(f, 16));
 }
 
+export function getNow () {
+    return (document.timeline?.currentTime || Date.now()) / 1000;
+}
+
 /// An animator manages an animation loop and dispatches update events to its registered objects
 /// every frame.
 class Animator {
@@ -45,7 +49,7 @@ class Animator {
         if (this.running) return;
         this.running = true;
         this.currentLoopID++;
-        this.prevTime = Date.now();
+        this.prevTime = getNow();
         this.animationLoop(this.currentLoopID);
     }
 
@@ -70,8 +74,8 @@ class Animator {
         window.requestAnimationFrame(() => this.animationLoop(loopID));
 
         // dispatch
-        const now = Date.now();
-        const deltaTime = (now - this.prevTime) / 1000 * this.animationSpeed;
+        const now = getNow();
+        const deltaTime = (now - this.prevTime) * this.animationSpeed;
         this.prevTime = now;
 
         for (const target of this.targets) {
@@ -366,6 +370,14 @@ export class Spring extends EventEmitter {
     setDampingRatio (dampingRatio) {
         const period = this.getPeriod();
         this.setDampingRatioAndPeriod(dampingRatio, period);
+    }
+
+    getValueAfter(t) {
+        return this.inner.getValue(t + this.getTime());
+    }
+
+    getVelocityAfter(t) {
+        return this.inner.getVelocity(t + this.getTime());
     }
 
     /// Generates keyframes starting at the current time.
