@@ -20,4 +20,5 @@ import Slider from './slider';
 export { Slider };
 import TextField from './text-field';
 export { TextField };
-export { Spring, globalAnimator } from './animation';
+export { Spring, RtSpring, getNow, globalAnimator } from './animation';
+export { ElementAnimationController } from './element-animation';

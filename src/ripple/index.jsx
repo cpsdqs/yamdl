@@ -1,7 +1,8 @@
 import { createRef, h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { getNow, Spring } from '../animation';
+import { RtSpring } from '../animation';
 import './style.less';
+import { ElementAnimationController } from 'yamdl/element-animation';
 
 /// Duration of a single ripple effect.
 const RIPPLE_DURATION = 0.5;
@@ -36,6 +37,7 @@ export default class Ripple extends PureComponent {
 
     resizeObserver = new ResizeObserver(() => {
         this.updateParameters();
+        this.forceUpdate();
     });
 
     /// The DOM node.
@@ -105,24 +107,18 @@ export default class Ripple extends PureComponent {
             id: Math.random().toString(36),
             x: offsetX,
             y: offsetY,
-            sizeSpring: new Spring(1, RIPPLE_HOLD_DURATION),
-            opacitySpring: new Spring(1, RIPPLE_HOLD_DURATION),
-            fadeInSpring: new Spring(1, RIPPLE_FADE_IN_DURATION),
-            lastSync: getNow(),
+            sizeSpring: new RtSpring({ period: RIPPLE_HOLD_DURATION, target: 1 }),
+            opacitySpring: new RtSpring({ period: RIPPLE_HOLD_DURATION, value: 1, target: 0.3 }),
+            fadeInSpring: new RtSpring({ period: RIPPLE_FADE_IN_DURATION, target: 1 }),
         };
 
         if (size > 1) {
             const { targetScale } = this.getParameters();
-            ripple.sizeSpring.value = size / targetScale;
-            ripple.fadeInSpring.value = 0;
+            ripple.sizeSpring.setValue(size / targetScale);
+            ripple.fadeInSpring.setValue(0);
         } else {
-            ripple.fadeInSpring.value = 1;
+            ripple.fadeInSpring.setValue(1);
         }
-
-        ripple.sizeSpring.target = 1;
-        ripple.opacitySpring.value = 1;
-        ripple.opacitySpring.target = 0.3;
-        ripple.fadeInSpring.target = 1;
 
         ripples.push(ripple);
         this.setState({
@@ -137,16 +133,9 @@ export default class Ripple extends PureComponent {
             const ripples = this.state.ripples.slice();
             const ripple = ripples[currentRippleIndex] = { ...ripples[currentRippleIndex] };
 
-            const now = getNow();
-            const elapsed = now - ripple.lastSync;
-            ripple.sizeSpring.update(elapsed);
-            ripple.opacitySpring.update(elapsed);
-            ripple.fadeInSpring.update(elapsed);
-
             ripple.sizeSpring.setPeriod(RIPPLE_DURATION);
-            ripple.opacitySpring.target = 0;
             ripple.opacitySpring.setPeriod(RIPPLE_DURATION);
-            ripple.lastSync = now;
+            ripple.opacitySpring.setTarget(0);
 
             this.setState({
                 currentRippleID: null,
@@ -223,108 +212,38 @@ export default class Ripple extends PureComponent {
 
 class RippleHighlight extends PureComponent {
     node = createRef();
-    focusSpring = new Spring(1, 0.3);
-
-    computeStyle (t, now) {
-        let maxHighlight = this.focusSpring.getValueAfter(t);
+    focusSpring = new RtSpring();
+    animCtrl = new ElementAnimationController((_, time) => {
+        let maxHighlight = this.focusSpring.getValue(time);
 
         for (const ripple of this.props.ripples) {
-            const rt = t + (now - ripple.lastSync);
-            const rippleHighlight = 1 - 4 * Math.abs(ripple.sizeSpring.getValueAfter(rt) - 0.5) ** 2;
-            const fadeIn = ripple.fadeInSpring.getValueAfter(rt);
+            const rippleHighlight = 1 - 4 * Math.abs(ripple.sizeSpring.getValue(time) - 0.5) ** 2;
+            const fadeIn = ripple.fadeInSpring.getValue(time);
             maxHighlight = Math.max(rippleHighlight * fadeIn, maxHighlight);
         }
 
         return { opacity: maxHighlight };
-    }
-
-    componentDidMount () {
-        this.didUpdate();
-    }
-
-    componentDidUpdate () {
-        this.didUpdate();
-    }
-
-    lastSync = null;
-    scheduledTimeout = null;
-    animation = null;
-    didUpdate () {
-        const now = getNow();
-        if (this.lastSync) {
-            this.focusSpring.update(now - this.lastSync);
-            this.lastSync = now;
-        } else {
-            this.lastSync = now;
-        }
-
-        this.focusSpring.target = this.props.focused ? 1 : 0;
-
-        if (!this.node.current) return;
-        clearTimeout(this.scheduledTimeout);
-        const timeout = 1;
-        const timeStep = 1 / 60;
-        let doScheduleTimeout = true;
-
-        // generate animation keyframes
-        const keyframes = [];
-        let dt = 0;
-
-        for (; dt < timeout; dt += timeStep) {
-            const t = dt;
-            const style = this.computeStyle(t, now);
-            keyframes.push(style);
-
-            const stopFocus = Math.abs(this.focusSpring.target - this.focusSpring.getValueAfter(t))
-                + Math.abs(this.focusSpring.getVelocityAfter(t)) < this.focusSpring.tolerance;
-
-            let stopRipples = true;
-            for (const ripple of this.props.ripples) {
-                const rt = t + (now - ripple.lastSync);
-                const stopRipple = Math.abs(ripple.sizeSpring.target - ripple.sizeSpring.getValueAfter(rt))
-                    + Math.abs(ripple.sizeSpring.getVelocityAfter(rt)) < ripple.sizeSpring.tolerance;
-                if (!stopRipple) {
-                    stopRipples = false;
-                    break;
-                }
-            }
-
-            if (stopFocus && stopRipples) {
-                doScheduleTimeout = false;
-                break;
-            }
-        }
-
-        for (const animation of this.node.current.getAnimations()) animation.cancel();
-        const animation = this.node.current.animate(keyframes, {
-            duration: dt * 1000,
-            easing: 'linear',
-            fill: 'forwards',
-        });
-        animation.play();
-
-        if (doScheduleTimeout) {
-            animation.addEventListener('finish', () => {
-                this.didUpdate();
-            });
-        }
-    }
+    }, this.node);
 
     componentWillUnmount () {
-        clearTimeout(this.scheduledTimeout);
+        this.animCtrl.drop();
     }
 
-    render () {
+    render ({ focused, ripples }) {
+        this.focusSpring.setTarget(focused ? 1 : 0);
+        this.animCtrl.setInputs([this.focusSpring]
+            .concat(ripples.map(ripple => ripple.sizeSpring))
+            .concat(ripples.map(ripple => ripple.fadeInSpring)));
+
         return (
-            <div ref={this.node} class="ink-ripple-highlight" style={this.computeStyle(0, getNow())} />
+            <div ref={this.node} class="ink-ripple-highlight" style={this.animCtrl.getCurrentStyles()} />
         );
     }
 }
 
 class SingleRipple extends PureComponent {
     node = createRef();
-
-    computeStyle (size, opacity, fadeIn) {
+    animCtrl = new ElementAnimationController(({ size, opacity, fadeIn }) => {
         const { centerX, centerY, x, y, targetScale } = this.props;
 
         const posX = size * (centerX - x) + x;
@@ -340,85 +259,25 @@ class SingleRipple extends PureComponent {
             marginLeft: `${-targetScale / 2}px`,
             marginTop: `${-targetScale / 2}px`,
         };
-    }
+    }, this.node);
 
     componentDidMount () {
-        this.didUpdate();
-    }
-
-    componentDidUpdate () {
-        this.didUpdate();
-    }
-
-    scheduledTimeout = null;
-    animation = null;
-    didUpdate () {
-        if (!this.node.current) return;
-        clearTimeout(this.scheduledTimeout);
-        const timeout = 1;
-        const timeStep = 1 / 60;
-        let doScheduleTimeout = true;
-        let doScheduleFinish = false;
-
-        // generate animation keyframes
-        const keyframes = [];
-        const startT = getNow() - this.props.lastSync;
-        let dt = 0;
-
-        for (; dt < timeout; dt += timeStep) {
-            const t = startT + dt;
-
-            const size = this.props.size.getValueAfter(t);
-            const opacity = this.props.opacity.getValueAfter(t);
-            const fadeIn = this.props.fadeIn.getValueAfter(t);
-
-            const opacityVel = this.props.opacity.getVelocityAfter(t);
-
-            const style = this.computeStyle(size, opacity, fadeIn);
-
-            keyframes.push(style);
-
-            const stopOpacity = Math.abs(this.props.opacity.target - opacity) + Math.abs(opacityVel) < this.props.opacity.tolerance;
-
-            if (stopOpacity && this.props.opacity.target === 0) {
-                doScheduleFinish = true;
-                doScheduleTimeout = false;
-                break;
-            }
-        }
-
-        if (this.animation) {
-            this.animation.cancel();
-            this.animation = null;
-        }
-        this.animation = this.node.current.animate(keyframes, {
-            duration: dt * 1000,
-            easing: 'linear',
-            fill: 'forwards',
-        });
-        this.animation.play();
-
-        if (doScheduleTimeout) {
-            this.animation.addEventListener('finish', () => {
-                this.didUpdate();
-            });
-        } else if (doScheduleFinish) {
-            this.animation.addEventListener('finish', () => {
-                this.props.onFinish();
-            });
-        }
+        this.animCtrl.resolve();
+        this.animCtrl.on('finish', () => this.props.onFinish());
     }
 
     componentWillUnmount () {
-        clearTimeout(this.scheduledTimeout);
+        this.animCtrl.drop();
     }
 
     render ({ size, opacity, fadeIn }) {
+        this.animCtrl.setInputs({ size, opacity, fadeIn });
+
         return (
             <div
                 ref={this.node}
                 class="ink-single-ripple"
-                style={this.computeStyle(size.value, opacity.value, fadeIn.value)} />
+                style={this.animCtrl.getCurrentStyles()} />
         );
     }
 }

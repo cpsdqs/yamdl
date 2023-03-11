@@ -238,26 +238,30 @@ export class SpringSolver {
 
 const timeKey = Symbol('time');
 
-/// Simulates spring physics.
-///
-/// Will use the global animator.
-///
-/// # Events
-/// - `update`(value: number): Fired every time the spring is updated by the global animator
+/**
+ * Simulates spring physics.
+ *
+ * Will use the global animator.
+ *
+ * # Events
+ * - `update`(value: number): Fired every time the spring is updated by the global animator
+ */
 export class Spring extends EventEmitter {
-    /// Tolerance below which the spring will be considered stationary.
+    /** Tolerance below which the spring will be considered stationary. */
     tolerance = 1 / 1000;
 
-    /// If true, the spring will stop animating automatically once it’s done (also see tolerance).
+    /** If true, the spring will stop animating automatically once it’s done (also see tolerance). */
     stopAutomatically = true;
 
-    /// If true, the spring won’t move but will still fire update events.
-    /// Useful e.g. when the user is dragging something controlled by a spring.
+    /**
+     * If true, the spring won’t move but will still fire update events.
+     * Useful e.g. when the user is dragging something controlled by a spring.
+     */
     locked = false;
 
     [timeKey] = 0;
 
-    /// Creates a new spring.
+    /** Creates a new spring. */
     constructor (dampingRatio, period, initial) {
         super();
 
@@ -305,9 +309,11 @@ export class Spring extends EventEmitter {
         this.resetTime();
     }
 
-    /// Updates the spring.
-    ///
-    /// Will emit an 'update' event with the current value.
+    /**
+     * Updates the spring.
+     *
+     * Will emit an 'update' event with the current value.
+     */
     update (elapsed) {
         if (!this.locked) this[timeKey] += elapsed;
 
@@ -319,23 +325,23 @@ export class Spring extends EventEmitter {
         this.emit('update', this.value);
     }
 
-    /// Returns true if the spring should not be considered stopped.
+    /** Returns true if the spring should not be considered stopped. */
     wantsUpdate () {
         if (this.target === null) return Math.abs(this.velocity) > this.tolerance;
         return Math.abs(this.value - this.target) + Math.abs(this.velocity) > this.tolerance;
     }
 
-    /// Starts the spring by registering it in the global animator.
+    /** Starts the spring by registering it in the global animator. */
     start () {
         globalAnimator.register(this);
     }
 
-    /// Stops the spring by deregistering it in the global animator.
+    /** Stops the spring by deregistering it in the global animator. */
     stop () {
         globalAnimator.deregister(this);
     }
 
-    /// Will finish the animation by immediately jumping to the end and emitting an `update`.
+    /** Will finish the animation by immediately jumping to the end and emitting an `update`. */
     finish () {
         this.velocity = 0;
         if (this.target === null) return;
@@ -344,12 +350,12 @@ export class Spring extends EventEmitter {
         this.stop();
     }
 
-    /// Returns the damping ratio.
+    /** Returns the damping ratio. */
     getDampingRatio () {
         return this.inner.dampingRatio;
     }
 
-    /// Returns the period.
+    /** Returns the period. */
     getPeriod () {
         return this.inner.dampingRatio * 4 * Math.PI / this.inner.friction;
     }
@@ -360,13 +366,13 @@ export class Spring extends EventEmitter {
         this.resetTime();
     }
 
-    /// Sets the period.
+    /** Sets the period. */
     setPeriod (period) {
         const dampingRatio = this.getDampingRatio();
         this.setDampingRatioAndPeriod(dampingRatio, period);
     }
 
-    /// Sets the damping ratio.
+    /** Sets the damping ratio. */
     setDampingRatio (dampingRatio) {
         const period = this.getPeriod();
         this.setDampingRatioAndPeriod(dampingRatio, period);
@@ -380,11 +386,13 @@ export class Spring extends EventEmitter {
         return this.inner.getVelocity(t + this.getTime());
     }
 
-    /// Generates keyframes starting at the current time.
-    ///
-    /// @param {Function} shouldStop - `(value, velocity, time)` should return true at some point
-    /// @param {number} [sampleScale] - pass a larger value to sample more points
-    /// @returns {[number, number][]} - array of keyframes and time offsets
+    /**
+     * Generates keyframes starting at the current time.
+     *
+     * @param {Function} shouldStop - `(value, velocity, time)` should return true at some point
+     * @param {number} [sampleScale] - pass a larger value to sample more points
+     * @returns {[number, number][]} - array of keyframes and time offsets
+     */
     genKeyframes (shouldStop, sampleScale = 1) {
         const startTime = this.getTime();
         let t = startTime;
@@ -399,6 +407,69 @@ export class Spring extends EventEmitter {
             t += Math.max(1e-2, Math.sqrt(velocity) / sampleScale);
         }
         return values;
+    }
+}
+
+/**
+ * A real-time spring for use with the Web Animations API.
+ */
+export class RtSpring {
+    motionThreshold = 1 / 1000;
+    lastReset = getNow();
+
+    constructor (initial = {}) {
+        this.dampingRatio = initial.dampingRatio ?? 1;
+        this.period = initial.period ?? 0.3;
+
+        this.inner = new SpringSolver(this.dampingRatio, this.period);
+        if (Number.isFinite(initial.value)) {
+            this.inner.resetValue(0, initial.value);
+        }
+        if (Number.isFinite(initial.target)) {
+            this.inner.retarget(0, initial.target);
+        } else if (Number.isFinite(initial.value)) {
+            this.inner.retarget(0, initial.value);
+        }
+    }
+
+    getInnerT (time) {
+        return Math.max(0, time - this.lastReset);
+    }
+
+    setDampingRatio (dr, time = getNow()) {
+        this.inner.resetDampingRatio(this.getInnerT(time), dr);
+        this.lastReset = time;
+    }
+
+    setPeriod (period, time = getNow()) {
+        this.inner.resetPeriod(this.getInnerT(time), period);
+        this.lastReset = time;
+    }
+
+    setTarget (target, time = getNow()) {
+        if (this.inner.target === target) return;
+        this.inner.retarget(this.getInnerT(time), target);
+        this.lastReset = time;
+    }
+
+    setValue (value, time = getNow()) {
+        this.inner.resetValue(this.getInnerT(time), value);
+        this.lastReset = time;
+    }
+
+    get target () {
+        return this.inner.target;
+    }
+
+    getValue (time = getNow()) {
+        return this.inner.getValue(this.getInnerT(time));
+    }
+    getVelocity (time = getNow()) {
+        return this.inner.getVelocity(this.getInnerT(time));
+    }
+    shouldStop (time = getNow()) {
+        return Math.abs(this.target - this.getValue(time))
+            + Math.abs(this.getVelocity(time)) < this.motionThreshold;
     }
 }
 
