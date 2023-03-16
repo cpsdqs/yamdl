@@ -1,6 +1,7 @@
-import { h } from 'preact';
-import { createPortal, PureComponent } from 'preact/compat';
-import { Spring, globalAnimator, lerp, clamp } from '../animation';
+import { createRef, h } from 'preact';
+import { PureComponent } from 'preact/compat';
+import { RtSpring, lerp, clamp } from '../animation';
+import { ElementAnimationController } from '../element-animation';
 import { AppBarProxy, MenuIcon } from '../app';
 import Button from '../button';
 import ModalPortal from '../modal-portal';
@@ -22,32 +23,17 @@ import './style.less';
 /// - `appBarProps`: additional app bar props
 /// - `fixed`: pass to override whether or not the container is `position: fixed`.
 export default class Dialog extends PureComponent {
-    presence = new Spring(1, 0.3);
-
     state = {
         fullScreen: false,
+        mounted: false,
     };
-
-    updatePeriod () {
-        this.presence.setPeriod(this.state.fullScreen ? 0.5 : 0.3);
-    }
 
     updateFullScreen () {
         const fullScreen = typeof this.props.fullScreen === 'function'
             ? this.props.fullScreen(window.innerWidth)
             : this.props.fullScreen;
-        this.setState({ fullScreen }, () => this.updatePeriod());
+        this.setState({ fullScreen });
     }
-
-    update (dt) {
-        this.presence.update(dt);
-        if (!this.presence.wantsUpdate()) globalAnimator.deregister(this);
-        this.forceUpdate();
-    }
-
-    onContainerClick = e => {
-        if (e.target === this.containerNode && this.props.onClose) this.props.onClose();
-    };
 
     onResize = () => {
         this.updateFullScreen();
@@ -55,30 +41,37 @@ export default class Dialog extends PureComponent {
 
     componentDidMount () {
         window.addEventListener('resize', this.onResize);
-        if (this.props.open) this.presence.value = 1;
+        if (this.props.open) {
+            this.setState({ mounted: true });
+        }
         this.updateFullScreen();
-        this.forceUpdate();
     }
 
     componentDidUpdate (prevProps) {
         if (prevProps.fullScreen !== this.props.fullScreen) this.updateFullScreen();
-        if (prevProps.open !== this.props.open) {
-            this.presence.target = +!!this.props.open;
-            globalAnimator.register(this);
+        if (this.props.open && !prevProps.open) {
+            this.setState({ mounted: true });
         }
     }
 
     componentWillUnmount () {
         window.removeEventListener('resize', this.onResize);
-        globalAnimator.deregister(this);
     }
 
-    renderStyle (props) {
+    onContainerClick () {
+        if (this.props.onClose) this.props.onClose();
+    }
+
+    updatePeriod (presence) {
+        presence.setPeriod(this.state.fullScreen ? 0.5 : 0.3);
+    }
+
+    renderStyle (style, presence) {
         if (this.state.fullScreen) {
-            props.style.transform += ` translateY(${lerp(100, 0, this.presence.value)}%)`;
-            props.style.opacity *= clamp(lerp(0, 50, this.presence.value), 0, 1);
+            style.transform += ` translateY(${lerp(100, 0, presence)}%)`;
+            style.opacity *= clamp(lerp(0, 50, presence), 0, 1);
         } else {
-            props.style.opacity *= this.presence.value;
+            style.opacity *= presence;
         }
     }
 
@@ -90,6 +83,11 @@ export default class Dialog extends PureComponent {
         ) : null;
     }
 
+    #onContainerClickProxy = () => this.onContainerClick();
+    #updatePeriodProxy = (presence) => this.updatePeriod(presence);
+    #renderStyleProxy = (style, presence) => this.renderStyle(style, presence);
+    #renderAppBarMenuProxy = () => this.renderAppBarMenu();
+
     get container () {
         return this.props.container || document.body;
     }
@@ -98,17 +96,10 @@ export default class Dialog extends PureComponent {
         this.props.onClose();
     };
 
-    render () {
-        const props = { ...this.props };
-        delete props.open;
-        delete props.fixed;
-        delete props.backdrop;
-        delete props.title;
-        delete props.actions;
-        delete props.fullScreen;
-        delete props.container;
-        delete props.appBarProps;
-
+    render ({
+        open, fixed, backdrop, title, actions, fullScreen, container,
+        appBarProps, appBarPriority, ...props
+    }) {
         props.class = (props.class || '') + ' paper-dialog';
 
         let containerClass = 'paper-dialog-container';
@@ -120,40 +111,118 @@ export default class Dialog extends PureComponent {
             ? this.props.fixed
             : !this.props.container) ? ' is-fixed' : '';
 
-        props.style = { ...(props.style || {}) };
-        props.style.transform = props.style.transform || '';
-        props.style.opacity = 'opacity' in props.style ? +props.style.opacity : 1;
-
-        this.renderStyle(props);
-
         const dialog = (
+            <InnerDialog
+                containerClass={containerClass}
+                onClose={this.props.onClose}
+                onUnmount={() => this.setState({ mounted: false })}
+                backdrop={backdrop}
+                fullScreen={this.state.fullScreen}
+                title={title}
+                open={open}
+                appBarProps={appBarProps}
+                appBarPriority={appBarPriority}
+                actions={actions}
+                onContainerClick={this.#onContainerClickProxy}
+                updatePeriod={this.#updatePeriodProxy}
+                renderStyle={this.#renderStyleProxy}
+                renderAppBarMenu={this.#renderAppBarMenuProxy}
+                {...props} />
+        );
+
+        return (
+            <ModalPortal
+                class={'paper-dialog-modal-portal' + (this.state.fullScreen ? ' is-full-screen' : '')}
+                disableModal={this.state.fullScreen || ('fixed' in this.props && !this.props.fixed)}
+                mounted={this.state.mounted}
+                onCancel={this.onCancel}>
+                {dialog}
+            </ModalPortal>
+        );
+    }
+}
+
+class InnerDialog extends PureComponent {
+    presence = new RtSpring({ period: 0.3, value: 0, target: 1 });
+
+    containerNode = createRef();
+    dialogNode = createRef();
+    dialogNodeAnimCtrl = new ElementAnimationController(({ presence }) => {
+        const style = { ...(this.props.style || {}) };
+        style.transform = style.transform || '';
+        style.opacity = Number.isFinite(style.opacity) ? style.opacity : 1;
+
+        this.props.renderStyle(style, presence);
+        return style;
+    }, this.dialogNode);
+
+    backdropNode = createRef();
+    backdropNodeAnimCtrl = new ElementAnimationController(({ presence }) => {
+        return { opacity: clamp(presence, 0, 1) };
+    }, this.backdropNode);
+
+    componentDidMount () {
+        this.props.updatePeriod(this.presence);
+        this.dialogNodeAnimCtrl.didMount();
+        this.backdropNodeAnimCtrl.didMount();
+        this.dialogNodeAnimCtrl.on('finish', () => {
+            if (!this.props.open) this.props.onUnmount();
+        });
+    }
+
+    componentWillUnmount () {
+        this.dialogNodeAnimCtrl.drop();
+        this.backdropNodeAnimCtrl.drop();
+    }
+
+    onContainerClick = e => {
+        if (e.target === this.containerNode.current) {
+            this.props.onContainerClick();
+        }
+    };
+
+    render ({
+        containerClass, onClose,
+        backdrop, fullScreen, title, open, appBarProps, appBarPriority, actions,
+        renderStyle, renderAppBarMenu, updatePeriod,
+        ...props
+    }) {
+        updatePeriod(this.presence);
+        this.presence.setTarget(open ? 1 : 0);
+        this.dialogNodeAnimCtrl.setInputs({ presence: this.presence });
+        this.backdropNodeAnimCtrl.setInputs({ presence: this.presence });
+
+        props.style = this.dialogNodeAnimCtrl.getCurrentStyles();
+
+        return (
             <div
                 class={containerClass}
-                ref={node => this.containerNode = node}
+                ref={this.containerNode}
                 onClick={this.onContainerClick}>
-                {this.props.backdrop && <div
+                {backdrop && <div
+                    ref={this.backdropNode}
                     class="paper-dialog-backdrop"
-                    style={{ opacity: this.presence.value }} />}
-                <div {...props}>
-                    {this.state.fullScreen || this.props.title ? (
+                    style={this.backdropNodeAnimCtrl.getCurrentStyles()} />}
+                <div ref={this.dialogNode} {...props}>
+                    {(fullScreen || title) ? (
                         <AppBarProxy
-                            local={!this.state.fullScreen}
-                            priority={this.props.open
-                                ? (this.props.appBarPriority || 1000)
+                            local={!fullScreen}
+                            priority={open
+                                ? (appBarPriority || 1000)
                                 : -Infinity}
                             class="paper-dialog-app-bar"
-                            menu={this.renderAppBarMenu()}
-                            title={this.props.title}
-                            actions={this.state.fullScreen ? this.props.actions : null}
+                            menu={renderAppBarMenu()}
+                            title={title}
+                            actions={fullScreen ? actions : null}
                             proxied={<div class="p-app-bar-placeholder" />}
-                            {...(this.props.appBarProps || {})} />
+                            {...(appBarProps || {})} />
                     ) : null}
                     <div class="paper-dialog-contents">
-                        {this.props.children}
+                        {props.children}
                     </div>
-                    {!this.state.fullScreen && this.props.actions ? (
+                    {!fullScreen && actions ? (
                         <footer class="paper-dialog-actions">
-                            {this.props.actions.map(({ label, action, disabled, props }, i) => (
+                            {actions.map(({ label, action, disabled, props }, i) => (
                                 <Button
                                     key={i}
                                     class="p-action"
@@ -167,16 +236,6 @@ export default class Dialog extends PureComponent {
                     ) : null}
                 </div>
             </div>
-        );
-
-        return (
-            <ModalPortal
-                class={'paper-dialog-modal-portal' + (this.state.fullScreen ? ' is-full-screen' : '')}
-                disableModal={this.state.fullScreen || ('fixed' in this.props && !this.props.fixed)}
-                mounted={this.presence.value > 1 / 100}
-                onCancel={this.onCancel}>
-                {dialog}
-            </ModalPortal>
         );
     }
 }

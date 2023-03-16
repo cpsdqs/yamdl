@@ -437,11 +437,15 @@ export class RtSpring {
     }
 
     setDampingRatio (dr, time = getNow()) {
+        if (this.dampingratio === dt) return;
+        this.dampingRatio = dt;
         this.inner.resetDampingRatio(this.getInnerT(time), dr);
         this.lastReset = time;
     }
 
     setPeriod (period, time = getNow()) {
+        if (this.period === period) return;
+        this.period = period;
         this.inner.resetPeriod(this.getInnerT(time), period);
         this.lastReset = time;
     }

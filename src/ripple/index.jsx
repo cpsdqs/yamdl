@@ -35,7 +35,9 @@ export default class Ripple extends PureComponent {
         focused: false,
     };
 
+    isUnmounted = false;
     resizeObserver = new ResizeObserver(() => {
+        if (this.isUnmounted) return;
         this.updateParameters();
         this.forceUpdate();
     });
@@ -45,6 +47,10 @@ export default class Ripple extends PureComponent {
 
     componentDidMount () {
         this.resizeObserver.observe(this.node.current);
+    }
+
+    componentWillUnmount () {
+        this.isUnmounted = true;
     }
 
     onPointerDown = e => {

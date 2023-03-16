@@ -94,6 +94,7 @@ export class ElementAnimationController extends EventEmitter {
 
     animation = null;
     resolve () {
+        if (this.dropped) return;
         const node = this.node.current;
         if (!node) return;
         let scheduleRefresh = true;
@@ -130,10 +131,12 @@ export class ElementAnimationController extends EventEmitter {
 
         if (scheduleRefresh) {
             this.animation.addEventListener('finish', () => {
+                if (this.dropped) return;
                 this.resolve();
             });
         } else {
             this.animation.addEventListener('finish', () => {
+                if (this.dropped) return;
                 this.emit('finish');
             });
         }
@@ -142,5 +145,6 @@ export class ElementAnimationController extends EventEmitter {
     /** call this inside componentWillUnmount to clean up timers */
     drop () {
         this.animation?.cancel();
+        this.dropped = true;
     }
 }
