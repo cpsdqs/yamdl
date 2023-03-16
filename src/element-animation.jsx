@@ -6,6 +6,7 @@ import { getNow } from './animation';
  * Handles animation of an element using the Web Animations API.
  *
  * First, set the `node` property to a node ref to the node that should be animated.
+ * You can also pass an array of refs, in which case computeStyles must also return an array.
  * A number of input animation objects (usually [RtSpring]s) will be passed to a computeStyles
  * callback to generate keyframes. Use setInputs anytime updates might have happened
  * (e.g. in the render function).
@@ -92,11 +93,14 @@ export class ElementAnimationController extends EventEmitter {
         return this.doComputeStyles(getNow());
     }
 
-    animation = null;
+    animations = [];
     resolve () {
         if (this.dropped) return;
-        const node = this.node.current;
-        if (!node) return;
+        const nodes = (Array.isArray(this.node)
+            ? this.node.map(item => item.current)
+            : [this.node.current])
+            .filter(x => x);
+        if (!nodes.length) return;
         let scheduleRefresh = true;
 
         const now = getNow();
@@ -105,7 +109,12 @@ export class ElementAnimationController extends EventEmitter {
         for (; dt < this.keyframeGenerationInterval; dt += this.keyframeTimeStep) {
             const t = now + dt;
 
-            keyframes.push(this.doComputeStyles(t));
+            const styles = this.doComputeStyles(t);
+            if (Array.isArray(styles)) {
+                keyframes.push(styles);
+            } else {
+                keyframes.push([styles]);
+            }
 
             let shouldStop = true;
             for (const input of this.#currentInputs.keys()) {
@@ -121,21 +130,21 @@ export class ElementAnimationController extends EventEmitter {
             }
         }
 
-        this.animation?.cancel();
-        this.animation = node.animate(keyframes, {
+        for (const anim of this.animations) anim.cancel();
+        this.animations = nodes.map((node, i) => node.animate(keyframes.map(x => x[i]), {
             duration: dt * 1000,
             easing: 'linear',
             fill: 'forwards',
-        });
-        this.emit('resolve', this.animation);
+        }));
+        this.emit('resolve', this.animations);
 
         if (scheduleRefresh) {
-            this.animation.addEventListener('finish', () => {
+            this.animations[0].addEventListener('finish', () => {
                 if (this.dropped) return;
                 this.resolve();
             });
         } else {
-            this.animation.addEventListener('finish', () => {
+            this.animations[0].addEventListener('finish', () => {
                 if (this.dropped) return;
                 this.emit('finish');
             });
@@ -144,7 +153,7 @@ export class ElementAnimationController extends EventEmitter {
 
     /** call this inside componentWillUnmount to clean up timers */
     drop () {
-        this.animation?.cancel();
+        for (const anim of this.animations) anim.cancel();
         this.dropped = true;
     }
 }

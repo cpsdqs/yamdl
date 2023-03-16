@@ -6,7 +6,9 @@
 @checkbox-checked-color: var(--md-checkbox-color);
 @checkbox-checked-color-opacity: var(--md-checkbox-color-opacity);
 @checkbox-ripple-color: @checkbox-checked-color;
-@checkbox-ripple-highlight: transparent;
+@checkbox-ripple-color-opacity: 1;
+@checkbox-ripple-highlight: 0 0 0;
+@checkbox-ripple-highlight-opacity: 0;
 @checkbox-highlight: @checkbox-checked-color;
 @checkbox-disabled: var(--md-checkbox-disabled);
 @checkbox-disabled-opacity: var(--md-checkbox-disabled-opacity);
@@ -150,8 +152,10 @@
         bottom: -12px;
         border-radius: 50%;
         transition: transform 0.3s @easing;
-        --md-ripple-color: rgb(@checkbox-ripple-color);
-        --md-ripple-highlight: rgb(@checkbox-ripple-highlight);
+        --md-ripple-color: @checkbox-ripple-color;
+        --md-ripple-color-opacity: @checkbox-ripple-color-opacity;
+        --md-ripple-highlight: @checkbox-ripple-highlight;
+        --md-ripple-highlight-opacity: @checkbox-ripple-highlight-opacity;
 
         &::before {
             content: '';

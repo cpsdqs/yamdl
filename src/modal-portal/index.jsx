@@ -26,10 +26,14 @@ export default class ModalPortal extends PureComponent {
         this.container.className = 'md-modal-portal-container';
     }
 
+    get useDialogElement () {
+        // we use the <dialog> element only when the mount target is body.
+        // otherwise, we'd get weird behavior (because <dialog> always steals all focus)
+        return DIALOG_SUPPORTED && this.mountTarget === document.body;
+    }
+
     get mountTarget () {
-        // anything else would cause inconsistent behavior depending on whether
-        // <dialog> is supported or not
-        return document.body;
+        return this.props.container || document.body;
     }
     mountedToNode = null;
 
@@ -49,7 +53,7 @@ export default class ModalPortal extends PureComponent {
     lastShownModalDialog = null;
     lastShownDialogWasModal = null;
     showModal () {
-        if (!DIALOG_SUPPORTED) {
+        if (!this.useDialogElement) {
             this.setState({ mounted: true });
             return;
         }
@@ -70,11 +74,11 @@ export default class ModalPortal extends PureComponent {
     }
 
     closeModal () {
-        if (DIALOG_SUPPORTED && this.lastShownModalDialog) {
+        if (this.useDialogElement && this.lastShownModalDialog) {
             this.lastShownModalDialog.close();
             this.lastShownModalDialog = null;
             this.setState({ mounted: false });
-        } else if (!DIALOG_SUPPORTED) {
+        } else if (!this.useDialogElement) {
             this.setState({ mounted: false });
         }
     }
@@ -107,11 +111,11 @@ export default class ModalPortal extends PureComponent {
         if (mounted) this.mountContainer();
         else this.unmountContainer();
 
-        const DialogElement = DIALOG_SUPPORTED ? 'dialog' : 'div';
+        const DialogElement = this.useDialogElement ? 'dialog' : 'div';
 
         return createPortal(
             <DialogElement
-                class={'md-modal-portal-dialog ' + (DIALOG_SUPPORTED ? '' : 'dialog-is-unsupported ') + (className || '')}
+                class={'md-modal-portal-dialog ' + (this.useDialogElement ? '' : 'dialog-is-unsupported ') + (className || '')}
                 ref={this.dialog}>
                 <RootContext.Provider value={this.dialog.current}>
                     {mounted && this.state.mounted ? children : null}

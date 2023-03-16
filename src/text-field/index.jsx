@@ -1,6 +1,7 @@
-import { h } from 'preact';
+import { createRef, h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Spring, lerp } from '../animation';
+import { RtSpring, lerp } from '../animation';
+import { ElementAnimationController } from '../element-animation';
 import './style.less';
 
 /// Scaling factor that will be applied to the label when it floats.
@@ -27,12 +28,8 @@ export default class TextField extends PureComponent {
         isFocused: false,
     };
 
-    floatingSpring = new Spring(1, 0.3);
-
     constructor (props) {
         super(props);
-
-        this.floatingSpring.tolerance = 1 / 60;
     }
 
     /// Input ID, used for the `for` attribute on the `<label>` if `id` is not given.
@@ -43,10 +40,17 @@ export default class TextField extends PureComponent {
     node = null;
 
     /// The `<input>` node.
-    inputNode = null;
-
+    inputNodeRef = createRef();
     /// The leading container node.
-    leadingNode = null;
+    leadingNodeRef = createRef();
+
+    get inputNode () {
+        return this.inputNodeRef.current;
+    }
+
+    get leadingNode () {
+        return this.leadingNodeRef.current;
+    }
 
     onFocus = e => {
         if (this.props.onFocus) this.props.onFocus(e);
@@ -80,27 +84,6 @@ export default class TextField extends PureComponent {
         this.inputNode.focus();
     }
 
-    /// Sets the target of the floating spring according to the current state.
-    updateFloatingSpring () {
-        this.floatingSpring.target = (this.state.isFocused || this.props.value) ? 1 : 0;
-        if (this.floatingSpring.wantsUpdate()) this.floatingSpring.start();
-    }
-
-    componentDidMount () {
-        this.updateFloatingSpring();
-        this.floatingSpring.finish();
-        this.forceUpdate();
-    }
-
-    componentDidUpdate (prevProps) {
-        this.updateFloatingSpring();
-
-        if (prevProps.label !== this.props.label) {
-            // label width changed; decorations need to be updated
-            this.floatingSpring.start();
-        }
-    }
-
     render () {
         let className = (this.props.class || '') + ' paper-text-field';
         if (this.state.isFocused) className += ' is-focused';
@@ -130,7 +113,7 @@ export default class TextField extends PureComponent {
         return (
             <span class={className} ref={node => this.node = node}>
                 <span class="p-contents">
-                    <span class="p-leading" ref={node => this.leadingNode = node}>
+                    <span class="p-leading" ref={this.leadingNodeRef}>
                         {this.props.leading}
                     </span>
                     <input
@@ -142,7 +125,7 @@ export default class TextField extends PureComponent {
                         onBlur={this.onBlur}
                         onMouseDown={this.onInputMouseDown}
                         onTouchStart={this.onInputTouchStart}
-                        ref={node => this.inputNode = node}
+                        ref={this.inputNodeRef}
                         value={this.props.value}
                         placeholder={this.props.placeholder}
                         disabled={this.props.disabled}
@@ -155,12 +138,12 @@ export default class TextField extends PureComponent {
                     </span>
                 </span>
                 <TextFieldDecoration
-                    floatingSpring={this.floatingSpring}
+                    floating={this.state.isFocused || this.props.value}
                     id={this.props.id || this.inputID}
                     labelID={this.labelID}
                     label={this.props.label}
-                    inputNode={this.inputNode}
-                    leadingNode={this.leadingNode}
+                    inputNode={this.inputNodeRef}
+                    leadingNode={this.leadingNodeRef}
                     outline={outline}
                     center={this.props.center}
                     underlineX={this.underlineX} />
@@ -174,43 +157,52 @@ export default class TextField extends PureComponent {
 /// Renders text field decoration.
 /// This is a separate component to avoid frequent re-rendering of the main TextField component.
 class TextFieldDecoration extends PureComponent {
-    state = {
-        float: 0,
-    };
+    floatingSpring = new RtSpring({ motionThreshold: 1 / 60 });
 
     /// The `<label>` node.
-    labelNode = null;
+    labelNode = createRef();
+    // see render fn
+    breakLeftNode = createRef();
+    breakRightNode = createRef();
+    animCtrl = new ElementAnimationController(({ float }) => {
+        const [labelStyle, breakState] = this.getLabelStyleAndBreakStyle(float);
+        const breakStyle = {
+            transform: `scaleX(${breakState.scale})`,
+        };
+        return [labelStyle, breakStyle, breakStyle];
+    }, [this.labelNode, this.breakLeftNode, this.breakRightNode]);
 
     /// Returns the styles for the label node and layout info for the outline break.
-    getLabelStyleAndBreakStyle () {
+    getLabelStyleAndBreakStyle (float) {
         // return dummy value if refs haven’t been populated yet
-        if (!this.labelNode) return [{}, {}];
+        const labelNode = this.labelNode.current;
+        if (!labelNode || !this.props.inputNode.current) return [{}, {}];
 
-        const labelWidth = this.labelNode.offsetWidth;
-        const labelHeight = this.labelNode.offsetHeight;
-        const inputStyle = getComputedStyle(this.props.inputNode);
+        const labelWidth = labelNode.offsetWidth;
+        const labelHeight = labelNode.offsetHeight;
+        const inputStyle = getComputedStyle(this.props.inputNode.current);
 
         const floatingY = this.props.outline ? -labelHeight * FLOATING_LABEL_SCALE / 2 : 0;
         const fixedY = (parseInt(inputStyle.paddingTop) + parseInt(inputStyle.paddingBottom)) / 2;
 
-        const leadingWidth = this.props.leadingNode.offsetWidth;
+        const leadingWidth = this.props.leadingNode.current?.offsetWidth || 0;
 
         let x = this.props.center
-            ? (this.props.inputNode.offsetWidth
-                - lerp(labelWidth, labelWidth * FLOATING_LABEL_SCALE, this.state.float)) / 2
+            ? (this.props.inputNode.current.offsetWidth
+                - lerp(labelWidth, labelWidth * FLOATING_LABEL_SCALE, float)) / 2
             : parseInt(inputStyle.paddingLeft);
         if (!this.props.outline) x += leadingWidth;
-        const y = lerp(fixedY, floatingY, this.state.float);
-        const scale = lerp(1, FLOATING_LABEL_SCALE, this.state.float);
+        const y = lerp(fixedY, floatingY, float);
+        const scale = lerp(1, FLOATING_LABEL_SCALE, float);
 
         const breakX = this.props.center
-            ? (this.props.inputNode.offsetWidth - labelWidth * FLOATING_LABEL_SCALE) / 2 - 2
+            ? (this.props.inputNode.current.offsetWidth - labelWidth * FLOATING_LABEL_SCALE) / 2 - 2
             : x - 2;
         const breakWidth = labelWidth ? labelWidth * FLOATING_LABEL_SCALE + 4 : 0;
 
         let labelX = x;
         const easeOutSine = t => Math.sin(Math.PI / 2 * t);
-        if (this.props.outline) labelX += leadingWidth * easeOutSine(1 - this.state.float);
+        if (this.props.outline) labelX += leadingWidth * easeOutSine(1 - float);
 
         return [
             {
@@ -229,23 +221,38 @@ class TextFieldDecoration extends PureComponent {
                 //          x
                 x: breakX,
                 width: breakWidth,
-                scale: 1 - this.state.float,
+                scale: 1 - float,
             },
         ];
     }
 
     componentDidMount () {
-        this.props.floatingSpring.on('update', this.onUpdate);
+        this.floatingSpring.setValue(this.floatingSpring.target); // skip any init animation
+        this.animCtrl.didMount();
+
+        // re-render for label width
+        this.forceUpdate();
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.center !== this.props.center
+            || prevProps.outline !== this.props.outline
+            || prevProps.label !== this.props.label) {
+            this.animCtrl.resolve();
+
+            // re-render for label width
+            this.forceUpdate();
+        }
     }
 
     componentWillUnmount () {
-        this.props.floatingSpring.removeListener('update', this.onUpdate);
+        this.animCtrl.drop();
     }
 
-    onUpdate = float => this.setState({ float });
-
     render () {
-        const [labelStyle, breakStyle] = this.getLabelStyleAndBreakStyle();
+        this.floatingSpring.setTarget(this.props.floating ? 1 : 0);
+        this.animCtrl.setInputs({ float: this.floatingSpring });
+        const [labelStyle, breakStyle] = this.getLabelStyleAndBreakStyle(this.floatingSpring.getValue());
 
         return (
             <span class="p-decoration">
@@ -254,7 +261,7 @@ class TextFieldDecoration extends PureComponent {
                     id={this.props.labelID}
                     for={this.props.id}
                     style={labelStyle}
-                    ref={node => this.labelNode = node}>
+                    ref={this.labelNode}>
                     {this.props.label}
                 </label>
                 {this.props.outline ? (
@@ -262,9 +269,11 @@ class TextFieldDecoration extends PureComponent {
                         <div class="outline-left" style={{ width: breakStyle.x }}></div>
                         <div class="outline-break" style={{ width: breakStyle.width }}>
                             <div
+                                ref={this.breakLeftNode}
                                 class="break-left"
                                 style={{ transform: `scaleX(${breakStyle.scale})` }} />
                             <div
+                                ref={this.breakRightNode}
                                 class="break-right"
                                 style={{ transform: `scaleX(${breakStyle.scale})` }} />
                             <div class="break-bottom" />

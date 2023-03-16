@@ -1,8 +1,9 @@
-import { h } from 'preact';
+import { createRef, h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import Button from '../button';
 import Menu from '../menu';
-import { Spring, globalAnimator } from '../animation';
+import { RtSpring, globalAnimator } from '../animation';
+import { ElementAnimationController } from '../element-animation';
 import './bar.less';
 
 /// An app bar.
@@ -44,57 +45,56 @@ export default class AppBar extends PureComponent {
 
 /// Contains a menu and animates width.
 class MenuContainer extends PureComponent {
-    width = new Spring(1, 0.5);
-    opacity = new Spring(1, 0.5);
-    node = null;
+    width = new RtSpring({ period: 0.5 });
+    opacity = new RtSpring({ period: 0.5 });
+    node = createRef();
     baseMarginRight = 0;
 
+    animCtrl = new ElementAnimationController(({ width, opacity }) => {
+        if (width === this.width.target) {
+            return { marginRight: 0, opacity: 1 };
+        }
+        return {
+            marginRight: width - this.width.target + this.baseMarginRight,
+            opacity,
+        };
+    }, this.node);
+
     updateWidth () {
-        this.width.target = this.node.offsetWidth;
-        this.opacity.target = +!!this.width.target;
+        this.width.setTarget(this.node.current?.offsetWidth || 0);
+        this.opacity.setTarget(+!!this.width.target);
     }
 
     componentDidMount () {
-        const computedStyle = getComputedStyle(this.node);
+        const computedStyle = getComputedStyle(this.node.current);
         this.baseMarginRight = parseInt(computedStyle.marginRight);
         this.updateWidth();
         this.width.value = this.width.target;
-        globalAnimator.register(this);
+        this.animCtrl.didMount();
     }
 
     componentDidUpdate (prevProps) {
         // conservative heuristics
         // TODO: use a resizeobserver...
-        let childrenDefintelyChanged = false;
-        if (!!prevProps.children !== !!this.props.children) childrenDefintelyChanged = true;
-        if (prevProps.children?.length !== this.props.children?.length) childrenDefintelyChanged = true;
+        let childrenDefinitelyChanged = false;
+        if (!!prevProps.children !== !!this.props.children) childrenDefinitelyChanged = true;
+        if (prevProps.children?.length !== this.props.children?.length) childrenDefinitelyChanged = true;
 
-        if (childrenDefintelyChanged) {
+        if (childrenDefinitelyChanged) {
             this.updateWidth();
-            globalAnimator.register(this);
+            this.animCtrl.setInputs({ width: this.width, opacity: this.opacity });
         }
-    }
-
-    update (dt) {
-        this.width.update(dt);
-        this.opacity.update(dt);
-        if (!this.width.wantsUpdate()) globalAnimator.deregister(this);
-        this.forceUpdate();
     }
 
     componentWillUnmount () {
-        globalAnimator.deregister(this);
+        this.animCtrl.drop();
     }
 
     render () {
-        const style = {};
-        if (this.width.value !== this.width.target) {
-            style.marginRight = this.width.value - this.width.target + this.baseMarginRight;
-            style.opacity = this.opacity.value;
-        }
+        this.animCtrl.setInputs({ width: this.width, opacity: this.opacity });
 
         return (
-            <div class="p-menu" style={style} ref={node => this.node = node}>
+            <div class="p-menu" style={this.animCtrl.getCurrentStyles()} ref={this.node}>
                 {this.props.children}
             </div>
         );

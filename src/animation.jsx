@@ -430,6 +430,9 @@ export class RtSpring {
         } else if (Number.isFinite(initial.value)) {
             this.inner.retarget(0, initial.value);
         }
+        if (Number.isFinite(initial.motionThreshold)) {
+            this.motionThreshold = initial.motionThreshold;
+        }
     }
 
     getInnerT (time) {
@@ -437,7 +440,7 @@ export class RtSpring {
     }
 
     setDampingRatio (dr, time = getNow()) {
-        if (this.dampingratio === dt) return;
+        if (this.dampingRatio === dt) return;
         this.dampingRatio = dt;
         this.inner.resetDampingRatio(this.getInnerT(time), dr);
         this.lastReset = time;
@@ -460,13 +463,23 @@ export class RtSpring {
         this.inner.resetValue(this.getInnerT(time), value);
         this.lastReset = time;
     }
+    forceReset (time = getNow()) {
+        this.inner.retarget(this.getInnerT(time), this.target);
+        this.lastReset = time;
+    }
 
     get target () {
         return this.inner.target;
     }
 
     getValue (time = getNow()) {
-        return this.inner.getValue(this.getInnerT(time));
+        const t = this.getInnerT(time);
+        const value = this.inner.getValue(t);
+        const velocity = this.inner.getVelocity(t);
+        if (Math.abs(this.target - value) + Math.abs(velocity) < this.motionThreshold) {
+            return this.target;
+        }
+        return value;
     }
     getVelocity (time = getNow()) {
         return this.inner.getVelocity(this.getInnerT(time));

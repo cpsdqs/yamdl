@@ -1,12 +1,12 @@
 import resolve from '@rollup/plugin-node-resolve';
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
 import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
-import pkg from './package.json';
+import pkg from './package.json' assert { type: 'json' };
 
 export default {
     input: {
-        index: 'src/index.js',
+        index: 'src/index.jsx',
     },
     plugins: [
         postcss({
@@ -33,7 +33,7 @@ export default {
             ],
         }),
         resolve({
-            extensions: ['.js', '.less'],
+            extensions: ['.js', '.jsx', '.less'],
             preferBuiltins: true,
         }),
     ],

@@ -50,7 +50,7 @@ body {
 body.dark {
     background: #222;
     color: #fff;
-    .md-dark-theme(#1883ff, #1883ff);
+    .md-dark-theme(24 131 255, 24 131 255);
 
     .demo-region {
         .demo-item {
@@ -60,19 +60,19 @@ body.dark {
 }
 
 .custom-button-color {
-    --md-button-color: #f44336;
+    --md-button-color: 244 67 54;
 }
 
 .custom-checkbox-color {
-    --md-checkbox-color: #f44336;
+    --md-checkbox-color: 244 67 54;
 }
 
 .custom-progress-color {
-    --md-progress-color: #f44336;
+    --md-progress-color: 244 67 54;
 }
 
 .custom-app-bar-color {
-    --md-app-bar-bg: #f44336;
+    --md-app-bar-bg: 244 67 54;
 }
 
 .app-bar-demo-status-bar-space {
@@ -113,6 +113,10 @@ body.dark {
         &.dialog-app-bar {
             background: #222;
         }
+    }
+
+    .md-modal-portal-container .md-modal-portal-dialog {
+        position: absolute;
     }
 
     .paper-dialog-container {

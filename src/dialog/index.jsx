@@ -132,6 +132,7 @@ export default class Dialog extends PureComponent {
 
         return (
             <ModalPortal
+                container={this.container}
                 class={'paper-dialog-modal-portal' + (this.state.fullScreen ? ' is-full-screen' : '')}
                 disableModal={this.state.fullScreen || ('fixed' in this.props && !this.props.fixed)}
                 mounted={this.state.mounted}
@@ -147,32 +148,26 @@ class InnerDialog extends PureComponent {
 
     containerNode = createRef();
     dialogNode = createRef();
-    dialogNodeAnimCtrl = new ElementAnimationController(({ presence }) => {
+    backdropNode = createRef();
+    animCtrl = new ElementAnimationController(({ presence }) => {
         const style = { ...(this.props.style || {}) };
         style.transform = style.transform || '';
         style.opacity = Number.isFinite(style.opacity) ? style.opacity : 1;
 
         this.props.renderStyle(style, presence);
-        return style;
-    }, this.dialogNode);
-
-    backdropNode = createRef();
-    backdropNodeAnimCtrl = new ElementAnimationController(({ presence }) => {
-        return { opacity: clamp(presence, 0, 1) };
-    }, this.backdropNode);
+        return [style, { opacity: clamp(presence, 0, 1) }];
+    }, [this.dialogNode, this.backdropNode]);
 
     componentDidMount () {
         this.props.updatePeriod(this.presence);
-        this.dialogNodeAnimCtrl.didMount();
-        this.backdropNodeAnimCtrl.didMount();
-        this.dialogNodeAnimCtrl.on('finish', () => {
+        this.animCtrl.didMount();
+        this.animCtrl.on('finish', () => {
             if (!this.props.open) this.props.onUnmount();
         });
     }
 
     componentWillUnmount () {
-        this.dialogNodeAnimCtrl.drop();
-        this.backdropNodeAnimCtrl.drop();
+        this.animCtrl.drop();
     }
 
     onContainerClick = e => {
@@ -189,10 +184,10 @@ class InnerDialog extends PureComponent {
     }) {
         updatePeriod(this.presence);
         this.presence.setTarget(open ? 1 : 0);
-        this.dialogNodeAnimCtrl.setInputs({ presence: this.presence });
-        this.backdropNodeAnimCtrl.setInputs({ presence: this.presence });
+        this.animCtrl.setInputs({ presence: this.presence });
 
-        props.style = this.dialogNodeAnimCtrl.getCurrentStyles();
+        const [dialogStyle, backdropStyle] = this.animCtrl.getCurrentStyles();
+        props.style = dialogStyle;
 
         return (
             <div
@@ -202,7 +197,7 @@ class InnerDialog extends PureComponent {
                 {backdrop && <div
                     ref={this.backdropNode}
                     class="paper-dialog-backdrop"
-                    style={this.backdropNodeAnimCtrl.getCurrentStyles()} />}
+                    style={backdropStyle} />}
                 <div ref={this.dialogNode} {...props}>
                     {(fullScreen || title) ? (
                         <AppBarProxy

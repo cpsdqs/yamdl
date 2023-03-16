@@ -1,8 +1,8 @@
 import { createRef, h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { RtSpring } from '../animation';
+import { ElementAnimationController } from '../element-animation';
 import './style.less';
-import { ElementAnimationController } from 'yamdl/element-animation';
 
 /// Duration of a single ripple effect.
 const RIPPLE_DURATION = 0.5;

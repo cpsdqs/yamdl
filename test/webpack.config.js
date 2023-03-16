@@ -20,14 +20,13 @@ module.exports = env => {
             }),
         ],
         resolve: {
-            extensions: ['.js', '.json', '.less'],
+            extensions: ['.js', '.jsx', '.json', '.less'],
         },
         module: {
             rules: [
                 {
-                    test: /\.m?js$/,
-                    // exclude all node_modules (except akso-client; see above)
-                    exclude: /node_modules\/(?!akso-client)/,
+                    test: /\.m?jsx?$/,
+                    exclude: /node_modules/,
                     use: [
                         {
                             loader: 'babel-loader',
@@ -63,9 +62,11 @@ module.exports = env => {
                         {
                             loader: 'postcss-loader',
                             options: {
-                                plugins: [
-                                    autoprefixer()
-                                ]
+                                postcssOptions: {
+                                    plugins: [
+                                        autoprefixer()
+                                    ],
+                                },
                             }
                         },
                         {
