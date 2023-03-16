@@ -27,12 +27,14 @@ export class ElementAnimationController extends EventEmitter {
     // Map<Object, lastResetTimestamp (number)>
     #currentInputs = new Map();
     #lastInputsObject = null;
+    #needsUpdate = false;
     /**
      * Sets inputs. `inputs` can be any sort of associative object or array.
      * Its shape will be passed on to computeStyles.
      */
     setInputs (inputs) {
-        let needsResolve = false;
+        let needsResolve = this.#needsUpdate;
+        this.#needsUpdate = false;
 
         // determine whether we need to resolve the animation again.
         // we keep track of changes using the lastReset property
@@ -60,6 +62,17 @@ export class ElementAnimationController extends EventEmitter {
 
         this.#lastInputsObject = inputs;
         if (needsResolve) this.resolve();
+    }
+
+    setNeedsUpdate () {
+        this.#needsUpdate = true;
+    }
+
+    didMount () {
+        // so that any update will trigger a resolve
+        this.setNeedsUpdate();
+        // resolve now also
+        this.resolve();
     }
 
     doComputeStyles (time) {

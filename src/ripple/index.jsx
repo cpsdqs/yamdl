@@ -225,6 +225,10 @@ class RippleHighlight extends PureComponent {
         return { opacity: maxHighlight };
     }, this.node);
 
+    componentDidMount () {
+        this.animCtrl.didMount();
+    }
+
     componentWillUnmount () {
         this.animCtrl.drop();
     }
@@ -236,7 +240,11 @@ class RippleHighlight extends PureComponent {
             .concat(ripples.map(ripple => ripple.fadeInSpring)));
 
         return (
-            <div ref={this.node} class="ink-ripple-highlight" style={this.animCtrl.getCurrentStyles()} />
+            <div
+                ref={this.node}
+                data-focused={focused}
+                class="ink-ripple-highlight"
+                style={this.animCtrl.getCurrentStyles()} />
         );
     }
 }
@@ -262,7 +270,7 @@ class SingleRipple extends PureComponent {
     }, this.node);
 
     componentDidMount () {
-        this.animCtrl.resolve();
+        this.animCtrl.didMount();
         this.animCtrl.on('finish', () => this.props.onFinish());
     }
 
