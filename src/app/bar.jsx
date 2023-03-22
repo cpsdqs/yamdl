@@ -69,7 +69,7 @@ class MenuContainer extends PureComponent {
         const computedStyle = getComputedStyle(this.node.current);
         this.baseMarginRight = parseInt(computedStyle.marginRight);
         this.updateWidth();
-        this.width.value = this.width.target;
+        this.width.setValue(this.width.target);
         this.animCtrl.didMount();
     }
 

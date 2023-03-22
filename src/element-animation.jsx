@@ -19,10 +19,15 @@ export class ElementAnimationController extends EventEmitter {
     /** Time-step between each keyframe */
     keyframeTimeStep = 1 / 60;
 
-    constructor (computeStyles, nodeRef) {
+    useAnimationFillForwards = true;
+
+    constructor (computeStyles, nodeRef, options = {}) {
         super();
         this.computeStyles = computeStyles;
         if (nodeRef) this.node = nodeRef;
+        if ('useAnimationFillForwards' in options) {
+            this.useAnimationFillForwards = options.useAnimationFillForwards;
+        }
     }
 
     // Map<Object, lastResetTimestamp (number)>
@@ -134,7 +139,7 @@ export class ElementAnimationController extends EventEmitter {
         this.animations = nodes.map((node, i) => node.animate(keyframes.map(x => x[i]), {
             duration: dt * 1000,
             easing: 'linear',
-            fill: 'forwards',
+            fill: this.useAnimationFillForwards ? 'forwards' : 'none',
         }));
         this.emit('resolve', this.animations);
 
@@ -146,6 +151,10 @@ export class ElementAnimationController extends EventEmitter {
         } else {
             this.animations[0].addEventListener('finish', () => {
                 if (this.dropped) return;
+                if (!this.useAnimationFillForwards) {
+                    for (const anim of this.animations) anim.cancel();
+                    this.animations = [];
+                }
                 this.emit('finish');
             });
         }
