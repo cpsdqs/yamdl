@@ -4,6 +4,7 @@ import { DAYS_IN_A_WEEK, mod, getLinesInMonth, dateCmp } from './util';
 import './style.less';
 
 const CONTEXT_KEY = 'yamdl-month-view-events';
+const MAX_MONTH_WEEK_SPAN = 6;
 
 /// Month view container; handles events.
 ///
@@ -166,6 +167,7 @@ export class MonthViewContainer extends Component {
 /// - `today`: today date to mark on the calendar
 /// - `min`: min date (dates beyond this point will be faded)
 /// - `max`: max date (dates beyond this point will be faded)
+/// - `useMaxHeight`: will always render the maximum number of weeks
 export class MonthView extends Component {
     state = {
         hover: null,
@@ -200,7 +202,7 @@ export class MonthView extends Component {
     }
 
     render ({
-        month, year, weekStart = 0, value, size, today, min, max,
+        month, year, weekStart = 0, value, size, today, min, max, useMaxHeight,
     }) {
         const className = size === 'medium' ? 'p-medium' : size === 'small' ? 'p-small' : '';
 
@@ -224,6 +226,13 @@ export class MonthView extends Component {
                     max={max} />
             );
         }
+
+        if (useMaxHeight) {
+            for (let i = lineCount; i < MAX_MONTH_WEEK_SPAN; i++) {
+                lines.push(<div class={'ink-date-week-placeholder p-' + size} />);
+            }
+        }
+
         while (this.weekRefs.length > lineCount) this.weekRefs.pop();
 
         return (

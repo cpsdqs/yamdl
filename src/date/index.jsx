@@ -32,6 +32,7 @@ const MAX_DATE = new Date(2999, 11, 31, 23, 59, 59);
 /// - `today`: set to new Date() to circle current date
 /// - `min`: min selectable date. Note: currently only affects year
 /// - `max`: max selectable date. Note: ditto
+/// - `useMaxHeight`: if true, will always size the picker to the max height a month could have
 export default class DatePicker extends Component {
     render ({
         value,
@@ -42,6 +43,7 @@ export default class DatePicker extends Component {
         today,
         min,
         max,
+        useMaxHeight,
         ...props
     }) {
         props.class = (props.class || '') + ' paper-date-picker';
@@ -56,7 +58,8 @@ export default class DatePicker extends Component {
                     weekStart={Number.isFinite(weekStart) ? weekStart : 1}
                     today={today}
                     min={min || MIN_DATE}
-                    max={max || MAX_DATE} />
+                    max={max || MAX_DATE}
+                    useMaxHeight={useMaxHeight} />
             </div>
         );
     }

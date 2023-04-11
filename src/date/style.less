@@ -65,6 +65,9 @@
 .ink-date-week.p-small .p-day {
     line-height: 32px;
 }
+.ink-date-week.p-small {
+    height: 32px;
+}
 
 .ink-date-weekday-labels {
     box-sizing: border-box;
@@ -81,8 +84,17 @@
     }
 }
 
+.ink-date-week-placeholder {
+    height: 48px;
+
+    &.p-small {
+        height: 32px;
+    }
+}
+
 .ink-date-week {
     position: relative;
+    height: 48px;
 
     .p-day {
         position: relative;

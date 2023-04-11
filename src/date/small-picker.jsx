@@ -14,6 +14,7 @@ import YearPicker from './year-picker';
 /// - today: today date
 /// - min: min pickable date
 /// - max: max pickable date
+/// - useMaxHeight: set height to max month size
 export default class SmallDatePicker extends Component {
     state = {
         expanded: false,
@@ -106,6 +107,7 @@ export default class SmallDatePicker extends Component {
         today,
         min,
         max,
+        useMaxHeight,
     }, { year, month, expanded }) {
         return (
             <div class={'ink-date-small-picker' + (expanded ? ' is-expanded' : '')}>
@@ -129,7 +131,8 @@ export default class SmallDatePicker extends Component {
                             value={value}
                             today={today}
                             min={min}
-                            max={max} />
+                            max={max}
+                            useMaxHeight={useMaxHeight} />
                     </MonthViewContainer>
                     <YearPicker
                         size="small"
