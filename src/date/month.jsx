@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import WeekView from './week-view';
 import { DAYS_IN_A_WEEK, mod, getLinesInMonth, dateCmp } from './util';
 import './style.less';
@@ -11,7 +12,7 @@ const MAX_MONTH_WEEK_SPAN = 6;
 /// # Props
 /// - `value`: Date | Date[2] ∈ { [a, b] : a ≤ b } - will show a selected date/date range
 /// - `onChange`: (Date | Date[2] => void) - if set, will allow changing the date/date range
-export class MonthViewContainer extends Component {
+export class MonthViewContainer extends PureComponent {
     getChildContext () {
         return {
             [CONTEXT_KEY]: {
@@ -168,7 +169,7 @@ export class MonthViewContainer extends Component {
 /// - `min`: min date (dates beyond this point will be faded)
 /// - `max`: max date (dates beyond this point will be faded)
 /// - `useMaxHeight`: will always render the maximum number of weeks
-export class MonthView extends Component {
+export class MonthView extends PureComponent {
     state = {
         hover: null,
     };

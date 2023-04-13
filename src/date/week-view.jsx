@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator, clamp } from '../animation';
 import {
     DAYS_IN_A_WEEK,
@@ -20,7 +21,7 @@ import {
 /// - size: size class
 /// - today: today date
 /// - min/max: date bounds (values outside will be faded)
-export default class WeekView extends Component {
+export default class WeekView extends PureComponent {
     selectionStart = new Spring(1, 0.15);
     selectionStartInd = new Spring(1, 0.15);
     selectionStartOpacity = new Spring(1, 0.15);
@@ -302,7 +303,7 @@ export default class WeekView extends Component {
                 let isSelected = false;
                 const date = new Date(year, month, baseDate + i);
                 if (value instanceof Date) {
-                    isSelected = value !== null && dateCmp(date, value) === 0;
+                    isSelected = dateCmp(date, value) === 0;
                     hasStartSelection = hasStartSelection || isSelected;
                 } else if (Array.isArray(value)) {
                     const a = value[0] !== null && dateCmp(value[0], date) === 0;

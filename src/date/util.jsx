@@ -22,8 +22,10 @@ export function getLinesInMonth (year, month, weekStart) {
 /// Compares Date objects with regard to their date only.
 export function dateCmp (a, b) {
     if (a === null || b === null) return 0;
-    a = Math.floor(+a / 86400000) * 86400000;
-    b = Math.floor(+b / 86400000) * 86400000;
+    a = a.getTime() - a.getTimezoneOffset() * 60000;
+    b = b.getTime() - b.getTimezoneOffset() * 60000;
+    a = Math.floor(a / 86400000) * 86400000;
+    b = Math.floor(b / 86400000) * 86400000;
     return a - b;
 }
 

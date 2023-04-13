@@ -84,6 +84,10 @@ export default class TextField extends PureComponent {
         this.inputNode.focus();
     }
 
+    blur () {
+        this.inputNode.blur();
+    }
+
     render () {
         let className = (this.props.class || '') + ' paper-text-field';
         if (this.state.isFocused) className += ' is-focused';
