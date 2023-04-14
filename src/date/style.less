@@ -187,10 +187,6 @@
     .p-month-nav {
         flex-shrink: 0;
         transition: opacity 0.1s @easing;
-
-        .p-prev-month-button {
-            margin-right: 24px;
-        }
     }
 
     .p-dropdown-expand-button,
@@ -205,9 +201,17 @@
             transition: transform 0.3s @easing;
         }
 
-        svg path {
+        svg * {
             fill: currentColor;
         }
+    }
+    .p-month-nav-spacer {
+        display: inline-block;
+        width: 20px;
+    }
+
+    .p-month-nav-button.p-is-today {
+        opacity: 0.5;
     }
 
     &.is-expanded {

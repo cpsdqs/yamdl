@@ -15,6 +15,7 @@ import YearPicker from './year-picker';
 /// - min: min pickable date
 /// - max: max pickable date
 /// - useMaxHeight: set height to max month size
+/// - todayIcon: vnode
 export default class SmallDatePicker extends Component {
     state = {
         expanded: false,
@@ -88,6 +89,15 @@ export default class SmallDatePicker extends Component {
         });
     }
 
+    setToday () {
+        if (!this.props.today) return;
+        this.setState({
+            year: this.props.today.getFullYear(),
+            month: this.props.today.getMonth(),
+            expanded: false,
+        });
+    }
+
     componentDidMount () {
         this.resetPosition();
     }
@@ -119,7 +129,9 @@ export default class SmallDatePicker extends Component {
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     onPrev={() => this.prevMonth()}
-                    onNext={() => this.nextMonth()} />
+                    onNext={() => this.nextMonth()}
+                    isToday={year === today.getFullYear() && month === today.getMonth()}
+                    onToday={() => this.setToday()} />
                 <DynHeightDiv class="p-picker-container">
                     <MonthViewContainer value={value} onChange={onChange}>
                         <WeekdayLabels weekdays={weekdays} weekStart={weekStart} size="small" />
