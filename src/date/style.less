@@ -176,11 +176,59 @@
     cursor: default;
 
     .p-dropdown-inner {
+        display: flex;
+        align-items: center;
         flex-shrink: 0;
+
         .p-dropdown-label {
             color: @month-dropdown-color;
             font-size: 14px;
             font-weight: 500;
+
+            .p-year {
+                display: inline-block;
+                position: relative;
+
+                &::before {
+                    content: '';
+                    pointer-events: none;
+                    position: absolute;
+                    border-radius: 100em;
+                    inset: -4px -8px;
+                    background: rgb(var(--md-date-picker-month-dropdown-color) / var(--md-button-highlight-opacity));
+                    opacity: 0;
+                    transition: opacity 0.2s;
+                }
+                &.is-editing::before {
+                    transition: none;
+                }
+
+                @media (hover: hover) {
+                    &:not(.is-editing):hover::before {
+                        opacity: 1;
+                    }
+                }
+                &:active {
+                    opacity: 0.5;
+                }
+
+                .p-year-input {
+                    font: inherit;
+                    color: inherit;
+                    padding: 2px 4px;
+                    margin: 0;
+                    margin-left: -4px;
+                    border: none;
+                    background: none;
+                    outline: none;
+                    border-radius: 100em;
+                    width: calc(4ch + 24px);
+                }
+            }
+
+            &:has(> .p-year.is-editing) + .p-dropdown-expand-button {
+                display: none;
+            }
         }
     }
 

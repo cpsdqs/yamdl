@@ -124,6 +124,7 @@ export default class SmallDatePicker extends Component {
                 <MonthDropdown
                     size="small"
                     year={year}
+                    onSetYear={year => this.setYear(year)}
                     month={month}
                     months={months}
                     expanded={expanded}

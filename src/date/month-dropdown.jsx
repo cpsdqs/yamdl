@@ -1,11 +1,12 @@
 import { h, Component } from 'preact';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import Button from '../button';
 import './style.less';
 
 /// The month dropdown at the top of some date picker versions.
 ///
 /// # Props
-/// - year: year number
+/// - year/onSetYear: year number
 /// - month: month index
 /// - expanded/onExpandedChange: bool
 /// - onPrev: callback for when the previous month button is pressed
@@ -16,6 +17,7 @@ import './style.less';
 /// - isToday: will dim the today button
 export default function MonthDropdown ({
     year,
+    onSetYear,
     month,
     expanded,
     onExpandedChange,
@@ -26,13 +28,13 @@ export default function MonthDropdown ({
     isToday,
     onToday,
 }) {
-    const dropdownLabel = `${months[month]} ${year}`;
-
     return (
         <div class={`ink-date-month-dropdown p-${size}` + (expanded ? ' is-expanded' : '')}>
             <div class="p-dropdown-inner">
                 <span class="p-dropdown-label">
-                    {dropdownLabel}
+                    {months[month]}
+                    {' '}
+                    <YearInput value={year} onChange={onSetYear} />
                 </span>
                 <Button
                     class="p-dropdown-expand-button"
@@ -84,5 +86,54 @@ export default function MonthDropdown ({
                 </Button>
             </div>
         </div>
+    );
+}
+
+function YearInput ({ value, onChange }) {
+    const [editing, setEditing] = useState(false);
+    const [editingValue, setEditingValue] = useState('');
+    const input = useRef(null);
+
+    useEffect(() => {
+        input.current?.focus();
+        requestAnimationFrame(() => {
+            input.current?.focus();
+        });
+    }, [editing, input.current]);
+
+    return (
+        <span class={'p-year' + (editing ? ' is-editing' : '')} onClick={() => {
+            if (!editing) {
+                setEditing(true);
+                setEditingValue(value.toString());
+            }
+        }}>
+            {editing ? (
+                <input
+                    ref={input}
+                    type="number"
+                    min="1900"
+                    step="1"
+                    class="p-year-input"
+                    value={editingValue}
+                    onKeyDown={e => {
+                        if (e.key === 'Escape') {
+                            setEditing(false);
+                        } else if (e.key === 'Enter') {
+                            e.target.blur();
+                        }
+                    }}
+                    onChange={e => {
+                        setEditingValue(e.target.value);
+                        const value = parseInt(e.target.value, 10);
+                        if (value >= 1900) onChange(value);
+                    }}
+                    onBlur={e => {
+                        const value = parseInt(editingValue, 10);
+                        if (value >= 1900) onChange(value);
+                        setEditing(false);
+                    }} />
+            ) : value.toString()}
+        </span>
     );
 }
