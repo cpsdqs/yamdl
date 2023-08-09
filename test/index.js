@@ -119,8 +119,8 @@ class ProgressDemo extends Component {
 class TextFieldDemo extends Component {
     state = { s: '', q: 'cats' };
     render (props, state) {
-        const sharedProps = { value: state.s, onChange: e => this.setState({ s: e.target.value }) };
-        const sharedProps2 = { value: state.q, onChange: e => this.setState({ q: e.target.value }) };
+        const sharedProps = { value: state.s, onChange: v => this.setState({ s: v }) };
+        const sharedProps2 = { value: state.q, onChange: v => this.setState({ q: v }) };
 
         return (
             <div class="demo-region">

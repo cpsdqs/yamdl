@@ -136,7 +136,8 @@ export default class TextField extends PureComponent {
                         aria-labelledby={this.labelID}
                         aria-invalid={!!this.props.error}
                         aria-errormessage={this.props.error && this.errorID}
-                        onInput={e => this.props.onChange && this.props.onChange(e)} />
+                        onInput={e => this.props.onChange
+                            && this.props.onChange(e.target.value, e)} />
                     <span class="p-trailing">
                         {this.props.trailing}
                     </span>
