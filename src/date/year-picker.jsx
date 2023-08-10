@@ -2,20 +2,22 @@ import { h, Component } from 'preact';
 import { clamp } from '../animation';
 import './style.less';
 
-/// Renders a year picker.
-///
-/// # Props
-/// - `size`: size class
-/// - `min`: min year
-/// - `max`: max year
-/// - `value`: currently selected year
-/// - `onChange`: onChange handler
-/// - `visible`: bool. If false, will assume the user can’t see this view.
+/**
+ * Renders a year picker.
+ *
+ * # Props
+ * - `size`: size class
+ * - `min`: min year
+ * - `max`: max year
+ * - `value`: currently selected year
+ * - `onChange`: onChange handler
+ * - `visible`: bool. If false, will assume the user can’t see this view.
+ */
 export default class YearPicker extends Component {
     scrollableNode = null;
     yearNodes = new Map();
 
-    /// Scrolls to the currently selected year, centering it in the scroll view.
+    /** Scrolls to the currently selected year, centering it in the scroll view. */
     scrollToSelected () {
         if (!this.scrollableNode || !this.yearNodes.has(this.props.value)) return;
         const scrollable = this.scrollableNode;

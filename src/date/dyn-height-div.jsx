@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { Spring, globalAnimator } from '../animation';
 
-/// Internal component for now
+/** Internal component for now */
 export default class DynHeightDiv extends Component {
     height = new Spring(1, 0.5);
     node = null;

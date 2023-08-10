@@ -7,11 +7,13 @@ import './style.less';
 const CONTEXT_KEY = 'yamdl-month-view-events';
 const MAX_MONTH_WEEK_SPAN = 6;
 
-/// Month view container; handles events.
-///
-/// # Props
-/// - `value`: Date | Date[2] ∈ { [a, b] : a ≤ b } - will show a selected date/date range
-/// - `onChange`: (Date | Date[2] => void) - if set, will allow changing the date/date range
+/**
+ * Month view container; handles events.
+ *
+ * # Props
+ * - `value`: Date | Date[2] ∈ { [a, b] : a ≤ b } - will show a selected date/date range
+ * - `onChange`: (Date | Date[2] => void) - if set, will allow changing the date/date range
+ */
 export class MonthViewContainer extends PureComponent {
     getChildContext () {
         return {
@@ -157,18 +159,20 @@ export class MonthViewContainer extends PureComponent {
     }
 }
 
-/// Renders a month view.
-///
-/// # Props
-/// - `month`*: integer ∈ { 0, 1, …, 11 } - the month to display
-/// - `year`*: integer - the year
-/// - `weekStart`: integer ∈ { 0, 1, …, 6 } - the day to start weeks at; default 0 for Sunday
-/// - `value`: Date | Date[2] ∈ { [a, b] : a ≤ b } - will show a selected date/date range
-/// - `size`: large, medium, or small
-/// - `today`: today date to mark on the calendar
-/// - `min`: min date (dates beyond this point will be faded)
-/// - `max`: max date (dates beyond this point will be faded)
-/// - `useMaxHeight`: will always render the maximum number of weeks
+/**
+ * Renders a month view.
+ *
+ * # Props
+ * - `month`*: integer ∈ { 0, 1, …, 11 } - the month to display
+ * - `year`*: integer - the year
+ * - `weekStart`: integer ∈ { 0, 1, …, 6 } - the day to start weeks at; default 0 for Sunday
+ * - `value`: Date | Date[2] ∈ { [a, b] : a ≤ b } - will show a selected date/date range
+ * - `size`: large, medium, or small
+ * - `today`: today date to mark on the calendar
+ * - `min`: min date (dates beyond this point will be faded)
+ * - `max`: max date (dates beyond this point will be faded)
+ * - `useMaxHeight`: will always render the maximum number of weeks
+ */
 export class MonthView extends PureComponent {
     state = {
         hover: null,
@@ -246,12 +250,14 @@ export class MonthView extends PureComponent {
     }
 }
 
-/// Renders weekday labels found at the top of a month view.
-///
-/// # Props
-/// - `weekdays`: string[7] - weekday labels (such as “SMTWTFS”)
-/// - `weekStart`: week start day
-/// - `size`: size class
+/**
+ * Renders weekday labels found at the top of a month view.
+ *
+ * # Props
+ * - `weekdays`: string[7] - weekday labels (such as “SMTWTFS”)
+ * - `weekStart`: week start day
+ * - `size`: size class
+ */
 export function WeekdayLabels ({ weekdays, weekStart, size, ...extra }) {
     const items = [];
     for (let i = 0; i < DAYS_IN_A_WEEK; i++) {

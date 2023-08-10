@@ -3,18 +3,20 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import Button from '../button';
 import './style.less';
 
-/// The month dropdown at the top of some date picker versions.
-///
-/// # Props
-/// - year/onSetYear: year number
-/// - month: month index
-/// - expanded/onExpandedChange: bool
-/// - onPrev: callback for when the previous month button is pressed
-/// - onNext: callback for when the next month button is pressed
-/// - months: an array with all month names
-/// - size: size class
-/// - onToday: enables the today button. callback for when the today button is pressed
-/// - isToday: will dim the today button
+/**
+ * The month dropdown at the top of some date picker versions.
+ *
+ * # Props
+ * - year/onSetYear: year number
+ * - month: month index
+ * - expanded/onExpandedChange: bool
+ * - onPrev: callback for when the previous month button is pressed
+ * - onNext: callback for when the next month button is pressed
+ * - months: an array with all month names
+ * - size: size class
+ * - onToday: enables the today button. callback for when the today button is pressed
+ * - isToday: will dim the today button
+ */
 export default function MonthDropdown ({
     year,
     onSetYear,

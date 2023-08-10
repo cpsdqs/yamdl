@@ -22,17 +22,19 @@ const MIN_DATE = new Date(1900, 0, 1);
 // to maintainers in 2999: Y3K problem is on this line
 const MAX_DATE = new Date(2999, 11, 31, 23, 59, 59);
 
-/// Date picker.
-///
-/// - `value`: selected date value or null
-/// - `onChange`: change callback
-/// - `months`: month names
-/// - `weekdays`: weekday labels (single letters)
-/// - `weekStart`: the day on which the week starts (0 for Sunday, 1 for Monday, etc.)
-/// - `today`: set to new Date() to circle current date
-/// - `min`: min selectable date. Note: currently only affects year
-/// - `max`: max selectable date. Note: ditto
-/// - `useMaxHeight`: if true, will always size the picker to the max height a month could have
+/**
+ * Date picker.
+ *
+ * - `value`: selected date value or null
+ * - `onChange`: change callback
+ * - `months`: month names
+ * - `weekdays`: weekday labels (single letters)
+ * - `weekStart`: the day on which the week starts (0 for Sunday, 1 for Monday, etc.)
+ * - `today`: set to new Date() to circle current date
+ * - `min`: min selectable date. Note: currently only affects year
+ * - `max`: max selectable date. Note: ditto
+ * - `useMaxHeight`: if true, will always size the picker to the max height a month could have
+ */
 export default class DatePicker extends Component {
     render ({
         value,

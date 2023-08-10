@@ -2,11 +2,13 @@ import { h } from 'preact';
 import Button from '../button';
 import './style.less';
 
-/// A navigation drawer item.
-///
-/// # Props
-/// - `icon`: the icon
-/// - `selected`: selection state
+/**
+ * A navigation drawer item.
+ *
+ * # Props
+ * - `icon`: the icon
+ * - `selected`: selection state
+ */
 export function DrawerItem (originalProps) {
     const props = { ...originalProps };
     const { icon, selected } = props;

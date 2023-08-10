@@ -36,19 +36,21 @@ const measureTextWidth = (font, text) => {
     return measureTextCtx.measureText(text).width;
 };
 
-/// A material slider.
-///
-/// # Props
-/// - `min`: minimum value; defaults to 0
-/// - `max`: maximum value; defaults to 1
-/// - `transfer`: tuple of `(f, f^(-1))` with
-///   `f : normalized screen space = [0, 1] -> [min, max] = value space`. Defaults to linear.
-/// - `value`: either a single number or an interval
-/// - `onChange`: called with a new value when it changes
-/// - `discrete`: if true, will round to integers
-/// - `tickDistance`: distance for tick marks. 1 by default
-/// - `popout`: if true, will show popout with rounded values despite not being discrete
-/// - `disabled`: disabled state
+/**
+ * A material slider.
+ *
+ * # Props
+ * - `min`: minimum value; defaults to 0
+ * - `max`: maximum value; defaults to 1
+ * - `transfer`: tuple of `(f, f^(-1))` with
+ *   `f : normalized screen space = [0, 1] -> [min, max] = value space`. Defaults to linear.
+ * - `value`: either a single number or an interval
+ * - `onChange`: called with a new value when it changes
+ * - `discrete`: if true, will round to integers
+ * - `tickDistance`: distance for tick marks. 1 by default
+ * - `popout`: if true, will show popout with rounded values despite not being discrete
+ * - `disabled`: disabled state
+ */
 export default class Slider extends PureComponent {
     // thumb positions in [0, 1]
     leftThumbX = new Spring(1, 0.3);

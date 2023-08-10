@@ -6,17 +6,19 @@ import { RtSpring, globalAnimator } from '../animation';
 import { ElementAnimationController } from '../element-animation';
 import './bar.less';
 
-/// An app bar.
-///
-/// # Props
-/// - `menu`: the menu button
-/// - `title`: the title
-/// - `actions`: array of actions to show on the right
-///    - each action should be an object like `{ icon, label, action, overflow }`
-///        - `icon`: optional icon to show instead of text
-///        - `label`: label in the overflow menu
-///        - `action`: action callback
-///        - `overflow`: if true, will always stay in the overflow menu
+/**
+ * An app bar.
+ *
+ * # Props
+ * - `menu`: the menu button
+ * - `title`: the title
+ * - `actions`: array of actions to show on the right
+ *    - each action should be an object like `{ icon, label, action, overflow }`
+ *        - `icon`: optional icon to show instead of text
+ *        - `label`: label in the overflow menu
+ *        - `action`: action callback
+ *        - `overflow`: if true, will always stay in the overflow menu
+ */
 export default class AppBar extends PureComponent {
     render (props) {
         props = { ...props };
@@ -43,7 +45,7 @@ export default class AppBar extends PureComponent {
     }
 }
 
-/// Contains a menu and animates width.
+/** Contains a menu and animates width. */
 class MenuContainer extends PureComponent {
     width = new RtSpring({ period: 0.5 });
     opacity = new RtSpring({ period: 0.5 });
@@ -101,7 +103,7 @@ class MenuContainer extends PureComponent {
     }
 }
 
-/// Renders a title string and animates changes with a crossfade.
+/** Renders a title string and animates changes with a crossfade. */
 class TitleText extends PureComponent {
     state = {
         text: this.props.title,

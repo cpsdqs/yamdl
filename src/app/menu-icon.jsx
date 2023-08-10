@@ -71,18 +71,20 @@ const positions = {
     },
 };
 
-/// Renders the menu icon, which can be one of three things:
-///
-/// - a hamburger
-/// - an X
-/// - a back arrow
-///
-/// # Props
-/// - `type`: one of the following:
-///    - a string: `close` or `back`, for automatic animation
-///    - an object like `{ close: 0, back: 0 }` indicating with a number from 0 to 1 which type to
-///      show (or interpolate between).
-///      To avoid strange behavior, the sum of the components should be about 1.
+/**
+ * Renders the menu icon, which can be one of three things:
+ *
+ * - a hamburger
+ * - an X
+ * - a back arrow
+ *
+ * # Props
+ * - `type`: one of the following:
+ *    - a string: `close` or `back`, for automatic animation
+ *    - an object like `{ close: 0, back: 0 }` indicating with a number from 0 to 1 which type to
+ *      show (or interpolate between).
+ *      To avoid strange behavior, the sum of the components should be about 1.
+ */
 export default class MenuIcon extends PureComponent {
     close = new Spring(1, 0.5);
     back = new Spring(1, 0.5);

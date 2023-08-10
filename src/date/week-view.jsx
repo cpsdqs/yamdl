@@ -11,16 +11,18 @@ import {
     isSameDayLZ,
 } from './util';
 
-/// Renders a week line.
-///
-/// # Props
-/// - year/month: year/month number
-/// - value: selection value
-/// - hover: hover value
-/// - unboundedSelection: bool
-/// - size: size class
-/// - today: today date
-/// - min/max: date bounds (values outside will be faded)
+/**
+ * Renders a week line.
+ *
+ * # Props
+ * - year/month: year/month number
+ * - value: selection value
+ * - hover: hover value
+ * - unboundedSelection: bool
+ * - size: size class
+ * - today: today date
+ * - min/max: date bounds (values outside will be faded)
+ */
 export default class WeekView extends PureComponent {
     selectionStart = new Spring(1, 0.15);
     selectionStartInd = new Spring(1, 0.15);
@@ -36,7 +38,7 @@ export default class WeekView extends PureComponent {
     selectionGhosts = [];
     wasFullRange = false;
 
-    /// Creates a selection ghost that fades out gradually.
+    /** Creates a selection ghost that fades out gradually. */
     makeSelectionGhost (start, end) {
         const ghost = {
             start,

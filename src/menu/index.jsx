@@ -6,20 +6,22 @@ import Ripple from '../ripple';
 import { Spring, globalAnimator } from '../animation';
 import './style.less';
 
-/// A context menu.
-///
-/// # Props
-/// - `open`: if true, will display context menu
-/// - `onClose`: called when the menu is dismissed
-/// - `container`: optional DOM node of the container. `<body>` by default
-/// - `position`: tuple of two elements; sets the top left position of the menu on screen.
-///   Shortcut to `style.transform = translate(x, y)`
-/// - `anchor`: tuple of two elements; anchor position normalized to 0..1
-/// - `items`: array of menu items
-/// - `clampToScreenEdge`: set to false to disable
-/// - `cascadeUp`: set to cascade up instead of cascading down
-/// - `selectionIcon`: icon to use for selection
-/// - `persistent`: if true, will not automatically close once an item is selected
+/**
+ * A context menu.
+ *
+ * # Props
+ * - `open`: if true, will display context menu
+ * - `onClose`: called when the menu is dismissed
+ * - `container`: optional DOM node of the container. `<body>` by default
+ * - `position`: tuple of two elements; sets the top left position of the menu on screen.
+ *   Shortcut to `style.transform = translate(x, y)`
+ * - `anchor`: tuple of two elements; anchor position normalized to 0..1
+ * - `items`: array of menu items
+ * - `clampToScreenEdge`: set to false to disable
+ * - `cascadeUp`: set to cascade up instead of cascading down
+ * - `selectionIcon`: icon to use for selection
+ * - `persistent`: if true, will not automatically close once an item is selected
+ */
 export default class Menu extends PureComponent {
     presence = new Spring(1, 0.3);
 
@@ -191,16 +193,18 @@ export default class Menu extends PureComponent {
     }
 }
 
-/// A menu item.
-///
-/// # Props
-/// - `selected`: disabled state
-/// - `disabled`: disabled state
-/// - `leadingIcon`: if not null, will display a leading icon
-/// - `selectWithIcon`: if set, will not highlight when selected
-/// - `innerRef`: allows access to the DOM node
-/// - `cascadeDelay`: if given, will animate it with a delay
-/// - `cascadeOffset`: if given, will cascade from the given offset
+/**
+ * A menu item.
+ *
+ * # Props
+ * - `selected`: disabled state
+ * - `disabled`: disabled state
+ * - `leadingIcon`: if not null, will display a leading icon
+ * - `selectWithIcon`: if set, will not highlight when selected
+ * - `innerRef`: allows access to the DOM node
+ * - `cascadeDelay`: if given, will animate it with a delay
+ * - `cascadeOffset`: if given, will cascade from the given offset
+ */
 export class MenuItem extends Button {
     presence = new Spring(1, 0.3);
 

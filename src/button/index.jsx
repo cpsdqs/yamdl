@@ -7,21 +7,22 @@ function isButtonPressKey (key) {
     return key === ' ' || key === 'Enter';
 }
 
-///
-/// A material button.
-///
-/// # Props
-/// - `raised`: will render a raised button
-/// - `fab`: will render a floating action button. Usually in conjunction with `icon`.
-/// - `icon`: will render a circular icon button (to be rendered with an icon inside)
-/// - `small`: will use the smaller icon button size
-/// - `href`: if given, will use a <a> instead
-/// - `selected`: if true, will pretend it’s focused
+/**
+ * A material button.
+ *
+ * # Props
+ * - `raised`: will render a raised button
+ * - `fab`: will render a floating action button. Usually in conjunction with `icon`.
+ * - `icon`: will render a circular icon button (to be rendered with an icon inside)
+ * - `small`: will use the smaller icon button size
+ * - `href`: if given, will use a <a> instead
+ * - `selected`: if true, will pretend it’s focused
+ */
 export default class Button extends PureComponent {
-    /// The button node.
+    /** The button node. */
     button = null;
 
-    /// The ripple instance.
+    /** The ripple instance. */
     ripple = null;
 
     onPointerDown = e => {

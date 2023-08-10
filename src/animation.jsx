@@ -11,40 +11,47 @@ export function getNow () {
     return (document.timeline?.currentTime || Date.now()) / 1000;
 }
 
-/// An animator manages an animation loop and dispatches update events to its registered objects
-/// every frame.
+/**
+ * An animator manages an animation loop and dispatches update events to its registered objects
+ * every frame.
+ */
 class Animator {
-    /// Update targets.
+    /** Update targets. */
     targets = new Set();
 
-    /// The current loop ID. Used to prevent multiple animation loops running simultaneously.
+    /** The current loop ID. Used to prevent multiple animation loops running simultaneously. */
     currentLoopID = 0;
 
-    /// True if the animation loop is running.
+    /** True if the animation loop is running. */
     running = false;
 
-    ///
-    /// The timestamp of the previous iteration of the animation loop. Used to calculate delta time.
-    /// Will be set when the animation loop starts.
+    /**
+     * The timestamp of the previous iteration of the animation loop. Used to calculate delta time.
+     * Will be set when the animation loop starts.
+     */
     prevTime = null;
 
-    /// Global animation speed.
+    /** Global animation speed. */
     animationSpeed = 1;
 
-    /// Registers an object with the animator. This object must have a function member named
-    /// `update`. That function will then be called with the elapsed time in seconds.
+    /**
+     * Registers an object with the animator. This object must have a function member named
+     * `update`. That function will then be called with the elapsed time in seconds.
+     */
     register (target) {
         this.targets.add(target);
         this.start();
     }
 
-    /// Deregisters an object. Does nothing if it was never registered.
+    /** Deregisters an object. Does nothing if it was never registered. */
     deregister (target) {
         this.targets.delete(target);
     }
 
-    /// Starts the animation loop if it isn’t already running.
-    /// Calling this function directly should generally be unnecessary.
+    /**
+     * Starts the animation loop if it isn’t already running.
+     * Calling this function directly should generally be unnecessary.
+     */
     start () {
         if (this.running) return;
         this.running = true;
@@ -53,13 +60,15 @@ class Animator {
         this.animationLoop(this.currentLoopID);
     }
 
-    /// Stops the animation loop.
-    /// Calling this function directly should generally be unnecessary.
+    /**
+     * Stops the animation loop.
+     * Calling this function directly should generally be unnecessary.
+     */
     stop () {
         this.running = false;
     }
 
-    /// The animation loop function; should not be called directly.
+    /** The animation loop function; should not be called directly. */
     animationLoop (loopID) {
         // check if the loop should be running in the first place
         if (loopID != this.currentLoopID || !this.running) return;
@@ -84,7 +93,7 @@ class Animator {
     }
 }
 
-/// The global animator.
+/** The global animator. */
 export const globalAnimator = new Animator();
 
 window.addEventListener('visibilitychange', () => {
@@ -96,22 +105,23 @@ window.addEventListener('visibilitychange', () => {
     }
 });
 
-/// Calculates spring position and velocity for any given condition.
-///
-/// equations copied from
-/// http://people.physics.tamu.edu/agnolet/Teaching/Phys_221/MathematicaWebPages/4_DampedHarmonicOsc
-/// illator.pdf
+/**
+ * Calculates spring position and velocity for any given condition.
+ *
+ * equations copied from
+ * http://people.physics.tamu.edu/agnolet/Teaching/Phys_221/MathematicaWebPages/4_DampedHarmonicOscillator.pdf
+ */
 export class SpringSolver {
     target = 0;
 
-    /// Creates a new spring with the given damping ratio and period.
+    /** Creates a new spring with the given damping ratio and period. */
     constructor (dampingRatio, period) {
         this.dampingRatio = dampingRatio;
         this.friction = dampingRatio * (4 * Math.PI / period);
         this.hydrateParams(0, 0);
     }
 
-    /// Sets internal parameters for the given initial velocity.
+    /** Sets internal parameters for the given initial velocity. */
     hydrateParams (initialValue, initialVelocity) {
         if (this.target === null) {
             // uncontrolled “spring”
@@ -147,11 +157,13 @@ export class SpringSolver {
             / (2 * this.dampedFriction);
     }
 
-    /// Retargets the spring; setting the start value to the current value and retaining velocity.
-    /// Time will be reset to zero.
-    ///
-    /// @param {number} t - the pivot time, at which the retargeting occurs
-    /// @param {number} newTarget - the new target position
+    /**
+     * Retargets the spring; setting the start value to the current value and retaining velocity.
+     * Time will be reset to zero.
+     *
+     * @param {number} t - the pivot time, at which the retargeting occurs
+     * @param {number} newTarget - the new target position
+     */
     retarget (t, newTarget) {
         const value = this.getValue(t);
         const velocity = this.getVelocity(t);
@@ -159,11 +171,13 @@ export class SpringSolver {
         this.hydrateParams(value, velocity);
     }
 
-    /// Resets the velocity to a new value.
-    /// Time will be reset to zero.
-    ///
-    /// @param {number} t - the pivot time, at which the resetting occurs
-    /// @param {number} newVelocity - the new velocity
+    /**
+     * Resets the velocity to a new value.
+     * Time will be reset to zero.
+     *
+     * @param {number} t - the pivot time, at which the resetting occurs
+     * @param {number} newVelocity - the new velocity
+     */
     resetVelocity (t, newVelocity) {
         const value = this.getValue(t);
         this.hydrateParams(value, newVelocity);
@@ -490,12 +504,12 @@ export class RtSpring {
     }
 }
 
-/// Linearly interpolates between a and b using t.
+/** Linearly interpolates between a and b using t. */
 export function lerp (a, b, t) {
     return t * (b - a) + a;
 }
 
-/// Clamps a value to the interval between l and h.
+/** Clamps a value to the interval between l and h. */
 export function clamp (x, l, h) {
     return Math.max(l, Math.min(x, h));
 }

@@ -10,22 +10,24 @@ function isCheckboxCheckKey (key) {
 const SWITCH_WIDTH = 46;
 const THUMB_SIZE = 24;
 
-/// Renders a material checkbox.
-///
-/// # Props
-/// - `checked`: checked state
-/// - `indeterminate`: indeterminate state
-/// - `onChange`: change handler
-/// - `disabled`: disabled state
-/// - `switch`: if true, will render a switch
+/**
+ * Renders a material checkbox.
+ *
+ * # Props
+ * - `checked`: checked state
+ * - `indeterminate`: indeterminate state
+ * - `onChange`: change handler
+ * - `disabled`: disabled state
+ * - `switch`: if true, will render a switch
+ */
 export default class Checkbox extends PureComponent {
-    /// The DOM node
+    /** The DOM node */
     node = null;
 
-    /// The thumb node if this is a switch.
+    /** The thumb node if this is a switch. */
     thumbNode = null;
 
-    /// The ripple instance
+    /** The ripple instance */
     ripple = null;
 
     state = {

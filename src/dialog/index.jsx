@@ -7,21 +7,23 @@ import Button from '../button';
 import ModalPortal from '../modal-portal';
 import './style.less';
 
-/// A dialog.
-///
-/// # Props
-/// - `open`: if true, will display the dialog
-/// - `onClose`: called when the dialog is dismissed
-/// - `title`: dialog title
-/// - `actions`: dialog actions to show in the footer, or in the top bar when full screen.
-///   Array of `{ icon, label, action }` objects (see menu).
-/// - `fullScreen`: if true, will make dialog full-screen.
-/// - `backdrop`: if true, will have a backdrop
-///   pass a function `width => bool` to make it conditional based on window width.
-/// - `container`: optional DOM node of the container. `<body>` by default
-/// - `priority`: app bar proxy priority. 1000 by default.
-/// - `appBarProps`: additional app bar props
-/// - `fixed`: pass to override whether or not the container is `position: fixed`.
+/**
+ * A dialog.
+ *
+ * # Props
+ * - `open`: if true, will display the dialog
+ * - `onClose`: called when the dialog is dismissed
+ * - `title`: dialog title
+ * - `actions`: dialog actions to show in the footer, or in the top bar when full screen.
+ *   Array of `{ icon, label, action }` objects (see menu).
+ * - `fullScreen`: if true, will make dialog full-screen.
+ * - `backdrop`: if true, will have a backdrop
+ *   pass a function `width => bool` to make it conditional based on window width.
+ * - `container`: optional DOM node of the container. `<body>` by default
+ * - `priority`: app bar proxy priority. 1000 by default.
+ * - `appBarProps`: additional app bar props
+ * - `fixed`: pass to override whether or not the container is `position: fixed`.
+ */
 export default class Dialog extends PureComponent {
     state = {
         fullScreen: false,

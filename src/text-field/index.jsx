@@ -4,25 +4,27 @@ import { RtSpring, lerp } from '../animation';
 import { ElementAnimationController } from '../element-animation';
 import './style.less';
 
-/// Scaling factor that will be applied to the label when it floats.
+/** Scaling factor that will be applied to the label when it floats. */
 const FLOATING_LABEL_SCALE = 0.75;
 
 let inputIDCounter = 0;
 
-/// A material text field.
-///
-/// # Props
-/// - `value`: text contents
-/// - `onChange`: text change handler
-/// - `label`: the floating label
-/// - `placeholder`: the placeholder shown when the label is floating
-/// - `outline`: will use outlined style if set
-/// - `disabled`: will disable the text field if set
-/// - `center`: will center the input if set
-/// - `error`: error label; should be falsy if no error is present
-/// - `helperLabel`: helper label shown when there is no error
-/// - `leading`: leading icon
-/// - `trailing`: trailing icon
+/**
+ * A material text field.
+ *
+ * # Props
+ * - `value`: text contents
+ * - `onChange`: text change handler
+ * - `label`: the floating label
+ * - `placeholder`: the placeholder shown when the label is floating
+ * - `outline`: will use outlined style if set
+ * - `disabled`: will disable the text field if set
+ * - `center`: will center the input if set
+ * - `error`: error label; should be falsy if no error is present
+ * - `helperLabel`: helper label shown when there is no error
+ * - `leading`: leading icon
+ * - `trailing`: trailing icon
+ */
 export default class TextField extends PureComponent {
     state = {
         isFocused: false,
@@ -32,16 +34,16 @@ export default class TextField extends PureComponent {
         super(props);
     }
 
-    /// Input ID, used for the `for` attribute on the `<label>` if `id` is not given.
+    /** Input ID, used for the `for` attribute on the `<label>` if `id` is not given. */
     inputID = `text-field-${inputIDCounter++}`;
     labelID = this.inputID + '-label';
     errorID = this.inputID + '-error';
 
     node = null;
 
-    /// The `<input>` node.
+    /** The `<input>` node. */
     inputNodeRef = createRef();
-    /// The leading container node.
+    /** The leading container node. */
     leadingNodeRef = createRef();
 
     get inputNode () {
@@ -79,7 +81,7 @@ export default class TextField extends PureComponent {
         }
     };
 
-    /// Calls `focus()` on the input node.
+    /** Calls `focus()` on the input node. */
     focus () {
         this.inputNode.focus();
     }
@@ -160,12 +162,14 @@ export default class TextField extends PureComponent {
     }
 }
 
-/// Renders text field decoration.
-/// This is a separate component to avoid frequent re-rendering of the main TextField component.
+/**
+ * Renders text field decoration.
+ * This is a separate component to avoid frequent re-rendering of the main TextField component.
+ */
 class TextFieldDecoration extends PureComponent {
     floatingSpring = new RtSpring({ motionThreshold: 1 / 60 });
 
-    /// The `<label>` node.
+    /** The `<label>` node. */
     labelNode = createRef();
     // see render fn
     breakLeftNode = createRef();
@@ -178,7 +182,7 @@ class TextFieldDecoration extends PureComponent {
         return [labelStyle, breakStyle, breakStyle];
     }, [this.labelNode, this.breakLeftNode, this.breakRightNode]);
 
-    /// Returns the styles for the label node and layout info for the outline break.
+    /** Returns the styles for the label node and layout info for the outline break. */
     getLabelStyleAndBreakStyle (float) {
         // return dummy value if refs haven’t been populated yet
         const labelNode = this.labelNode.current;

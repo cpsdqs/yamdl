@@ -4,32 +4,35 @@ import { RtSpring } from '../animation';
 import { ElementAnimationController } from '../element-animation';
 import './style.less';
 
-/// Duration of a single ripple effect.
+/** Duration of a single ripple effect. */
 const RIPPLE_DURATION = 0.5;
 
-/// Duration of a single ripple effect while the pointer is held down.
+/** Duration of a single ripple effect while the pointer is held down. */
 const RIPPLE_HOLD_DURATION = 3;
 
-/// Duration of a single ripple effect fading in (required when its starting size is not 0)
+/** Duration of a single ripple effect fading in (required when its starting size is not 0) */
 const RIPPLE_FADE_IN_DURATION = 0.4;
 
 const TOUCH_RIPPLE_SIZE = 20;
 
-///
-/// Draws a material ripple in the parent container.
-///
-/// Methods `onMouseDown`, `onTouchStart`, `onAnonymousDown`, `onAnonymousUp`, `onFocus`, `onBlur`
-/// should be called by the enclosing component when appropriate.
-///
-/// # Props
-/// - `circle`: will use radius instead of bounding box diagonal for ripple size if true
+/**
+ * Draws a material ripple in the parent container.
+ *
+ * Methods `onMouseDown`, `onTouchStart`, `onAnonymousDown`, `onAnonymousUp`, `onFocus`, `onBlur`
+ * should be called by the enclosing component when appropriate.
+ *
+ * # Props
+ * - `circle`: will use radius instead of bounding box diagonal for ripple size if true
+ */
 export default class Ripple extends PureComponent {
     state = {
-        /// List of current ripples.
+        /** List of current ripples. */
         ripples: [],
 
-        /// The ID of the current ripple. Used to identify which ripple to modify when the
-        /// pointer is released.
+        /**
+         * The ID of the current ripple. Used to identify which ripple to modify when the
+         * pointer is released.
+         */
         currentRippleID: null,
 
         focused: false,
@@ -42,7 +45,7 @@ export default class Ripple extends PureComponent {
         this.forceUpdate();
     });
 
-    /// The DOM node.
+    /** The DOM node. */
     node = createRef();
 
     componentDidMount () {
@@ -61,14 +64,14 @@ export default class Ripple extends PureComponent {
         window.addEventListener('pointercancel', this.onPointerCancel);
     };
 
-    /// Will be bound automatically---should not be called directly.
+    /** Will be bound automatically---should not be called directly. */
     onPointerUp = () => {
         this.onUp();
         window.removeEventListener('pointerup', this.onPointerUp);
         window.removeEventListener('pointercancel', this.onPointerCancel);
     };
 
-    /// Will be bound automatically---should not be called directly.
+    /** Will be bound automatically---should not be called directly. */
     onPointerCancel = () => {
         this.onPointerUp();
     };
@@ -83,7 +86,7 @@ export default class Ripple extends PureComponent {
 
     anonDown = false;
 
-    /// Anonymous down event---will render a centered ripple.
+    /** Anonymous down event---will render a centered ripple. */
     onAnonymousDown = () => {
         if (!this.anonDown) {
             this.onDown();
@@ -91,8 +94,10 @@ export default class Ripple extends PureComponent {
         }
     };
 
-    /// Anonymous up event—will stop holding the ripple previously created by an `onAnonymousDown`
-    /// call.
+    /**
+     * Anonymous up event—will stop holding the ripple previously created by an `onAnonymousDown`
+     * call.
+     */
     onAnonymousUp = () => {
         if (this.anonDown) {
             this.onUp();

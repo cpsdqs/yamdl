@@ -3,29 +3,31 @@ import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator, lerp } from '../animation';
 import './style.less';
 
-/// Circle radius for the progress indicator.
+/** Circle radius for the progress indicator. */
 const CIRCLE_RADIUS = 16;
 
-/// Circle radius for the small progress indicator.
+/** Circle radius for the small progress indicator. */
 const CIRCLE_RADIUS_SMALL = 8;
 
-/// Size of the circular progress indicator.
+/** Size of the circular progress indicator. */
 const CIRCULAR_PROGRESS_SIZE = 48;
 
-/// Size of the small circular progress indicator.
+/** Size of the small circular progress indicator. */
 const CIRCULAR_PROGRESS_SIZE_SMALL = 24;
 
-/// The size of the small arc phase of the indeterminate circular progress indicator.
+/** The size of the small arc phase of the indeterminate circular progress indicator. */
 const SMALL_ARC_SIZE = Math.PI / 12;
 
-/// The size of the large arc phase of the indeterminate circular progress indicator.
+/** The size of the large arc phase of the indeterminate circular progress indicator. */
 const LARGE_ARC_SIZE = Math.PI * 3 / 2;
 
-/// The “speed” of the error function as used by the indeterminate circular progress indicator.
+/** The “speed” of the error function as used by the indeterminate circular progress indicator. */
 const ERF_TIME_SCALE = 7.3;
 
-/// Approximation of the error function
-/// from https://stackoverflow.com/questions/457408/#answer-457805
+/**
+ * Approximation of the error function
+ * from https://stackoverflow.com/questions/457408/#answer-457805
+ */
 const erf = x => {
     // save the sign of x
     const sign = x >= 0 ? 1 : -1;
@@ -48,28 +50,28 @@ const erf = x => {
 
 const modTau = x => ((x % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
 
-///
-/// The following code is responsible the growing-and-shrinking spinning effect that the
-/// indeterminate progress bar has, by using overcomplicated math:
-/// To attain the “one side moves while the other stays still” behavior, the integral of a
-/// gaussian function is taken, resulting in the error function. Then the plot of the two
-/// ends looks something like this:
-///  ^ progress
-///  |
-///  1          .-'''''.-''''
-///  |         /      /
-///  0- - - - / - - -/- - - 1 -------> stageProgress
-///  |       /      /
-/// -1 ....-'.....-'
-///  |
-/// These values are then interpolated over stageProgress, resulting in a small arc phase
-/// at the beginning angle, a large arc phase, and then a small arc phase now offset by
-/// LARGE_ARC_SIZE.
-/// Because the beginning and end angles aren’t the same, the offset is incremented above
-/// and added as sweepOffset after.
-/// And finally, rotation is added to the sweepOffset such that the whole thing moves the
-/// entire time.
-///
+/**
+ * The following code is responsible the growing-and-shrinking spinning effect that the
+ * indeterminate progress bar has, by using overcomplicated math:
+ * To attain the “one side moves while the other stays still” behavior, the integral of a
+ * gaussian function is taken, resulting in the error function. Then the plot of the two
+ * ends looks something like this:
+ *  ^ progress
+ *  |
+ *  1          .-'''''.-''''
+ *  |         /      /
+ *  0- - - - / - - -/- - - 1 -------> stageProgress
+ *  |       /      /
+ * -1 ....-'.....-'
+ *  |
+ * These values are then interpolated over stageProgress, resulting in a small arc phase
+ * at the beginning angle, a large arc phase, and then a small arc phase now offset by
+ * LARGE_ARC_SIZE.
+ * Because the beginning and end angles aren’t the same, the offset is incremented above
+ * and added as sweepOffset after.
+ * And finally, rotation is added to the sweepOffset such that the whole thing moves the
+ * entire time.
+ */
 function sweepAnglesForStageProgress (stageProgress) {
     const endProgress = erf((stageProgress - 0.25) * ERF_TIME_SCALE);
     const startProgress = erf((stageProgress - 0.75) * ERF_TIME_SCALE);
@@ -80,12 +82,14 @@ function sweepAnglesForStageProgress (stageProgress) {
     return [sweepStart, sweepEnd];
 }
 
-/// A material circular progress indicator. Can be determinate or indeterminate.
-///
-/// # Props
-/// - `progress`: progress value
-/// - `indeterminate`: will render as indeterminate progress if true
-/// - `small`: will be 24px instead of 48px in size
+/**
+ * A material circular progress indicator. Can be determinate or indeterminate.
+ *
+ * # Props
+ * - `progress`: progress value
+ * - `indeterminate`: will render as indeterminate progress if true
+ * - `small`: will be 24px instead of 48px in size
+ */
 export default class CircularProgress extends PureComponent {
     start = new Spring(1, 0.5, 0);
     end = new Spring(1, 0.5, (this.props.progress || 0) * 2 * Math.PI);
@@ -183,7 +187,7 @@ export default class CircularProgress extends PureComponent {
         return [iNetStartAngle, iNetEndAngle];
     }
 
-    /// Returns SVG path data for a clockwise arc that begins at sweepStart and ends at sweepEnd.
+    /** Returns SVG path data for a clockwise arc that begins at sweepStart and ends at sweepEnd. */
     getPathForArcAngles (sweepStart, sweepEnd, circle) {
         const radius = this.props.small ? CIRCLE_RADIUS_SMALL : CIRCLE_RADIUS;
         const halfSize = (this.props.small

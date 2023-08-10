@@ -4,30 +4,32 @@ import AppBar from './bar';
 
 const contextKey = 'md-app-bar-provider';
 
-/// In a setup like the following
-///
-/// ```
-/// App
-/// |- AppBar
-/// |- Dialog (full screen)
-///    |- AppBar
-/// ```
-///
-/// it would be bad to have two app bars that share the same space but seem to be two different
-/// objects, so this module allows all components in an app to share a single app bar as follows:
-///
-/// ```
-/// App
-/// |- AppBarProvider
-///    |- AppBarConsumer
-///       |- AppBar (provided by AppBarProvider)
-///    |- Dialog (full screen)
-///       |- AppBarProxy
-/// ```
-///
-/// In this setup, the dialog uses an app bar proxy to control the global app bar.
-///
-/// AppBarProviders may also be nested without causing additional app bars to appear.
+/**
+ * In a setup like the following
+ *
+ * ```
+ * App
+ * |- AppBar
+ * |- Dialog (full screen)
+ *    |- AppBar
+ * ```
+ *
+ * it would be bad to have two app bars that share the same space but seem to be two different
+ * objects, so this module allows all components in an app to share a single app bar as follows:
+ *
+ * ```
+ * App
+ * |- AppBarProvider
+ *    |- AppBarConsumer
+ *       |- AppBar (provided by AppBarProvider)
+ *    |- Dialog (full screen)
+ *       |- AppBarProxy
+ * ```
+ *
+ * In this setup, the dialog uses an app bar proxy to control the global app bar.
+ *
+ * AppBarProviders may also be nested without causing additional app bars to appear.
+ */
 export class AppBarProvider extends PureComponent {
     getChildContext () {
         return {
@@ -84,9 +86,11 @@ export class AppBarProvider extends PureComponent {
     }
 }
 
-/// # Props
-/// - `prependedProps`: props to prepend to the app bar props instead of appending
-/// - `onData`: (data, allProps) => void - additional data from the proxy, or null
+/**
+ * # Props
+ * - `prependedProps`: props to prepend to the app bar props instead of appending
+ * - `onData`: (data, allProps) => void - additional data from the proxy, or null
+ */
 export class AppBarConsumer extends PureComponent {
     state = {
         appBar: null,
@@ -134,17 +138,19 @@ export class AppBarConsumer extends PureComponent {
     }
 }
 
-/// Proxy for an AppBarProvider.
-///
-/// Will create its own AppBar if there is no AppBarProvider, so this should be placed somewhere
-/// where an app bar may be allowed to appear.
-///
-/// # Props
-/// - `priority`: works like z-index; the highest priority app bar will be visible. Defaults to 0
-/// - `local`: if true, will cause the app bar not to be proxied. Useful for dialogs that are
-///   conditionally full-screen
-/// - `proxied`: will be returned when the app bar is proxied. null by default.
-/// - `data`: additional data, retrievable from the consumer with the onData callback.
+/**
+ * Proxy for an AppBarProvider.
+ *
+ * Will create its own AppBar if there is no AppBarProvider, so this should be placed somewhere
+ * where an app bar may be allowed to appear.
+ *
+ * # Props
+ * - `priority`: works like z-index; the highest priority app bar will be visible. Defaults to 0
+ * - `local`: if true, will cause the app bar not to be proxied. Useful for dialogs that are
+ *   conditionally full-screen
+ * - `proxied`: will be returned when the app bar is proxied. null by default.
+ * - `data`: additional data, retrievable from the consumer with the onData callback.
+ */
 export class AppBarProxy extends PureComponent {
     id = Math.random().toString();
 

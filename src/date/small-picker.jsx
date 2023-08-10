@@ -4,18 +4,20 @@ import DynHeightDiv from './dyn-height-div';
 import MonthDropdown from './month-dropdown';
 import YearPicker from './year-picker';
 
-/// Small date picker, for the desktop layout.
-///
-/// # Props
-/// - value/onChange: date picker value
-/// - weekdays: weekday label names
-/// - months: month label names
-/// - weekStart: week start day
-/// - today: today date
-/// - min: min pickable date
-/// - max: max pickable date
-/// - useMaxHeight: set height to max month size
-/// - todayIcon: vnode
+/**
+ * Small date picker, for the desktop layout.
+ *
+ * # Props
+ * - value/onChange: date picker value
+ * - weekdays: weekday label names
+ * - months: month label names
+ * - weekStart: week start day
+ * - today: today date
+ * - min: min pickable date
+ * - max: max pickable date
+ * - useMaxHeight: set height to max month size
+ * - todayIcon: vnode
+ */
 export default class SmallDatePicker extends Component {
     state = {
         expanded: false,

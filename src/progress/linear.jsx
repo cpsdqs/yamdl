@@ -2,12 +2,14 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator } from '../animation';
 
-/// A linear progress indicator.
-///
-/// # Props
-/// - `progress`: progress value
-/// - `indeterminate`: will be indeterminate if true
-/// - `hideIfNone`: if true, will hide itself when indeterminate is false and progress is zero
+/**
+ * A linear progress indicator.
+ *
+ * # Props
+ * - `progress`: progress value
+ * - `indeterminate`: will be indeterminate if true
+ * - `hideIfNone`: if true, will hide itself when indeterminate is false and progress is zero
+ */
 export default class LinearProgress extends PureComponent {
     componentWillMount () {
         globalAnimator.register(this);
@@ -118,12 +120,14 @@ export default class LinearProgress extends PureComponent {
     }
 }
 
-/// A single “span” of the linear progress indicator--when determinate, this is just the
-/// colored bar indicating progress.
-/// When indeterminate, this is each of the lines that animate.
-///
-/// There are two variants of indeterminate curves: the one that speeds up (0) and the one that
-/// slows down (1).
+/**
+ * A single “span” of the linear progress indicator--when determinate, this is just the
+ * colored bar indicating progress.
+ * When indeterminate, this is each of the lines that animate.
+ *
+ * There are two variants of indeterminate curves: the one that speeds up (0) and the one that
+ * slows down (1).
+ */
 class Span {
     start = new Spring(1, 0.5);
     end = new Spring(1, 0.5);
@@ -138,10 +142,10 @@ class Span {
         }
     }
 
-    /// This span should be removed if true. Will be set by update.
+    /** This span should be removed if true. Will be set by update. */
     isDead = false;
 
-    /// If true, the next indeterminate span should be emitted.
+    /** If true, the next indeterminate span should be emitted. */
     emitNext = false;
 
     update (dt) {

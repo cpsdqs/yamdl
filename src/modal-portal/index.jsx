@@ -6,12 +6,14 @@ import './style.less';
 const DIALOG_SUPPORTED = ('HTMLDialogElement' in window)
     && (typeof window.HTMLDialogElement.prototype.showModal === 'function');
 
-/// Provides a modal portal element that steals focus if &lt;dialog&gt; is supported.
-///
-/// # Props
-/// - mounted: bool - if true, mounts to container
-/// - onCancel: () => void - fired when dialog is canceled
-/// - children: VNodes - dialog content
+/**
+ * Provides a modal portal element that steals focus if &lt;dialog&gt; is supported.
+ *
+ * # Props
+ * - mounted: bool - if true, mounts to container
+ * - onCancel: () => void - fired when dialog is canceled
+ * - children: VNodes - dialog content
+ */
 export default class ModalPortal extends PureComponent {
     container = document.createElement('div');
     dialog = createRef();
