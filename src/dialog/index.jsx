@@ -219,12 +219,13 @@ class InnerDialog extends PureComponent {
                     </div>
                     {!fullScreen && actions ? (
                         <footer class="paper-dialog-actions">
-                            {actions.map(({ label, action, disabled, props }, i) => (
+                            {actions.map(({ label, action, disabled, danger, props }, i) => (
                                 <Button
                                     key={i}
                                     class="p-action"
                                     onClick={action}
                                     disabled={disabled}
+                                    danger={danger}
                                     {...(props || {})}>
                                     {label}
                                 </Button>

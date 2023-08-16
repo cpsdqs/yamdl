@@ -17,6 +17,7 @@ function isButtonPressKey (key) {
  * - `small`: will use the smaller icon button size
  * - `href`: if given, will use a <a> instead
  * - `selected`: if true, will pretend it’s focused
+ * - `danger`: if true, will mark it red
  */
 export default class Button extends PureComponent {
     /** The button node. */
@@ -76,6 +77,7 @@ export default class Button extends PureComponent {
         props.class = (props.class || '') + ' paper-button';
 
         if (props.raised) props.class += ' raised';
+        if (props.danger) props.class += ' is-danger';
         if (props.fab) props.class += ' fab';
         if (props.icon) props.class += ' icon-button';
         if (props.small) props.class += ' small';
@@ -85,6 +87,7 @@ export default class Button extends PureComponent {
         delete props.icon;
         delete props.small;
         delete props.selected;
+        delete props.danger;
 
         const circle = props.fab || props.icon;
 

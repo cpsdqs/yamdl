@@ -204,6 +204,7 @@ export default class Menu extends PureComponent {
  * - `innerRef`: allows access to the DOM node
  * - `cascadeDelay`: if given, will animate it with a delay
  * - `cascadeOffset`: if given, will cascade from the given offset
+ * - `danger`: if true, will mark red
  */
 export class MenuItem extends Button {
     presence = new Spring(1, 0.3);
@@ -243,6 +244,7 @@ export class MenuItem extends Button {
         delete props.leadingIcon;
         delete props.selectWithIcon;
         delete props.innerRef;
+        delete props.danger;
 
         props.class = (props.class || '') + ' paper-menu-item';
         if (this.props.hasAction) props.class += ' has-action';
@@ -251,6 +253,7 @@ export class MenuItem extends Button {
             if (this.props.selectWithIcon) props.class += ' select-with-icon';
         }
         if (this.props.disabled) props.class += ' is-disabled';
+        if (this.props.danger) props.class += ' is-danger';
 
         let icon = null;
 
